@@ -1,0 +1,51 @@
+﻿@page
+<script>
+    function setValue(pole, value, elem) {
+        bindings[pole].value = value;
+        $('#fightRule').prop('disabled', true);
+        var elems = $('label.btn.btn-primary.btn-sm');
+        elems.removeClass('active');
+        $(elem).addClass('active');
+    }
+    function activateFightRule(elem) {
+        $('#fightRule').prop('disabled', false);
+        var elems = $('label.btn.btn-primary.btn-sm');
+        elems.removeClass('active');
+        $(elem).addClass('active');
+    }
+
+</script>
+<div class="tab-pane fade active show" id="nav-meta">
+    <div class="row">
+        <div class="pr-0 col-2">
+            <div role="group" class="btn-group btn-group-toggle" style="width: 100%;">
+                <label class="btn active btn-primary btn-sm" onclick="setValue('metaFightRule', 'FT3', this)">
+                    <input name="set-type" type="radio" autocomplete="off" disabled="disabled">FT3</label>
+                <label class="btn btn-primary btn-sm" onclick="setValue('metaFightRule', 'FT5', this)">
+                    <input name="set-type" type="radio" autocomplete="off" disabled="disabled">FT5
+                </label>
+                <label class="btn btn-primary btn-sm" onclick="activateFightRule(this)">
+                    <input name="set-type" type="radio" autocomplete="off" disabled="disabled">Custom
+                </label>
+                </div>
+            <input id="fightRule" disabled class="form-control form-control-sm" data-bind="metaFightRule">
+        </div>
+        <div class="col">
+            <form class="">
+                <div class="input-group input-group-sm">
+                    <input placeholder="Sponsor" class="form-control" value="" data-bind="metaSponsor" style="">
+                    <div class="border border-light"></div>
+                    <input placeholder="Commentators" data-bind="metaCommentators" class="form-control">
+                </div>
+                <div style="display: flex;">
+                    <div class="input-group input-group-sm"><input placeholder="Prizepool" data-bind="metaPrizepool" class="form-control" value=""></div>
+                    <div class="input-group input-group-sm"><input placeholder="Notation" data-bind="metaNotation" class="form-control" value="" style=""></div>
+                </div>
+            </form>
+        </div>
+        <div class="col-3">
+            <input placeholder="Stream Title" class="form-control form-control-sm" value="" data-bind="metaTitle">
+            <input placeholder="Bracket URL" class="form-control form-control-sm" value="" data-bind="metaUrl">
+        </div>
+    </div>
+</div>

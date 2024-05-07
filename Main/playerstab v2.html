@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Players Tab</title>
+    <link rel="stylesheet" href="test1.css">
+    <link rel="stylesheet" href="test2.css">
+    <link rel="stylesheet" href="test3.css">
+</head>
+<body data-bs-theme="dark">
+    <div id="root">
+        <nav>
+            <div class="nav nav-tabs">
+                <a class="nav-item nav-link active" id="nav-players-tab" data-toggle="tab" href="#nav-players" role="tab" aria-controls="nav-players" style="padding: 2px 5px;">Players</a>
+                <a class="nav-item nav-link " id="nav-meta-tab" data-toggle="tab" href="#nav-meta" role="tab" aria-controls="nav-meta" style="padding: 2px 5px;">Meta</a>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-players">
+                <div class="row">
+                    <div class="col">
+                        <form class="" style="display: flex; flex-direction: row;">
+                            <div style="flex: 1 1 0%;">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user" class="svg-inline--fa fa-user fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <input placeholder="Sponsor" class="form-control" value="" style="flex: 0.3 1 0%;">
+                                    <div class="border border-light"></div>
+                                    <input placeholder="Tag" class="form-control" value="Player 1">
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="hand-pointer" class="svg-inline--fa fa-hand-pointer fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path fill="currentColor" d="M448 240v96c0 3.084-.356 6.159-1.063 9.162l-32 136C410.686 499.23 394.562 512 376 512H168a40.004 40.004 0 0 1-32.35-16.473l-127.997-176c-12.993-17.866-9.043-42.883 8.822-55.876 17.867-12.994 42.884-9.043 55.877 8.823L104 315.992V40c0-22.091 17.908-40 40-40s40 17.909 40 40v200h8v-40c0-22.091 17.908-40 40-40s40 17.909 40 40v40h8v-24c0-22.091 17.908-40 40-40s40 17.909 40 40v24h8c0-22.091 17.908-40 40-40s40 17.909 40 40zm-256 80h-8v96h8v-96zm88 0h-8v96h8v-96zm88 0h-8v96h8v-96z"></path>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <select class="form-control">
+                                            <option>No Character</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div style="width: 6px;"></div>
+                                        <div role="group" class="btn-group" style="flex: 1 1 0%;"><button value="winners" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">W</button><button value="losers" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">L</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 10px;"></div>
+                            <div class="d-flex" style="flex-direction: row;">
+                                <input min="0" max="5" type="number" class="top-left bottom-left form-control form-control-sm" value="0" style="text-align: center; width: 50px; font-size: 30px; height: 100%; border-color: black;">
+                                <div class="d-flex flex-column">
+                                    <button type="button" class="py-0 px-1 slim-button top-right btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-up" class="svg-inline--fa fa-arrow-up fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                    <button type="button" class="py-0 px-1 slim-button no-borders btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="undo" class="svg-inline--fa fa-undo fa-w-16 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                    <button type="button" class="py-0 px-1 slim-button bottom-right btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down" class="svg-inline--fa fa-arrow-down fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="p-0 d-flex flex-column col-2">
+                        <div class="no-gutters row">
+                            <div class="col">
+                                <button type="button" class="top-left btn btn-dark btn-block btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-left" class="svg-inline--fa fa-long-arrow-alt-left fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-right: 0.5rem;">
+                                        <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z"></path>
+                                    </svg>
+                                    Name
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-right" class="svg-inline--fa fa-long-arrow-alt-right fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-left: 0.5rem;">
+                                        <path fill="currentColor" d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="top-right btn btn-dark btn-block btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-left" class="svg-inline--fa fa-long-arrow-alt-left fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-right: 0.5rem;">
+                                        <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z"></path>
+                                    </svg>
+                                    Char
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-right" class="svg-inline--fa fa-long-arrow-alt-right fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-left: 0.5rem;">
+                                        <path fill="currentColor" d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="no-gutters row">
+                            <div class="col">
+                                <button type="button" class="bottom-left btn btn-dark btn-block btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-left" class="svg-inline--fa fa-long-arrow-alt-left fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-right: 0.5rem;">
+                                        <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z"></path>
+                                    </svg>
+                                    All
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-right" class="svg-inline--fa fa-long-arrow-alt-right fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-left: 0.5rem;">
+                                        <path fill="currentColor" d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="bottom-right btn btn-dark btn-block btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="undo" class="svg-inline--fa fa-undo fa-w-16 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="margin-right: 0.5rem;">
+                                        <path fill="currentColor" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z"></path>
+                                    </svg>
+                                    Reset
+                                    <div></div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <form class="" style="display: flex; flex-direction: row-reverse;">
+                            <div style="flex: 1 1 0%;">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user" class="svg-inline--fa fa-user fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <input placeholder="Sponsor" class="form-control" value="" style="flex: 0.3 1 0%;">
+                                    <div class="border border-light"></div>
+                                    <input placeholder="Tag" class="form-control" value="Player 2">
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="hand-pointer" class="svg-inline--fa fa-hand-pointer fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path fill="currentColor" d="M448 240v96c0 3.084-.356 6.159-1.063 9.162l-32 136C410.686 499.23 394.562 512 376 512H168a40.004 40.004 0 0 1-32.35-16.473l-127.997-176c-12.993-17.866-9.043-42.883 8.822-55.876 17.867-12.994 42.884-9.043 55.877 8.823L104 315.992V40c0-22.091 17.908-40 40-40s40 17.909 40 40v200h8v-40c0-22.091 17.908-40 40-40s40 17.909 40 40v40h8v-24c0-22.091 17.908-40 40-40s40 17.909 40 40v24h8c0-22.091 17.908-40 40-40s40 17.909 40 40zm-256 80h-8v96h8v-96zm88 0h-8v96h8v-96zm88 0h-8v96h8v-96z"></path>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <select class="form-control">
+                                            <option>No Character</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div style="width: 6px;"></div>
+                                        <div role="group" class="btn-group" style="flex: 1 1 0%;"><button value="winners" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">W</button><button value="losers" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">L</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 10px;"></div>
+                            <div class="d-flex" style="flex-direction: row-reverse;">
+                                <input min="0" max="5" type="number" class="top-right bottom-right form-control form-control-sm" value="0" style="text-align: center; width: 50px; font-size: 30px; height: 100%; border-color: black;">
+                                <div class="d-flex flex-column">
+                                    <button type="button" class="py-0 px-1 slim-button top-left btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-up" class="svg-inline--fa fa-arrow-up fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                    <button type="button" class="py-0 px-1 slim-button no-borders btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="undo" class="svg-inline--fa fa-undo fa-w-16 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                    <button type="button" class="py-0 px-1 slim-button bottom-left btn btn-dark btn-sm">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down" class="svg-inline--fa fa-arrow-down fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"></path>
+                                        </svg>
+                                        <div></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="level-spacing" style="max-width: none;">
+                        <div role="group" class="btn-group btn-group-toggle">
+                            <table cellpadding="0" type="radio" name="bracket">
+                                <tbody>
+                                    <tr>
+                                        <td><label class="top-left btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="pools">P</label></td>
+                                        <td><label class="no-borders btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="winners">W</label></td>
+                                        <td><label class="top-right btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="grandFinals">GF</label></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="bottom-left btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="roundRobin">RR</label></td>
+                                        <td><label class="no-borders btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="losers">L</label></td>
+                                        <td><label class="bottom-right btn btn-primary btn-sm"><input name="bracket" type="radio" autocomplete="off" value="custom">C</label></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div role="group" class="btn-group btn-group-toggle">
+                            <table cellpadding="0" type="radio" name="round">
+                                <tbody>
+                                    <tr>
+                                        <td><label class="top-left btn btn-primary btn-sm"><input name="round" type="radio" autocomplete="off" value="midRound">R</label></td>
+                                        <td><label class="top-right btn btn-primary btn-sm"><input name="round" type="radio" autocomplete="off" value="quarters">Q</label></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="bottom-left btn btn-primary btn-sm"><input name="round" type="radio" autocomplete="off" value="semis">S</label></td>
+                                        <td><label class="bottom-right btn btn-primary btn-sm"><input name="round" type="radio" autocomplete="off" value="finals">F</label></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex" style="flex-direction: row;">
+                            <input min="1" max="9" type="number" class="top-left bottom-left form-control form-control-sm" value="1" style="text-align: center; width: 50px; font-size: 30px; height: 100%; border-color: black;">
+                            <div class="d-flex flex-column">
+                                <button type="button" class="py-0 px-1 slim-button top-right btn btn-dark btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-up" class="svg-inline--fa fa-arrow-up fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path fill="currentColor" d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"></path>
+                                    </svg>
+                                    <div></div>
+                                </button>
+                                <button type="button" class="py-0 px-1 slim-button no-borders btn btn-dark btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="undo" class="svg-inline--fa fa-undo fa-w-16 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z"></path>
+                                    </svg>
+                                    <div></div>
+                                </button>
+                                <button type="button" class="py-0 px-1 slim-button bottom-right btn btn-dark btn-sm">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down" class="svg-inline--fa fa-arrow-down fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path fill="currentColor" d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"></path>
+                                    </svg>
+                                    <div></div>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="custom-animation-exit-done form-control" style="width: 150px; height: auto;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade " id="nav-meta">
+                <div class="row">
+                    <div class="pr-0 col-2">
+                        <div role="group" class="btn-group btn-group-toggle" style="width: 100%;"><label class="btn active btn-primary btn-sm"><input name="set-type" type="radio" autocomplete="off" value="[object Object]" checked="">BO3</label><label class="btn btn-primary btn-sm"><input name="set-type" type="radio" autocomplete="off" value="[object Object]">BO5</label><label class="btn btn-primary btn-sm"><input name="set-type" type="radio" autocomplete="off" value="[object Object]">Custom</label></div>
+                        <input disabled="" class="form-control form-control-sm" value="">
+                    </div>
+                    <div class="col">
+                        <form class="">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user" class="svg-inline--fa fa-user fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <input placeholder="Sponsor" class="form-control" value="" style="flex: 0.3 1 0%;">
+                                <div class="border border-light"></div>
+                                <input placeholder="Tag" class="form-control" value="Commentator 1">
+                            </div>
+                            <div style="display: flex;">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" class="svg-inline--fa fa-twitter fa-w-16 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path>
+                                            </svg>
+                                        </span>
+                                        <span class="input-group-text">@</span>
+                                    </div>
+                                    <input placeholder="Username" class="form-control" value="">
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitch" class="svg-inline--fa fa-twitch fa-w-16 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor" d="M391.17,103.47H352.54v109.7h38.63ZM285,103H246.37V212.75H285ZM120.83,0,24.31,91.42V420.58H140.14V512l96.53-91.42h77.25L487.69,256V0ZM449.07,237.75l-77.22,73.12H294.61l-67.6,64v-64H140.14V36.58H449.07Z"></path>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <input placeholder="Twitch handle" class="form-control" value="">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="p-0 d-flex flex-column justify-content-around col-1">
+                        <button type="button" class="btn btn-dark btn-sm">
+                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-left" class="svg-inline--fa fa-long-arrow-alt-left fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-right: 0.5rem;">
+                                <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z"></path>
+                            </svg>
+                            All
+                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="long-arrow-alt-right" class="svg-inline--fa fa-long-arrow-alt-right fa-w-14 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="margin-left: 0.5rem;">
+                                <path fill="currentColor" d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-dark btn-sm">
+                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="undo" class="svg-inline--fa fa-undo fa-w-16 " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="margin-right: 0.5rem;">
+                                <path fill="currentColor" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z"></path>
+                            </svg>
+                            Reset
+                            <div></div>
+                        </button>
+                    </div>
+                    <div class="col">
+                        <form class="">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user" class="svg-inline--fa fa-user fa-w-14 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <input placeholder="Sponsor" class="form-control" value="" style="flex: 0.3 1 0%;">
+                                <div class="border border-light"></div>
+                                <input placeholder="Tag" class="form-control" value="Commentator 2">
+                            </div>
+                            <div style="display: flex;">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" class="svg-inline--fa fa-twitter fa-w-16 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path>
+                                            </svg>
+                                        </span>
+                                        <span class="input-group-text">@</span>
+                                    </div>
+                                    <input placeholder="Username" class="form-control" value="">
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitch" class="svg-inline--fa fa-twitch fa-w-16 fa-fw " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor" d="M391.17,103.47H352.54v109.7h38.63ZM285,103H246.37V212.75H285ZM120.83,0,24.31,91.42V420.58H140.14V512l96.53-91.42h77.25L487.69,256V0ZM449.07,237.75l-77.22,73.12H294.61l-67.6,64v-64H140.14V36.58H449.07Z"></path>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <input placeholder="Twitch handle" class="form-control" value="">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-3">
+                        <input placeholder="Stream Title" class="form-control form-control-sm" value=""><input placeholder="Bracket URL" class="form-control form-control-sm" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

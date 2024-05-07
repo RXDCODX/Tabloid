@@ -1,0 +1,43 @@
+﻿@page
+@{
+    Layout = "_Layout";
+}
+<link href="~/styles/scoreboard.css" rel="stylesheet" type="text/css">
+<div id="topGroup">
+
+    <div class="double-skew" id="topBar">
+        <h6 data-sb="bracket-url"></h6>
+    </div>
+
+    <div id="banner">
+
+        <div class="left-skew" id="left">
+            <div class="score">
+                <h2 data-side="left" data-sb="score" data-bind="gameInfoPlayer1Counter">0</h2>
+            </div>
+            <h4 class="playerName">
+                <span data-side="left" data-sb="tag" data-bind="player1FullName">Player 1</span> <span class="side" data-side="left" data-sb="side"></span>
+            </h4>
+        </div>
+
+        <div class="double-skew" id="middle">
+            <h5 data-sb="title" data-bind="metaTitle"></h5>
+            <h5 id="round" data-sb="round" data-bind="metaFightRule"></h5>
+        </div>
+
+        <div id="right">
+            <div class="score">
+                <h2 data-side="right" data-sb="score" data-bind="gameInfoPlayer2Counter">0</h2>
+            </div>
+            <h4 class="playerName">
+                <span data-side="right" data-sb="tag" data-bind="player2FullName">Player 2</span> <span class="side" data-side="right" data-sb="side"></span>
+            </h4>
+        </div>
+
+    </div>
+
+    <div class="double-skew hidden" id="subBar" style="opacity: 1;">
+        <h6 class="text-center justify-content-center" data-sb="commentator-right" data-bind="metaCommentators"></h6>
+    </div>
+
+</div>

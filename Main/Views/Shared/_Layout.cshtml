@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Hosting.Server
+@using Microsoft.AspNetCore.Hosting.Server.Features
+@model Main.Domains.MainModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IServer Server;
+@{
+    var addressesFeature = Server.Features.Get<IServerAddressesFeature>();
+    var wssLink = addressesFeature.Addresses.FirstOrDefault() + "/hub";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+    <link href="~/styles/test1.css" rel="stylesheet" type="text/css">
+    <link href="~/styles/test2.css" rel="stylesheet" type="text/css">
+    <link href="~/styles/test3.css" rel="stylesheet" type="text/css">
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="scripts/MainModel.js"></script>
+    <script>
+        var wsServerLink = "@wssLink";
+    </script>
+    @Html.Partial("_ValidationScriptsPartial")
+</head>
+<body data-bs-theme="dark">
+    @RenderBody()
+<script src="/scripts/_Layout.js"></script>
+</body>
+</html>
