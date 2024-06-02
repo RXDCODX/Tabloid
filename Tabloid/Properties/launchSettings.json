@@ -25,6 +25,17 @@
       "environmentVariables": {
         "ASPNETCORE_HTTP_PORTS": "8080"
       },
+      "publishAllPorts": true,
+      "applicationUrl": "http://localhost:14435"
+
+    },
+    "Container (.NET SDK)": {
+      "commandName": "SdkContainer",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080"
+      },
       "publishAllPorts": true
     }
   },

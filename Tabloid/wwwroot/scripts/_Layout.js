@@ -147,9 +147,19 @@ window.decrement = decrement;
 window.zeroing = zeroing;
 
 const swapNames = () => {
-    const tempName = bindings.gameInfoPlayer1Name.value;
-    bindings.gameInfoPlayer1Name.value = bindings.gameInfoPlayer2Name.value;
-    bindings.gameInfoPlayer2Name.value = tempName;
+    connection.invoke('SwapNames');
+}
+
+const swapPlayers = () => {
+    connection.invoke('SwapPlayers');
+}
+
+const swapCountry = () => {
+    connection.invoke('SwapCountry');
+}
+
+const reset = () => {
+    connection.invoke('Reset');
 }
 
 const updateModel = (mainModel) => {
@@ -207,7 +217,7 @@ const createMainModelFromBindings = (bindings) => {
 window.createMainModelFromBindings = createMainModelFromBindings;
 
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl(wsServerLink,
+    .withUrl("http://" + window.location.host + "/hub",
         {
             skipNegotiation: true,
             transport: signalR.HttpTransportType.WebSockets
@@ -252,9 +262,27 @@ connection.onclose(async () => {
     await start();
 });
 
+const getFullName = (player) => {
+
+    if (player == 1) {
+        if (bindings.gameInfoPlayer1Sponsor.value == "" || bindings.gameInfoPlayer1Sponsor.value == undefined) {
+            return bindings.gameInfoPlayer1Name.value;
+        }
+
+        return `${bindings.gameInfoPlayer1Sponsor.value} | ${bindings.gameInfoPlayer1Name.value}`;
+    }
+
+    if (player == 2) {
+        if (bindings.gameInfoPlayer2Sponsor.value == "" || bindings.gameInfoPlayer2Sponsor.value == undefined) {
+            return bindings.gameInfoPlayer2Name.value;
+        }
+
+        return `${bindings.gameInfoPlayer2Name.value} | ${bindings.gameInfoPlayer2Sponsor.value}`;
+    }
+}
 
 const app = () => {
-    // Создаем observable свойства для каждого поля класса MainModel
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ observable пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ MainModel
     bindings.gameInfoPlayer1Name = new Observable("");
     bindings.gameInfoPlayer1Country = new Observable("ru");
     bindings.gameInfoPlayer1Character = new Observable("");
@@ -276,16 +304,14 @@ const app = () => {
     bindings.metaUrl = new Observable("");
     bindings.metaPlayersCount = new Observable(0);
 
-    // Создаем computed свойства для полей, которые зависят от других полей
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ computed пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     bindings.gameInfoP1Wins = new Computed(() => bindings.gameInfoPlayer1Counter.value, [bindings.gameInfoPlayer1Counter]);
     bindings.gameInfoP2Wins = new Computed(() => bindings.gameInfoPlayer2Counter.value, [bindings.gameInfoPlayer2Counter]);
 
-    bindings.player1FullName = new Computed(() => `${bindings.gameInfoPlayer1Sponsor.value} | ${bindings.gameInfoPlayer1Name.value}`, [bindings.gameInfoPlayer1Sponsor, bindings.gameInfoPlayer1Name]);
-    bindings.player2FullName =
-        new Computed(() => `${bindings.gameInfoPlayer2Name.value} | ${bindings.gameInfoPlayer2Sponsor.value}`,
-            [bindings.gameInfoPlayer2Name, bindings.gameInfoPlayer2Sponsor]);
+    bindings.player1FullName = new Computed(() => getFullName(1), [bindings.gameInfoPlayer1Sponsor, bindings.gameInfoPlayer1Name]);
+    bindings.player2FullName = new Computed(() => getFullName(2), [bindings.gameInfoPlayer2Name, bindings.gameInfoPlayer2Sponsor]);
 
-    // Применяем binding к элементам на странице
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ binding пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     applyBindings();
 };
 
