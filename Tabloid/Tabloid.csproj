@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <EnableSdkContainerDebugging>True</EnableSdkContainerDebugging>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,5 +31,15 @@
     <None Include="wwwroot\styles\test2.css" />
     <None Include="wwwroot\styles\test3.css" />
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' Or '$(ASPNETCORE_ENVIRONMENT)' == 'Development' ">
+    <Content Include="wwwroot\background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="CompileScoreboardScss" BeforeTargets="Build">
+    <Exec Command="npx sass &quot;$(ProjectDir)wwwroot/styles/scoreboard.scss&quot; &quot;$(ProjectDir)wwwroot/styles/scoreboard.css&quot; --no-source-map" />
+  </Target>
 
 </Project>

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const bindings = {};
 window.bindings = bindings;
@@ -28,7 +28,7 @@ class Observable {
             if (createMainModelFromBindings != null && !window.isSignalrUpdate) {
                 if (connection != null) {
                     var model = createMainModelFromBindings(bindings);
-                    connection.invoke('Update', JSON.stringify(model));
+                    connection.invoke("Update", model);
                 }
             }
         }
@@ -72,69 +72,69 @@ const applyBindings = () => {
     });
 };
 
-const addWinnerTagLeftSide = (pole) => {
+const addWinnerTagLeftSide = (field) => {
     const addition = " [L]";
     const addition2 = " [W]";
-    if (bindings[pole].value.includes(addition) || bindings[pole].value.includes(addition2)) {
-        bindings[pole].value = bindings[pole].value.replace(addition, "");
-        bindings[pole].value = bindings[pole].value.replace(addition2, "");
+    if (bindings[field].value.includes(addition) || bindings[field].value.includes(addition2)) {
+        bindings[field].value = bindings[field].value.replace(addition, "");
+        bindings[field].value = bindings[field].value.replace(addition2, "");
     }
 
-    bindings[pole].value = bindings[pole].value + addition2;
+    bindings[field].value = bindings[field].value + addition2;
 };
 
-const addLooserTagLeftSide = (pole) => {
+const addLooserTagLeftSide = (field) => {
     const addition = " [L]";
     const addition2 = " [W]";
-    if (bindings[pole].value.includes(addition) || bindings[pole].value.includes(addition2)) {
-        bindings[pole].value = bindings[pole].value.replace(addition, "");
-        bindings[pole].value = bindings[pole].value.replace(addition2, "");
+    if (bindings[field].value.includes(addition) || bindings[field].value.includes(addition2)) {
+        bindings[field].value = bindings[field].value.replace(addition, "");
+        bindings[field].value = bindings[field].value.replace(addition2, "");
     }
-    bindings[pole].value = bindings[pole].value + addition;
+    bindings[field].value = bindings[field].value + addition;
 };
 
-const addLooserTagRightSide = (pole) => {
+const addLooserTagRightSide = (field) => {
     const addition = "[L] ";
     const addition2 = "[W] ";
-    if (bindings[pole].value.includes(addition) || bindings[pole].value.includes(addition2)) {
-        bindings[pole].value = bindings[pole].value.replace(addition, "");
-        bindings[pole].value = bindings[pole].value.replace(addition2, "");
+    if (bindings[field].value.includes(addition) || bindings[field].value.includes(addition2)) {
+        bindings[field].value = bindings[field].value.replace(addition, "");
+        bindings[field].value = bindings[field].value.replace(addition2, "");
     }
-    bindings[pole].value = addition + bindings[pole].value;
+    bindings[field].value = addition + bindings[field].value;
 };
 
-const addWinnerTagRightSide = (pole) => {
+const addWinnerTagRightSide = (field) => {
     const addition = "[L] ";
     const addition2 = "[W] ";
-    if (bindings[pole].value.includes(addition) || bindings[pole].value.includes(addition2)) {
-        bindings[pole].value = bindings[pole].value.replace(addition, "");
-        bindings[pole].value = bindings[pole].value.replace(addition2, "");
+    if (bindings[field].value.includes(addition) || bindings[field].value.includes(addition2)) {
+        bindings[field].value = bindings[field].value.replace(addition, "");
+        bindings[field].value = bindings[field].value.replace(addition2, "");
     }
-    bindings[pole].value = addition2 + bindings[pole].value;
+    bindings[field].value = addition2 + bindings[field].value;
 };
 
-const increment = (pole) => {
-    var value = bindings[pole].value;
+const increment = (field) => {
+    var value = bindings[field].value;
     const num = parseFloat(value);
     if (!isNaN(num)) {
-        bindings[pole].value = value + 1;
+        bindings[field].value = value + 1;
     }
 }
 
-const decrement = (pole) => {
-    var value = bindings[pole].value;
+const decrement = (field) => {
+    var value = bindings[field].value;
 
     const num = parseFloat(value);
     if (!isNaN(num)) {
-        bindings[pole].value = value - 1;
+        bindings[field].value = value - 1;
     }
 }
 
-const zeroing = (pole) => {
-    var value = bindings[pole].value;
+const zeroing = (field) => {
+    var value = bindings[field].value;
     const num = parseFloat(value);
     if (!isNaN(num)) {
-        bindings[pole].value = 0;
+        bindings[field].value = 0;
     }
 }
 
@@ -163,53 +163,57 @@ const reset = () => {
 }
 
 const updateModel = (mainModel) => {
-    bindings.gameInfoPlayer1Name.value = mainModel.GameInfo.Player1.Name;
-    bindings.gameInfoPlayer1Country.value = mainModel.GameInfo.Player1.Country;
-    bindings.gameInfoPlayer1Character.value = mainModel.GameInfo.Player1.Character;
-    bindings.gameInfoPlayer1Sponsor.value = mainModel.GameInfo.Player1.Sponsor;
-    bindings.gameInfoPlayer1Counter.value = mainModel.GameInfo.Player1.Counter;
+    bindings.gameInfoPlayer1Name.value = mainModel.gameInfo.player1.name;
+    bindings.gameInfoPlayer1Country.value = mainModel.gameInfo.player1.country;
+    bindings.gameInfoPlayer1Character.value = mainModel.gameInfo.player1.character;
+    bindings.gameInfoPlayer1Sponsor.value = mainModel.gameInfo.player1.sponsor;
+    bindings.gameInfoPlayer1Counter.value = mainModel.gameInfo.player1.counter;
+    bindings.gameInfoPlayer1Tag.value = mainModel.gameInfo.player1.tag;
 
-    bindings.gameInfoPlayer2Name.value = mainModel.GameInfo.Player2.Name;
-    bindings.gameInfoPlayer2Country.value = mainModel.GameInfo.Player2.Country;
-    bindings.gameInfoPlayer2Character.value = mainModel.GameInfo.Player2.Character;
-    bindings.gameInfoPlayer2Sponsor.value = mainModel.GameInfo.Player2.Sponsor;
-    bindings.gameInfoPlayer2Counter.value = mainModel.GameInfo.Player2.Counter;
+    bindings.gameInfoPlayer2Name.value = mainModel.gameInfo.player2.name;
+    bindings.gameInfoPlayer2Country.value = mainModel.gameInfo.player2.country;
+    bindings.gameInfoPlayer2Character.value = mainModel.gameInfo.player2.character;
+    bindings.gameInfoPlayer2Sponsor.value = mainModel.gameInfo.player2.sponsor;
+    bindings.gameInfoPlayer2Counter.value = mainModel.gameInfo.player2.counter;
+    bindings.gameInfoPlayer2Tag.value = mainModel.gameInfo.player2.tag;
 
-    bindings.metaCommentators.value = mainModel.Meta.Commentators;
-    bindings.metaFightRule.value = mainModel.Meta.FightRule;
-    bindings.metaNotation.value = mainModel.Meta.Notation;
-    bindings.metaSponsor.value = mainModel.Meta.Sponsor;
-    bindings.metaPrizepool.value = mainModel.Meta.Prizepool;
-    bindings.metaTitle.value = mainModel.Meta.Title;
-    bindings.metaUrl.value = mainModel.Meta.Url;
-    bindings.metaPlayersCount.value = mainModel.Meta.PlayersCount;
+    bindings.metaCommentators.value = mainModel.meta.commentators;
+    bindings.metaFightRule.value = mainModel.meta.fightRule;
+    bindings.metaNotation.value = mainModel.meta.notation;
+    bindings.metaSponsor.value = mainModel.meta.sponsor;
+    bindings.metaPrizepool.value = mainModel.meta.prizepool;
+    bindings.metaTitle.value = mainModel.meta.title;
+    bindings.metaUrl.value = mainModel.meta.url;
+    bindings.metaPlayersCount.value = mainModel.meta.playersCount;
 };
 
 const createMainModelFromBindings = (bindings) => {
     const mainModel = new MainModel();
 
-    mainModel.GameInfo.Player1 = new Player();
-    mainModel.GameInfo.Player1.Name = bindings.gameInfoPlayer1Name.value;
-    mainModel.GameInfo.Player1.Country = bindings.gameInfoPlayer1Country.value;
-    mainModel.GameInfo.Player1.Character = bindings.gameInfoPlayer1Character.value;
-    mainModel.GameInfo.Player1.Sponsor = bindings.gameInfoPlayer1Sponsor.value;
-    mainModel.GameInfo.Player1.Counter = bindings.gameInfoPlayer1Counter.value;
+    mainModel.gameInfo.player1 = new Player();
+    mainModel.gameInfo.player1.name = bindings.gameInfoPlayer1Name.value;
+    mainModel.gameInfo.player1.country = bindings.gameInfoPlayer1Country.value;
+    mainModel.gameInfo.player1.character = bindings.gameInfoPlayer1Character.value;
+    mainModel.gameInfo.player1.sponsor = bindings.gameInfoPlayer1Sponsor.value;
+    mainModel.gameInfo.player1.counter = bindings.gameInfoPlayer1Counter.value;
+    mainModel.gameInfo.player1.tag = bindings.gameInfoPlayer1Tag.value;
 
-    mainModel.GameInfo.Player2 = new Player();
-    mainModel.GameInfo.Player2.Name = bindings.gameInfoPlayer2Name.value;
-    mainModel.GameInfo.Player2.Country = bindings.gameInfoPlayer2Country.value;
-    mainModel.GameInfo.Player2.Character = bindings.gameInfoPlayer2Character.value;
-    mainModel.GameInfo.Player2.Sponsor = bindings.gameInfoPlayer2Sponsor.value;
-    mainModel.GameInfo.Player2.Counter = bindings.gameInfoPlayer2Counter.value;
+    mainModel.gameInfo.player2 = new Player();
+    mainModel.gameInfo.player2.name = bindings.gameInfoPlayer2Name.value;
+    mainModel.gameInfo.player2.country = bindings.gameInfoPlayer2Country.value;
+    mainModel.gameInfo.player2.character = bindings.gameInfoPlayer2Character.value;
+    mainModel.gameInfo.player2.sponsor = bindings.gameInfoPlayer2Sponsor.value;
+    mainModel.gameInfo.player2.counter = bindings.gameInfoPlayer2Counter.value;
+    mainModel.gameInfo.player2.tag = bindings.gameInfoPlayer2Tag.value;
 
-    mainModel.Meta.Commentators = bindings.metaCommentators.value;
-    mainModel.Meta.FightRule = bindings.metaFightRule.value;
-    mainModel.Meta.Notation = bindings.metaNotation.value;
-    mainModel.Meta.Sponsor = bindings.metaSponsor.value;
-    mainModel.Meta.Prizepool = bindings.metaPrizepool.value;
-    mainModel.Meta.Title = bindings.metaTitle.value;
-    mainModel.Meta.Url = bindings.metaUrl.value;
-    mainModel.Meta.PlayersCount = bindings.metaPlayersCount.value;
+    mainModel.meta.commentators = bindings.metaCommentators.value;
+    mainModel.meta.fightRule = bindings.metaFightRule.value;
+    mainModel.meta.notation = bindings.metaNotation.value;
+    mainModel.meta.sponsor = bindings.metaSponsor.value;
+    mainModel.meta.prizepool = bindings.metaPrizepool.value;
+    mainModel.meta.title = bindings.metaTitle.value;
+    mainModel.meta.url = bindings.metaUrl.value;
+    mainModel.meta.playersCount = bindings.metaPlayersCount.value;
 
     return mainModel;
 }
@@ -242,16 +246,7 @@ async function start() {
     }
 };
 
-connection.on("Update", function (content) {
-    const model = JSON.parse(content);
-    console.log(model);
-    window.isSignalrUpdate = true;
-    updateModel(model);
-    window.isSignalrUpdate = false;
-});
-
-connection.on("GetOnStartup", function (content) {
-    const model = JSON.parse(content);
+connection.on("Update", function (model) {
     console.log(model);
     window.isSignalrUpdate = true;
     updateModel(model);
@@ -288,12 +283,14 @@ const app = () => {
     bindings.gameInfoPlayer1Character = new Observable("");
     bindings.gameInfoPlayer1Sponsor = new Observable("");
     bindings.gameInfoPlayer1Counter = new Observable(0);
+    bindings.gameInfoPlayer1Tag = new Observable("");
 
     bindings.gameInfoPlayer2Name = new Observable("");
     bindings.gameInfoPlayer2Country = new Observable("ru");
     bindings.gameInfoPlayer2Character = new Observable("");
     bindings.gameInfoPlayer2Sponsor = new Observable("");
     bindings.gameInfoPlayer2Counter = new Observable(0);
+    bindings.gameInfoPlayer2Tag = new Observable("");
 
     bindings.metaCommentators = new Observable("");
     bindings.metaFightRule = new Observable("");
@@ -304,14 +301,12 @@ const app = () => {
     bindings.metaUrl = new Observable("");
     bindings.metaPlayersCount = new Observable(0);
 
-    // ������� computed �������� ��� �����, ������� ������� �� ������ �����
     bindings.gameInfoP1Wins = new Computed(() => bindings.gameInfoPlayer1Counter.value, [bindings.gameInfoPlayer1Counter]);
     bindings.gameInfoP2Wins = new Computed(() => bindings.gameInfoPlayer2Counter.value, [bindings.gameInfoPlayer2Counter]);
 
     bindings.player1FullName = new Computed(() => getFullName(1), [bindings.gameInfoPlayer1Sponsor, bindings.gameInfoPlayer1Name]);
     bindings.player2FullName = new Computed(() => getFullName(2), [bindings.gameInfoPlayer2Name, bindings.gameInfoPlayer2Sponsor]);
 
-    // ��������� binding � ��������� �� ��������
     applyBindings();
 };
 
@@ -319,7 +314,6 @@ document.addEventListener("DOMContentLoaded", async function (event) {
     try {
         setTimeout(app, 0);
         await start();
-        await connection.invoke("GetOnStartup", null);
     } catch (err) {
         console.error(err);
     }

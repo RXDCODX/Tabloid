@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "1.0",
   "defaultProvider": "cdnjs",
   "libraries": [
@@ -27,11 +27,16 @@
       ]
     },
     {
-      "provider": "unpkg",
-      "library": "jquery@latest",
+      "provider": "cdnjs",
+      "library": "jquery@3.7.1",
       "destination": "wwwroot/lib/jquery/",
       "files": [
-        "dist/jquery.min.js"
+        "jquery.min.js",
+        "jquery.slim.min.js",
+        "jquery.min.map",
+        "jquery.slim.min.map",
+        "jquery.slim.js",
+        "jquery.js"
       ]
     }
   ]

@@ -1,6 +1,6 @@
-﻿using Main.Domains;
+﻿using Tabloid.Domains;
 
-namespace Main.Services;
+namespace Tabloid.Services;
 
 public class DataHost
 {

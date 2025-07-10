@@ -6,6 +6,11 @@ namespace Tabloid.Hubs;
 
 public class MainHub(Methods methods, ILogger<MainHub> logger) : Hub<IMainHub>
 {
+    public override Task OnConnectedAsync()
+    {
+        return Clients.Caller.Update(DataHost.Data);
+    }
+
     public Task Reset()
     {
         try
@@ -94,10 +99,5 @@ public class MainHub(Methods methods, ILogger<MainHub> logger) : Hub<IMainHub>
             );
         }
         return Clients.Others.Update(DataHost.Data);
-    }
-
-    public Task GetOnStartup()
-    {
-        return Clients.Caller.GetOnStartup(DataHost.Data);
     }
 }

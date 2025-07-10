@@ -1,8 +1,6 @@
-﻿using System.Threading.Channels;
-using Main.Domains;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Controllers;
+namespace Tabloid.Controllers;
 
 public class ViewsController : Controller
 {

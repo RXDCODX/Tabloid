@@ -1,4 +1,4 @@
-﻿using Main.Domains;
+﻿using Tabloid.Domains;
 
 namespace Tabloid.Hubs;
 

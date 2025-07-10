@@ -9,11 +9,11 @@
     <link href="~/styles/test3.css" rel="stylesheet" type="text/css">
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="scripts/MainModel.js"></script>
-    @Html.Partial("_ValidationScriptsPartial")
+    <script src="scripts/MainModel.js?v=@DateTime.Now.Ticks"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 </head>
 <body data-bs-theme="dark">
     @RenderBody()
-<script src="/scripts/_Layout.js"></script>
+<script src="/scripts/_Layout.js?v=@DateTime.Now.Ticks"></script>
 </body>
 </html>
