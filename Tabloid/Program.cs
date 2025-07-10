@@ -1,11 +1,8 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Main.Hubs;
-using Main.Services;
+﻿using Main.Services;
 using Microsoft.AspNetCore.HttpLogging;
-using StackExchange.Redis;
+using Tabloid.Hubs;
 
-namespace Main
+namespace Tabloid
 {
     public class Program
     {
@@ -51,10 +48,10 @@ namespace Main
 
             app.MapHub<MainHub>("/hub");
 
-
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogCritical("Если приложение не открыло страницу в браузере по умолчанию, то открой её сам по пути /swagger/index.html");
-
+            logger.LogCritical(
+                "Если приложение не открыло страницу в браузере по умолчанию, то открой её сам по пути /swagger/index.html"
+            );
 
             app.Run();
         }
