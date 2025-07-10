@@ -1,88 +1,103 @@
-﻿using System.Text.Json;
-using Main.Domains;
-using Main.Services;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
+using Tabloid.Domains;
+using Tabloid.Services;
 
-namespace Main.Hubs;
+namespace Tabloid.Hubs;
 
-public class MainHub : Hub<IMainHub>
+public class MainHub(Methods methods, ILogger<MainHub> logger) : Hub<IMainHub>
 {
-    private readonly Methods _methods;
-    private readonly ILogger<MainHub> _logger;
-
-    public MainHub(Methods methods, ILogger<MainHub> logger)
-    {
-        _methods = methods;
-        _logger = logger;
-    }
-
     public Task Reset()
     {
         try
         {
-            _methods.Reset();
+            methods.Reset();
         }
         catch (Exception e)
         {
-            _logger.LogError("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+            logger.LogError(
+                "{Message}{NewLine}{StackTrace}",
+                e.Message,
+                Environment.NewLine,
+                e.StackTrace
+            );
         }
-        return Clients.All.Update(JsonSerializer.Serialize(DataHost.Data));
+        return Clients.All.Update(DataHost.Data);
     }
 
     public Task SwapPlayers()
     {
         try
         {
-            _methods.SwitchPlayers();
+            methods.SwitchPlayers();
         }
         catch (Exception e)
         {
-            _logger.LogError("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+            logger.LogError(
+                "{Message}{NewLine}{StackTrace}",
+                e.Message,
+                Environment.NewLine,
+                e.StackTrace
+            );
         }
-        return Clients.All.Update(JsonSerializer.Serialize(DataHost.Data));
+        return Clients.All.Update(DataHost.Data);
     }
 
     public Task SwapNames()
     {
         try
         {
-            _methods.SwitchPlayerNames();
+            methods.SwitchPlayerNames();
         }
         catch (Exception e)
         {
-            _logger.LogError("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+            logger.LogError(
+                "{Message}{NewLine}{StackTrace}",
+                e.Message,
+                Environment.NewLine,
+                e.StackTrace
+            );
         }
-        return Clients.All.Update(JsonSerializer.Serialize(DataHost.Data));
+        return Clients.All.Update(DataHost.Data);
     }
 
     public Task SwapCountry()
     {
         try
         {
-            _methods.SwitchPlayerCountryes();
+            methods.SwitchPlayerCountryes();
         }
         catch (Exception e)
         {
-            _logger.LogError("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+            logger.LogError(
+                "{Message}{NewLine}{StackTrace}",
+                e.Message,
+                Environment.NewLine,
+                e.StackTrace
+            );
         }
-        return Clients.All.Update(JsonSerializer.Serialize(DataHost.Data));
+        return Clients.All.Update(DataHost.Data);
     }
 
-    public Task Update(string content)
+    public Task Update(MainModel data)
     {
         try
         {
-            DataHost.Data = JsonSerializer.Deserialize<MainModel>(content);
+            DataHost.Data = data;
         }
         catch (Exception e)
         {
-            _logger.LogError("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+            logger.LogError(
+                "{Message}{NewLine}{StackTrace}",
+                e.Message,
+                Environment.NewLine,
+                e.StackTrace
+            );
         }
-        return Clients.Others.Update(JsonSerializer.Serialize(DataHost.Data));
+        return Clients.Others.Update(DataHost.Data);
     }
 
-    public Task GetOnStartup(string content)
+    public Task GetOnStartup()
     {
-        return Clients.Caller.GetOnStartup(JsonSerializer.Serialize(DataHost.Data));
-    } 
+        return Clients.Caller.GetOnStartup(DataHost.Data);
+    }
 }

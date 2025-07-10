@@ -1,9 +1,9 @@
-﻿using Main.Domains;
+﻿using Tabloid.Domains;
 
-namespace Main.Hubs;
+namespace Tabloid.Hubs;
 
 public interface IMainHub
 {
-    public Task Update(string content);
-    public Task GetOnStartup(string content);
+    public Task Update(MainModel data);
+    public Task GetOnStartup(MainModel data);
 }
