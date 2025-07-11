@@ -16,6 +16,10 @@ h4 {
 h5 {
   font-size: 16px;
   font-weight: normal;
+  line-height: 0.8 !important;
+  &#round {
+    margin-bottom: 0 !important;
+  }
 }
 
 h6 {
@@ -203,6 +207,7 @@ body {
   width: 25%;
   flex-direction: column;
   justify-content: center;
+  gap: 0.45rem;
 }
 
 #topBar,
@@ -226,4 +231,7 @@ body {
 #downBar {
   display: flex;
   justify-content: space-between;
+  h6 {
+    margin-bottom: 0;
+  }
 }

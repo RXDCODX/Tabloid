@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2752196">
+  <PropertyGroup>
+    <ProjectTypeGuids>{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}</ProjectTypeGuids>
+    <Name>scoreboard-app</Name>
+    <RootNamespace>scoreboard_app</RootNamespace>
+    <NodeExePath>$(MSBuildThisFileDirectory)node_modules/.bin/node</NodeExePath>
+    <PackageJsonPath>$(MSBuildThisFileDirectory)package.json</PackageJsonPath>
+    <TypeScriptConfig>$(MSBuildThisFileDirectory)tsconfig.json</TypeScriptConfig>
+    <ViteConfig>$(MSBuildThisFileDirectory)vite.config.ts</ViteConfig>
+    <OutDir>dist</OutDir>
+	<StartupCommand>npm run dev</StartupCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Vitest</JavaScriptTestFramework>
+    <!-- Allows the build (or compile) script located on package.json to run on Build -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <!-- Folder where production build objects will be placed -->
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="src\**\*.*" />
+    <Content Include="public\**\*.*" />
+    <None Include="package.json" />
+    <None Include="tsconfig.json" />
+    <None Include="vite.config.ts" />
+    <None Include="README.md" />
+  </ItemGroup>
+</Project> 

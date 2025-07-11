@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   ButtonGroup,
@@ -6,10 +6,8 @@ import {
   Col,
   Container,
   Form,
-  OverlayTrigger,
   Row,
   Stack,
-  Tooltip,
 } from "react-bootstrap";
 import {
   ArrowDown,
@@ -22,19 +20,46 @@ import {
   XCircleFill,
 } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import { useScoreboardStore } from "../store";
+import { SignalRContext } from "../SignalRProvider";
 
 // Типы
 type Player = {
   name: string;
   sponsor: string;
   score: number;
-  final: "none" | "winner" | "loser";
   tag: string;
+  final: string; // "winner", "loser", "none"
+};
+
+type MetaInfo = {
+  title: string;
+  fightRule: string;
+};
+
+type ScoreboardState = {
+  player1: Player;
+  player2: Player;
+  meta: MetaInfo;
+};
+
+// Типы с timestamp для отслеживания времени изменений
+type PlayerWithTimestamp = Player & {
+  _lastEdit?: number;
+};
+
+type MetaInfoWithTimestamp = MetaInfo & {
+  _lastEdit?: number;
+};
+
+type ScoreboardStateWithTimestamp = {
+  player1: PlayerWithTimestamp;
+  player2: PlayerWithTimestamp;
+  meta: MetaInfoWithTimestamp;
+  _receivedAt?: number;
 };
 
 type PlayerCardProps = {
-  player: Player;
+  player: PlayerWithTimestamp;
   onName: (name: string) => void;
   onSponsor: (sponsor: string) => void;
   onScore: (score: number) => void;
@@ -173,16 +198,21 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   </Card>
 );
 
-const MetaPanel: React.FC = () => {
-  const meta = useScoreboardStore((s) => s.meta);
-  const setMeta = useScoreboardStore((s) => s.setMeta);
-  const [customFightRule, setCustomFightRule] = useState(meta.fightRule);
+const MetaPanel: React.FC<{
+  setMeta: (meta: any) => void;
+  meta: MetaInfoWithTimestamp;
+}> = ({ setMeta, meta }) => {
+  const [customFightRule, setCustomFightRule] = useState(meta.fightRule || "");
 
   const fightRules = ["FT1", "FT2", "FT3", "FT4", "FT5"];
 
   const handleFightRuleChange = (rule: string) => {
     setMeta({ fightRule: rule });
-    setCustomFightRule(rule);
+    if (fightRules.includes(rule)) {
+      setCustomFightRule(""); // сбрасываем customFightRule
+    } else {
+      setCustomFightRule(rule);
+    }
   };
 
   return (
@@ -254,7 +284,7 @@ const MetaPanel: React.FC = () => {
                       ? "primary"
                       : "outline-primary"
                   }
-                  onClick={() => setMeta({ fightRule: "Custom" })}
+                  onClick={() => handleFightRuleChange("Custom")}
                   className="fw-bold w-100"
                   style={{
                     minWidth: 100,
@@ -271,7 +301,7 @@ const MetaPanel: React.FC = () => {
                   <Form.Control
                     type="text"
                     placeholder="Кастомный режим (например: FT10, BO3)"
-                    value={customFightRule}
+                    value={customFightRule || ""}
                     onChange={(e) => {
                       setCustomFightRule(e.target.value);
                       setMeta({ fightRule: e.target.value });
@@ -290,6 +320,26 @@ const MetaPanel: React.FC = () => {
 };
 
 const AdminPanel = () => {
+  // Состояние с timestamp
+  const [player1, setPlayer1State] = useState<PlayerWithTimestamp>({
+    name: "Player 1",
+    sponsor: "",
+    score: 0,
+    tag: "",
+    final: "none",
+  });
+  const [player2, setPlayer2State] = useState<PlayerWithTimestamp>({
+    name: "Player 2",
+    sponsor: "",
+    score: 0,
+    tag: "",
+    final: "none",
+  });
+  const [meta, setMetaState] = useState<MetaInfoWithTimestamp>({
+    title: "",
+    fightRule: "",
+  });
+
   // Редирект на админку при открытии с телефона
   const navigate = useNavigate();
   useEffect(() => {
@@ -298,10 +348,126 @@ const AdminPanel = () => {
     }
   }, [navigate]);
 
+  // Подписка на SignalR события
+  useEffect(() => {
+    const handleReceiveState = (state: ScoreboardState) => {
+      const now = Date.now();
+      const stateWithTimestamp: ScoreboardStateWithTimestamp = {
+        ...state,
+        _receivedAt: now,
+      };
+
+      // Проверяем и обновляем только те поля, которые не были изменены локально недавно
+      setPlayer1State((prev) => {
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000; // Если локальное изменение было больше 1 секунды назад
+        return shouldUpdate
+          ? { ...state.player1, _lastEdit: prev._lastEdit }
+          : prev;
+      });
+
+      setPlayer2State((prev) => {
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000;
+        return shouldUpdate
+          ? { ...state.player2, _lastEdit: prev._lastEdit }
+          : prev;
+      });
+
+      setMetaState((prev) => {
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000;
+        return shouldUpdate
+          ? { ...state.meta, _lastEdit: prev._lastEdit }
+          : prev;
+      });
+    };
+
+    SignalRContext.connection?.on("ReceiveState", handleReceiveState);
+
+    return () => {
+      SignalRContext.connection?.off("ReceiveState", handleReceiveState);
+    };
+  }, []);
+
+  // Методы для отправки данных с timestamp
+  const setPlayer1 = useCallback(
+    (playerUpdate: any) => {
+      const now = Date.now();
+      const updatedPlayer = { ...player1, ...playerUpdate, _lastEdit: now };
+      setPlayer1State(updatedPlayer); // Оптимистичное обновление
+      SignalRContext.invoke("UpdatePlayer1", updatedPlayer);
+    },
+    [player1],
+  );
+
+  const setPlayer2 = useCallback(
+    (playerUpdate: any) => {
+      const now = Date.now();
+      const updatedPlayer = { ...player2, ...playerUpdate, _lastEdit: now };
+      setPlayer2State(updatedPlayer); // Оптимистичное обновление
+      SignalRContext.invoke("UpdatePlayer2", updatedPlayer);
+    },
+    [player2],
+  );
+  const setMeta = useCallback(
+    (metaUpdate: any) => {
+      const now = Date.now();
+      const updatedMeta = { ...meta, ...metaUpdate, _lastEdit: now };
+      setMetaState(updatedMeta); // Оптимистичное обновление
+      SignalRContext.connection?.invoke("UpdateMeta", updatedMeta);
+    },
+    [meta],
+  );
+  const setState = useCallback((state: any) => {
+    const now = Date.now();
+    setPlayer1State({ ...state.player1, _lastEdit: now }); // Оптимистичное обновление
+    setPlayer2State({ ...state.player2, _lastEdit: now }); // Оптимистичное обновление
+    setMetaState({ ...state.meta, _lastEdit: now }); // Оптимистичное обновление
+    SignalRContext.invoke("SetState", state);
+  }, []);
+  const getState = useCallback(() => SignalRContext.invoke("GetState"), []);
+
+  // Вспомогательные функции
+  const swapPlayers = useCallback(() => {
+    const now = Date.now();
+    const newPlayer1 = { ...player2, _lastEdit: now };
+    const newPlayer2 = { ...player1, _lastEdit: now };
+    setPlayer1State(newPlayer1);
+    setPlayer2State(newPlayer2);
+    SignalRContext.invoke("UpdatePlayer1", newPlayer1);
+    SignalRContext.invoke("UpdatePlayer2", newPlayer2);
+  }, [player1, player2]);
+
+  const reset = useCallback(() => {
+    const now = Date.now();
+    const initialState: ScoreboardState = {
+      player1: {
+        name: "Player 1",
+        sponsor: "",
+        score: 0,
+        tag: "",
+        final: "none",
+      },
+      player2: {
+        name: "Player 2",
+        sponsor: "",
+        score: 0,
+        tag: "",
+        final: "none",
+      },
+      meta: {
+        title: "",
+        fightRule: "",
+      },
+    };
+    setPlayer1State({ ...initialState.player1, _lastEdit: now });
+    setPlayer2State({ ...initialState.player2, _lastEdit: now });
+    setMetaState({ ...initialState.meta, _lastEdit: now });
+    SignalRContext.invoke("SetState", initialState);
+  }, []);
+
   return (
     <Container className="py-4">
       {/* Meta Panel */}
-      <MetaPanel />
+      <MetaPanel setMeta={setMeta} meta={meta} />
 
       {/* Players Cards */}
       <Row className="justify-content-center align-items-center g-4">
@@ -312,28 +478,19 @@ const AdminPanel = () => {
           className="d-flex justify-content-center mb-3 mb-md-0"
         >
           <PlayerCard
-            player={useScoreboardStore((s) => s.player1)}
-            onName={(name) =>
-              useScoreboardStore.getState().setPlayer1({ name })
-            }
-            onSponsor={(sponsor) =>
-              useScoreboardStore.getState().setPlayer1({ sponsor })
-            }
+            player={player1}
+            onName={(name) => setPlayer1({ ...player1, name })}
+            onSponsor={(sponsor) => setPlayer1({ ...player1, sponsor })}
             onScore={(score) =>
-              useScoreboardStore
-                .getState()
-                .setPlayer1({ score: Math.max(0, Math.min(99, score)) })
+              setPlayer1({
+                ...player1,
+                score: Math.max(0, Math.min(99, score)),
+              })
             }
-            onWin={() =>
-              useScoreboardStore.getState().setPlayer1({ final: "winner" })
-            }
-            onLose={() =>
-              useScoreboardStore.getState().setPlayer1({ final: "loser" })
-            }
-            onTag={(tag) => useScoreboardStore.getState().setPlayer1({ tag })}
-            onClearFinal={() =>
-              useScoreboardStore.getState().setPlayer1({ final: "none" })
-            }
+            onWin={() => setPlayer1({ ...player1, final: "winner" })}
+            onLose={() => setPlayer1({ ...player1, final: "loser" })}
+            onTag={(tag) => setPlayer1({ ...player1, tag })}
+            onClearFinal={() => setPlayer1({ ...player1, final: "none" })}
             label="Player 1"
             accent="#0dcaf0"
           />
@@ -345,95 +502,71 @@ const AdminPanel = () => {
           className="d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2"
         >
           <Stack gap={3} className="w-100 w-md-auto align-items-center">
-            <OverlayTrigger
-              placement="right"
-              overlay={<Tooltip>Поменять имена</Tooltip>}
+            <Button
+              variant="info"
+              className="fw-bold py-2 text-white w-100 w-md-auto mx-2 tooltip-container"
+              style={{
+                fontSize: 18,
+                background: "#0dcaf0",
+                border: "none",
+                boxShadow: "0 2px 8px #0dcaf055",
+                position: "relative",
+              }}
+              onClick={() => {
+                setPlayer1({ ...player1, name: player2.name });
+                setPlayer2({ ...player2, name: player1.name });
+              }}
+              title="Поменять имена"
             >
-              <Button
-                variant="info"
-                className="fw-bold py-2 text-white w-100 w-md-auto mx-2"
-                style={{
-                  fontSize: 18,
-                  background: "#0dcaf0",
-                  border: "none",
-                  boxShadow: "0 2px 8px #0dcaf055",
-                }}
-                onClick={() => {
-                  const p1 = useScoreboardStore.getState().player1;
-                  const p2 = useScoreboardStore.getState().player2;
-                  useScoreboardStore
-                    .getState()
-                    .setPlayer1({ name: p2.name, final: p2.final });
-                  useScoreboardStore
-                    .getState()
-                    .setPlayer2({ name: p1.name, final: p1.final });
-                }}
-              >
-                <ArrowLeftRight /> Name
-              </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="right"
-              overlay={<Tooltip>Поменять игроков местами</Tooltip>}
+              <ArrowLeftRight /> Name
+            </Button>
+            <Button
+              variant="info"
+              className="fw-bold py-2 text-white w-100 w-md-auto mx-2 tooltip-container"
+              style={{
+                fontSize: 18,
+                background: "#0dcaf0",
+                border: "none",
+                boxShadow: "0 2px 8px #0dcaf055",
+                position: "relative",
+              }}
+              onClick={swapPlayers}
+              title="Поменять игроков местами"
             >
-              <Button
-                variant="info"
-                className="fw-bold py-2 text-white w-100 w-md-auto mx-2"
-                style={{
-                  fontSize: 18,
-                  background: "#0dcaf0",
-                  border: "none",
-                  boxShadow: "0 2px 8px #0dcaf055",
-                }}
-                onClick={() => useScoreboardStore.getState().swapPlayers()}
-              >
-                <ArrowLeftRight /> All
-              </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="right"
-              overlay={<Tooltip>Сбросить всё</Tooltip>}
+              <ArrowLeftRight /> All
+            </Button>
+            <Button
+              variant="danger"
+              className="fw-bold py-2 text-white w-100 w-md-auto mx-2 tooltip-container"
+              style={{
+                fontSize: 18,
+                background: "#dc3545",
+                border: "none",
+                boxShadow: "0 2px 8px #dc354555",
+                position: "relative",
+              }}
+              onClick={reset}
+              title="Сбросить всё"
             >
-              <Button
-                variant="danger"
-                className="fw-bold py-2 text-white w-100 w-md-auto mx-2"
-                style={{
-                  fontSize: 18,
-                  background: "#dc3545",
-                  border: "none",
-                  boxShadow: "0 2px 8px #dc354555",
-                }}
-                onClick={() => useScoreboardStore.getState().reset()}
-              >
-                <ArrowRepeat /> Reset
-              </Button>
-            </OverlayTrigger>
+              <ArrowRepeat /> Reset
+            </Button>
           </Stack>
         </Col>
         <Col xs={12} md={5} lg={4} className="d-flex justify-content-center">
           <PlayerCard
-            player={useScoreboardStore((s) => s.player2)}
-            onName={(name) =>
-              useScoreboardStore.getState().setPlayer2({ name })
-            }
-            onSponsor={(sponsor) =>
-              useScoreboardStore.getState().setPlayer2({ sponsor })
-            }
+            player={player2}
+            onName={(name) => setPlayer2({ ...player2, name })}
+            onSponsor={(sponsor) => setPlayer2({ ...player2, sponsor })}
             onScore={(score) =>
-              useScoreboardStore
-                .getState()
-                .setPlayer2({ score: Math.max(0, Math.min(99, score)) })
+              setPlayer2({
+                ...player2,
+                score: Math.max(0, Math.min(99, score)),
+              })
             }
-            onWin={() =>
-              useScoreboardStore.getState().setPlayer2({ final: "winner" })
-            }
-            onLose={() =>
-              useScoreboardStore.getState().setPlayer2({ final: "loser" })
-            }
-            onTag={(tag) => useScoreboardStore.getState().setPlayer2({ tag })}
-            onClearFinal={() =>
-              useScoreboardStore.getState().setPlayer2({ final: "none" })
-            }
+            onWin={() => setPlayer2({ ...player2, final: "winner" })}
+            onLose={() => setPlayer2({ ...player2, final: "loser" })}
+            onTag={(tag) => setPlayer2({ ...player2, tag })}
+            onClearFinal={() => setPlayer2({ ...player2, final: "none" })}
             label="Player 2"
             accent="#6610f2"
           />
