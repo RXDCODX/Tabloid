@@ -156,7 +156,14 @@
                                     </div>
                                     <div class="d-flex">
                                         <div style="width: 6px;"></div>
-                                        <div role="group" class="btn-group" style="flex: 1 1 0%;"><button value="winners" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">W</button><button value="losers" name="side" type="button" class="btn btn-primary btn-sm" style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;">L</button></div>
+                                        <div role="group" class="btn-group" style="flex: 1 1 0%;">
+                                            <button value="winners" name="side" type="button" class="btn btn-primary btn-sm"
+                                                style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;"
+                                                onclick="addWinnerTagRightSide('player2TagInput')">W</button>
+                                            <button value="losers" name="side" type="button" class="btn btn-primary btn-sm"
+                                                style="padding-top: 3px; padding-bottom: 3px; min-width: 30px;"
+                                                onclick="addLooserTagRightSide('player2TagInput')">L</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -353,5 +360,6 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="player2TagInput" />
 </body>
 </html>

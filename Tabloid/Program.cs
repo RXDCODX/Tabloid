@@ -46,6 +46,11 @@ public static class Program
             // Красивое сообщение о доступности страниц
             var adminUrl = "http://localhost:5125/adminpanel";
             var scoreboardUrl = "http://localhost:5125/scoreboard";
+            string MakeClickableLink(string url, string text)
+            {
+                // ANSI escape sequence for clickable link
+                return $"\u001b]8;;{url}\u001b\\{text}\u001b]8;;\u001b\\";
+            }
             var oldColor = Console.ForegroundColor;
             Console.OutputEncoding = Encoding.UTF8;
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -57,8 +62,8 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(
                 $"""
-                🛡️  Админ-панель:                    {adminUrl}
-                🏆  Scoreboard (вставить в обс):     {scoreboardUrl}
+                🛡️  Админ-панель:                    {MakeClickableLink(adminUrl, adminUrl)}
+                🏆  Scoreboard (вставить в обс):     {MakeClickableLink(scoreboardUrl, scoreboardUrl)}
                 
                 """
             );

@@ -1,9 +1,10 @@
 ﻿@page
+@inject IWebHostEnvironment environment
 @{
     Layout = "_Layout";
 }
 <link rel="stylesheet" href="/styles/scoreboard.css" />
-<div class="scoreboard-bg">
+<div class="scoreboard-bg" @(environment.IsDevelopment() ? "style='background-image: (\"/background.png\");'" : "") >
 
     @* <div class="double-skew" id="topBar">
         <h6 data-sb="bracket-url" data-bind="metaUrl">TEST</h6>
@@ -17,7 +18,7 @@
             </div>
             <div class="score-bar">
                 <h4 class="playerName">
-                    <span data-side="left" data-sb="tag" data-bind="player1Name">Player 1</span> <span class="side" data-side="left" data-sb="side"></span>
+                    <span data-side="left" data-sb="tag" data-bind="gameInfoPlayer1Name">Player 1</span> <span class="side" data-side="left" data-sb="side"></span>
                 </h4>
             </div>
         </div>
@@ -28,26 +29,27 @@
         </div>
 
         <div id="right">
-            <div class="score-bar">
-                <h4 class="playerName">
-                    <span data-side="right" data-sb="tag" data-bind="player2Name">Player 2</span> <span class="side" data-side="right" data-sb="side"></span>
-                </h4>
-            </div>
             <div class="score">
                 <h2 data-side="right" data-sb="score" data-bind="gameInfoPlayer2Counter">0</h2>
+            </div>
+            <div class="score-bar">
+                <h4 class="playerName">
+                    <span data-side="right" data-sb="tag" data-bind="gameInfoPlayer2Name">Player 2</span> <span class="side" data-side="right" data-sb="side"></span>
+                </h4>
             </div>
         </div>
     </div>
     
     <div id="downBar">
         <div class="double-skew hidden" id="subBar1" style="opacity: 1;">
-            <h6 class="text-center justify-content-center" data-sb="team-left" data-bind="player1Tag"></h6>
+            <h6 class="text-center justify-content-center" data-sb="team-left" data-bind="gameInfoPlayer1Sponsor"></h6>
         </div>
         <div class="double-skew hidden" id="subBar2" style="opacity: 1;">
-            <h6 class="text-center justify-content-center" data-sb="team-right" data-bind="player2Tag"></h6>
+            <h6 class="text-center justify-content-center" data-sb="team-right" data-bind="gameInfoPlayer2Sponsor"></h6>
         </div>
     </div>
 
-
+    <input type="hidden" data-bind="gameInfoPlayer1Tag" />
+    <input type="hidden" data-bind="gameInfoPlayer2Tag" />
 
 </div>
