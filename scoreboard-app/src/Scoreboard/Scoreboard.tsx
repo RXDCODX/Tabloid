@@ -16,10 +16,19 @@ type MetaInfo = {
   fightRule: string;
 };
 
+type ColorPreset = {
+  textColor?: string;
+  scoreColor?: string;
+  titleColor?: string;
+  backgroundColor?: string;
+  scoreBackgroundColor?: string;
+};
+
 type ScoreboardState = {
   player1: Player;
   player2: Player;
   meta: MetaInfo;
+  colors: ColorPreset;
 };
 
 const Scoreboard: React.FC = () => {
@@ -41,6 +50,13 @@ const Scoreboard: React.FC = () => {
     title: "",
     fightRule: "",
   });
+  const [colors, setColors] = useState<ColorPreset>({
+    textColor: "#ffffff",
+    scoreColor: "#0dcaf0",
+    scoreBackgroundColor: "#23272f",
+    titleColor: "#ffc107",
+    backgroundColor: "#23272f",
+  });
 
   // Подписка на SignalR события
   useEffect(() => {
@@ -48,6 +64,11 @@ const Scoreboard: React.FC = () => {
       setPlayer1(state.player1);
       setPlayer2(state.player2);
       setMeta(state.meta);
+
+      // Обновляем цвета с сервера
+      if (state.colors) {
+        setColors(state.colors);
+      }
     };
 
     SignalRContext.connection?.on("ReceiveState", handleReceiveState);
@@ -59,14 +80,23 @@ const Scoreboard: React.FC = () => {
 
   return (
     <div className="scoreboard-bg">
-      <div id="banner">
-        <div className="left-skew" id="left">
-          <div className="score">
-            <h2 data-side="left">{player1.score}</h2>
+      <div id="banner" style={{ backgroundColor: colors.backgroundColor }}>
+        <div
+          className="left-skew"
+          id="left"
+          style={{ backgroundColor: colors.backgroundColor }}
+        >
+          <div
+            className="score"
+            style={{ backgroundColor: colors.scoreBackgroundColor }}
+          >
+            <h2 data-side="left" style={{ color: colors.scoreColor }}>
+              {player1.score}
+            </h2>
           </div>
           <div className="score-bar">
-            <h4 className="playerName">
-              <span data-side="left">
+            <h4 className="playerName" style={{ color: colors.textColor }}>
+              <span data-side="left" style={{ color: colors.textColor }}>
                 {player1.final === "winner"
                   ? "[W] "
                   : player1.final === "loser"
@@ -78,17 +108,30 @@ const Scoreboard: React.FC = () => {
             </h4>
           </div>
         </div>
-        <div className="double-skew" id="middle">
-          <h5 id="metaTitle">{meta.title}</h5>
-          <h5 id="round">{meta.fightRule}</h5>
+        <div
+          className="double-skew"
+          id="middle"
+          style={{ backgroundColor: colors.backgroundColor }}
+        >
+          <h5 id="metaTitle" style={{ color: colors.titleColor }}>
+            {meta.title}
+          </h5>
+          <h5 id="round" style={{ color: colors.titleColor }}>
+            {meta.fightRule}
+          </h5>
         </div>
-        <div id="right">
-          <div className="score">
-            <h2 data-side="right">{player2.score}</h2>
+        <div id="right" style={{ backgroundColor: colors.backgroundColor }}>
+          <div
+            className="score"
+            style={{ backgroundColor: colors.scoreBackgroundColor }}
+          >
+            <h2 data-side="right" style={{ color: colors.scoreColor }}>
+              {player2.score}
+            </h2>
           </div>
           <div className="score-bar">
-            <h4 className="playerName">
-              <span data-side="right">
+            <h4 className="playerName" style={{ color: colors.textColor }}>
+              <span data-side="right" style={{ color: colors.textColor }}>
                 {player2.final === "winner"
                   ? "[W] "
                   : player2.final === "loser"
@@ -102,13 +145,27 @@ const Scoreboard: React.FC = () => {
         </div>
       </div>
       <div id="downBar">
-        <div className="double-skew hidden" id="subBar1" style={{ opacity: 1 }}>
-          <h6 className="text-center justify-content-center">
+        <div
+          className="double-skew hidden"
+          id="subBar1"
+          style={{ opacity: 1, backgroundColor: colors.backgroundColor }}
+        >
+          <h6
+            className="text-center justify-content-center"
+            style={{ color: colors.textColor }}
+          >
             {player1.tag}
           </h6>
         </div>
-        <div className="double-skew hidden" id="subBar2" style={{ opacity: 1 }}>
-          <h6 className="text-center justify-content-center">
+        <div
+          className="double-skew hidden"
+          id="subBar2"
+          style={{ opacity: 1, backgroundColor: colors.backgroundColor }}
+        >
+          <h6
+            className="text-center justify-content-center"
+            style={{ color: colors.textColor }}
+          >
             {player2.tag}
           </h6>
         </div>
