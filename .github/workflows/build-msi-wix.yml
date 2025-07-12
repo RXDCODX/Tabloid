@@ -1,0 +1,147 @@
+name: Build MSI Installer (WiX)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-msi:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Setup Node.js 23
+      uses: actions/setup-node@v4
+      with:
+        node-version: '23'
+        cache: 'npm'
+        cache-dependency-path: scoreboard-app/package-lock.json
+        
+    - name: Install WiX Toolset
+      run: |
+        # Устанавливаем WiX Toolset через Chocolatey
+        choco install wixtoolset -y
+        
+    - name: Restore .NET dependencies
+      run: dotnet restore
+      
+    - name: Build and publish scoreboard-backend
+      run: |
+        dotnet publish scoreboard-backend/scoreboard-backend.csproj -c Release -o ./publish --self-contained false
+        
+    - name: Create WiX project file
+      run: |
+        # Создаем WiX проект для сборки MSI
+        $wixContent = @"
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+          <Product Id="*" 
+                   Name="Scoreboard Application" 
+                   Language="1033" 
+                   Version="${{ github.ref_name }}" 
+                   Manufacturer="Default Company Name" 
+                   UpgradeCode="C22826E9-82D7-48BD-B22F-348140261D4C">
+            <Package InstallerVersion="200" 
+                     Compressed="yes" 
+                     InstallScope="perMachine" />
+            
+            <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+            <MediaTemplate EmbedCab="yes" />
+            
+            <Feature Id="ProductFeature" 
+                     Title="Scoreboard Application" 
+                     Level="1">
+              <ComponentGroupRef Id="ProductComponents" />
+            </Feature>
+            
+            <UIRef Id="WixUI_Minimal" />
+            <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+          </Product>
+          
+          <Fragment>
+            <Directory Id="TARGETDIR" Name="SourceDir">
+              <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="ScoreboardApplication" />
+              </Directory>
+            </Directory>
+          </Fragment>
+          
+          <Fragment>
+            <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+              <Component Id="ApplicationFiles" Guid="*">
+                <File Id="scoreboard-backend.exe" 
+                      Source="publish\scoreboard-backend.exe" 
+                      KeyPath="yes" />
+                <File Id="scoreboard-backend.dll" 
+                      Source="publish\scoreboard-backend.dll" />
+                <File Id="appsettings.json" 
+                      Source="publish\appsettings.json" />
+                <File Id="appsettings.Development.json" 
+                      Source="publish\appsettings.Development.json" />
+                <File Id="web.config" 
+                      Source="publish\web.config" />
+                <File Id="wwwroot\index.html" 
+                      Source="publish\wwwroot\index.html" />
+                <File Id="wwwroot\assets\index.css" 
+                      Source="publish\wwwroot\assets\index.css" />
+                <File Id="wwwroot\assets\index.js" 
+                      Source="publish\wwwroot\assets\index.js" />
+                <File Id="wwwroot\favicon.ico" 
+                      Source="publish\wwwroot\favicon.ico" />
+                <File Id="wwwroot\manifest.json" 
+                      Source="publish\wwwroot\manifest.json" />
+                <File Id="wwwroot\robots.txt" 
+                      Source="publish\wwwroot\robots.txt" />
+              </Component>
+            </ComponentGroup>
+          </Fragment>
+        </Wix>
+        "@
+        
+        $wixContent | Out-File -FilePath "installer.wxs" -Encoding UTF8
+        
+        # Создаем простой license.rtf
+        $licenseContent = @"
+        {\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}}
+        \f0\fs24 
+        License Agreement\par
+        \par
+        This software is provided as-is without any warranty.\par
+        \par
+        }
+        "@
+        
+        $licenseContent | Out-File -FilePath "license.rtf" -Encoding ASCII
+        
+    - name: Build MSI with WiX
+      run: |
+        # Компилируем WiX проект
+        candle installer.wxs -out installer.wixobj
+        
+        # Создаем MSI файл
+        light installer.wixobj -out ScoreboardApplication.msi
+        
+    - name: Upload MSI artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: scoreboard-installer-wix-${{ github.ref_name }}
+        path: ScoreboardApplication.msi
+        retention-days: 30
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ScoreboardApplication.msi
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

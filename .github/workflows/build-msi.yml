@@ -1,0 +1,55 @@
+name: Build MSI Installer
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-msi:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Setup Node.js 23
+      uses: actions/setup-node@v4
+      with:
+        node-version: '23'
+        cache: 'npm'
+        cache-dependency-path: scoreboard-app/package-lock.json
+        
+    - name: Restore .NET dependencies
+      run: dotnet restore
+      
+    - name: Build scoreboard-backend in Release
+      run: |
+        dotnet build scoreboard-backend/scoreboard-backend.csproj -c Release
+        
+    - name: Build MSI installer
+      run: |
+        # Используем MSBuild для сборки MSI инсталлера
+        msbuild Install/Install.vdproj /p:Configuration=Release /p:Platform="Any CPU" /p:DeployOnBuild=true
+        
+    - name: Upload MSI artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: scoreboard-installer-${{ github.ref_name }}
+        path: Install/Release/Install.msi
+        retention-days: 30
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: Install/Release/Install.msi
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.HttpLogging;
 using scoreboard_backend.Hubs;
+using scoreboard_backend.Serialization;
 using scoreboard_backend.Services;
 
 namespace scoreboard_backend;
@@ -13,7 +14,15 @@ public static class Program
 
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
-        builder.Services.AddSignalR();
+        builder
+            .Services.AddSignalR()
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.TypeInfoResolverChain.Insert(
+                    0,
+                    ScoreboardJsonContext.Default
+                );
+            });
         builder.Services.AddCors(options =>
             options.AddPolicy(
                 "CorsPolicy",
@@ -82,11 +91,8 @@ public static class Program
         app.UseStatusCodePages();
         app.UseRouting();
         app.UseCors("CorsPolicy");
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapHub<ScoreboardHub>("/scoreboardHub");
-            endpoints.MapFallbackToFile("index.html");
-        });
+        app.MapHub<ScoreboardHub>("/scoreboardHub");
+        app.MapFallbackToFile("index.html");
 
         app.Run("http://localhost:5035");
     }

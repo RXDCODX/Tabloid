@@ -5,7 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>scoreboard_backend</RootNamespace>
-    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,18 +17,16 @@
   </ItemGroup>
 
   <Target Name="BuildFrontendAndCopyToWwwroot" AfterTargets="Build">
-    <!-- Билдим фронтенд -->
     <Exec WorkingDirectory="..\scoreboard-app" Command="npm install" />
     <Exec WorkingDirectory="..\scoreboard-app" Command="npm run build" />
-    <!-- Очищаем wwwroot (кроме node_modules, если есть) -->
     <RemoveDir Directories="wwwroot" />
     <MakeDir Directories="wwwroot" />
-    <!-- Копируем всё из dist во wwwroot -->
-    <Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Retries="3" />
   </Target>
   <ItemGroup>
     <FrontendDistFiles Include="..\scoreboard-app\dist\**\*.*" />
   </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Serialization\" />
   </ItemGroup>

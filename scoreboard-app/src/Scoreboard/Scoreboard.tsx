@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { SignalRContext } from "../SignalRProvider";
 import "../scoreboard.scss";
+import { defaultPreset } from "../AdminPanel/types";
 
 type Player = {
   name: string;
@@ -50,13 +51,7 @@ const Scoreboard: React.FC = () => {
     title: "",
     fightRule: "",
   });
-  const [colors, setColors] = useState<ColorPreset>({
-    textColor: "#ffffff",
-    scoreColor: "#0dcaf0",
-    scoreBackgroundColor: "#23272f",
-    titleColor: "#ffc107",
-    backgroundColor: "#23272f",
-  });
+  const [colors, setColors] = useState<ColorPreset>(defaultPreset);
 
   // Подписка на SignalR события
   useEffect(() => {
@@ -80,7 +75,7 @@ const Scoreboard: React.FC = () => {
 
   return (
     <div className="scoreboard-bg">
-      <div id="banner" style={{ backgroundColor: colors.backgroundColor }}>
+      <div id="banner">
         <div
           className="left-skew"
           id="left"
