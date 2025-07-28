@@ -47,10 +47,6 @@ public static class Program
             });
             builder.Logging.SetMinimumLevel(LogLevel.Trace);
         }
-        else
-        {
-            builder.Logging.ClearProviders();
-        }
 
         var app = builder.Build();
 
@@ -87,10 +83,36 @@ public static class Program
             );
         }
 
-        app.UseStaticFiles();
+        // Настройки для статических файлов с предотвращением кеширования
+        app.UseStaticFiles(
+            new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    // Добавляем заголовки для предотвращения кеширования
+                    ctx.Context.Response.Headers.Append(
+                        "Cache-Control",
+                        "no-cache, no-store, must-revalidate"
+                    );
+                    ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+                    ctx.Context.Response.Headers.Append("Expires", "0");
+                    
+                    // Для HTML файлов добавляем дополнительный заголовок
+                    if (ctx.File.Name.EndsWith(".html"))
+                    {
+                        ctx.Context.Response.Headers.Append(
+                            "Cache-Control",
+                            "no-cache, no-store, must-revalidate, max-age=0"
+                        );
+                    }
+                },
+            }
+        );
+
         app.UseStatusCodePages();
         app.UseRouting();
         app.UseCors("CorsPolicy");
+
         app.MapHub<ScoreboardHub>("/scoreboardHub");
         app.MapFallbackToFile("index.html");
 

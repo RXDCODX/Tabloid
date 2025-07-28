@@ -1,0 +1,303 @@
+// Переменные для повторяющихся значений
+$border-radius-small: 8px;
+$border-radius-large: 100px;
+$skew-angle-small: 13deg;
+$skew-angle-large: 15deg;
+$pseudo-element-width-small: 33px;
+$pseudo-element-width-large: 69px;
+$pseudo-element-offset-small: 4px;
+$pseudo-element-offset-large: 13px;
+$side-div-width: 510px;
+$side-div-top-offset: 15px;
+$side-div-left-offset: 180px;
+$side-div-height: 50px;
+$center-div-width: 300px;
+$center-div-height: 30px;
+$side-div-min-height: 10px;
+$padding-horizontal: 20px;
+$padding-vertical: 10px;
+$score-width: 80px;
+$score-height: 50px;
+$score-margin: 20px;
+$font-size-h2: 30px;
+$font-size-h4: 18px;
+$font-size-h5: 16px;
+$h2-margin-top: 10px;
+$animation-duration: 800ms; // Время анимации появления элементов (максимум 10000мс)
+
+// Отступы для счетчиков с учетом псевдоэлементов
+$pseudo-element-total-width: $pseudo-element-width-large + $pseudo-element-offset-large; //
+$score-margin-calculated: $pseudo-element-total-width * 0.2; //
+
+// Максимальная ширина для текста игрока (рассчитана с учетом псевдоэлементов, счета, флага и отступов)
+$player-name-max-width: none;
+
+
+// Базовые стили для scoreboard
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  color: indigo;
+  font-family: Bahnschrift;
+  text-transform: uppercase;
+  white-space: nowrap;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+  background-size: 100% auto;
+}
+
+// Стили для заголовков
+h2 {
+  margin-top: $h2-margin-top;
+  font-size: $font-size-h2;
+  font-weight: normal;
+}
+
+h4 {
+  font-size: $font-size-h4;
+  font-weight: bold;
+}
+
+h5 {
+  font-size: $font-size-h5;
+  font-weight: normal;
+  line-height: 0.8 !important;
+  
+  &#round {
+    margin-bottom: 0 !important;
+  }
+}
+
+// Центральный див
+.centerDiv {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $padding-vertical $padding-horizontal;
+  height: $center-div-height;
+  width: $center-div-width;
+  position: relative;
+  border-radius: $border-radius-small;
+  z-index: 1;
+
+  &:before {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-small;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: -$pseudo-element-offset-small;
+    transform: skew($skew-angle-small);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-small;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -$pseudo-element-offset-small;
+    transform: skew(-$skew-angle-small);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+}
+
+// Левый див
+.leftDiv {
+  position: absolute;
+  top: $side-div-top-offset;
+  left: $side-div-left-offset;
+  width: $side-div-width;
+  height: $side-div-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $padding-vertical $padding-horizontal;
+  min-height: $side-div-min-height;
+  border-radius: $border-radius-large;
+  gap: 5px; // Уменьшаем промежуток между элементами
+
+  &:before {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-large;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: -$pseudo-element-offset-large;
+    transform: skew($skew-angle-large);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-large;
+    height: 100%;
+    position: absolute;
+    bottom: 0;
+    right: -$pseudo-element-offset-large;
+    transform: skew($skew-angle-small);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+}
+
+// Правый див
+.rightDiv {
+  position: absolute;
+  top: $side-div-top-offset;
+  right: $side-div-left-offset;
+  width: $side-div-width;
+  height: $side-div-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $padding-vertical $padding-horizontal;
+  min-height: $side-div-min-height;
+  border-radius: $border-radius-large;
+  gap: 5px; // Уменьшаем промежуток между элементами
+
+  &:before {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-large;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -$pseudo-element-offset-large;
+    transform: skew(-$skew-angle-large);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+
+  &:after {
+    content: "";
+    display: block;
+    background: inherit;
+    width: $pseudo-element-width-large;
+    height: 100%;
+    position: absolute;
+    bottom: 0;
+    left: -$pseudo-element-offset-large;
+    transform: skew(-$skew-angle-small);
+    border-radius: $border-radius-small;
+    z-index: 100;
+  }
+}
+
+// Информация об игроке
+.playerInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0; // Позволяет тексту сжиматься
+}
+
+.leftDiv .playerInfo {
+  justify-content: flex-end;
+}
+
+.rightDiv .playerInfo {
+  justify-content: flex-start;
+}
+
+// Имя игрока
+.playerName {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  line-height: 1; // Добавляем для выравнивания с флагом
+  white-space: nowrap; // Предотвращаем перенос текста
+  overflow: hidden; // Скрываем переполнение
+  text-overflow: ellipsis; // Добавляем многоточие при переполнении
+  max-width: 100%; // Используем всю доступную ширину контейнера
+  width: 100%; // Занимаем всю ширину
+}
+
+// Счетчик
+.score {
+  width: $score-width;
+  height: $score-height;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0; // Предотвращаем сжатие счета
+  
+  h2 {
+    margin: 0;
+    line-height: 1; // Добавляем для выравнивания
+  }
+}
+
+// Специфичные отступы для счетчиков в левом и правом дивах
+.leftDiv .score {
+  margin: 0 $score-margin-calculated 0 0; // Отступ справа от псевдоэлемента
+}
+
+.rightDiv .score {
+  margin: 0 0 0 $score-margin-calculated; // Отступ слева от псевдоэлемента
+}
+
+// Флаг
+.flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; // Добавляем для выравнивания по высоте
+  min-width: 30px; // Добавляем минимальную ширину
+  width: 30px; // Фиксированная ширина
+  flex-shrink: 0; // Предотвращаем сжатие флага
+  
+  img {
+    width: 30px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    vertical-align: middle; // Добавляем для выравнивания
+  }
+}
+
+// Четвертый див - режим драки
+.fightModeDiv {
+  position: absolute;
+  top: 150px; // Под центральным дивом
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 130px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: inherit;
+  
+  h4 {
+    margin: 0;
+    font-weight: bold;
+    text-align: center;
+  }
+} 

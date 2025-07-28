@@ -1,0 +1,37 @@
+// Глобальные стили для всего приложения
+
+html {
+  background-color: transparent !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+// Белые плейсхолдеры для темных полей
+.bg-dark::placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+  text-align: center;
+}
+
+.bg-dark:focus::placeholder {
+  opacity: 0.5;
+  text-align: center;
+}
+
+// Центрирование плейсхолдеров для всех полей в админ панели
+.admin-panel input::placeholder {
+  text-align: center;
+}
+
+// Центрирование плейсхолдеров для всех полей ввода
+input::placeholder {
+  text-align: center;
+} 

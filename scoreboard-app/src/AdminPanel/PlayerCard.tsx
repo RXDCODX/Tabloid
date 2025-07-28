@@ -9,6 +9,7 @@ import {
     XCircleFill,
 } from "react-bootstrap-icons";
 import { PlayerWithTimestamp } from "./types";
+import FlagSelector from "./FlagSelector";
 
 type PlayerCardProps = {
   player: PlayerWithTimestamp;
@@ -20,6 +21,7 @@ type PlayerCardProps = {
   label: string;
   accent: string;
   onTag: (tag: string) => void;
+  onFlag: (flag: string) => void;
   onClearFinal: () => void;
 };
 
@@ -33,6 +35,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   label,
   accent,
   onTag,
+  onFlag,
   onClearFinal,
 }) => (
   <Card
@@ -79,6 +82,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           size="sm"
           className="fw-bold bg-dark text-white border-primary border-2 rounded-3"
           style={{ maxWidth: 110 }}
+        />
+      </div>
+      <div className="d-flex align-items-center gap-2 mb-3">
+        <FlagSelector
+          selectedFlag={player.flag}
+          onFlagChange={onFlag}
+          placeholder="Флаг"
         />
       </div>
       <div className="d-flex align-items-center justify-content-between mb-3 gap-2">

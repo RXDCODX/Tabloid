@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { Palette } from "react-bootstrap-icons";
 import { ColorPreset, defaultPreset } from "./types";
+import ColorPickerWithTransparency from "./ColorPickerWithTransparency";
 
 type ColorPresetCardProps = {
   onColorChange: (colors: Partial<ColorPreset>) => void;
@@ -14,51 +15,63 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
     defaultPreset,
     {
       name: "Classic Blue",
-      textColor: "#ffffff",
+      mainColor: "#0dcaf0",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#0dcaf0",
+      fightModeColor: "#0dcaf0",
       scoreColor: "#0dcaf0",
-      scoreBackgroundColor: "#1a1d23",
-      titleColor: "#ffc107",
-      backgroundColor: "#23272f",
+      backgroundColor: "#1a1d23",
+      borderColor: "#0dcaf0",
     },
     {
       name: "Fire Red",
-      textColor: "#ffffff",
+      mainColor: "#dc3545",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#dc3545",
+      fightModeColor: "#dc3545",
       scoreColor: "#dc3545",
-      scoreBackgroundColor: "#1a1d23",
-      titleColor: "#ffc107",
       backgroundColor: "#1a1d23",
+      borderColor: "#dc3545",
     },
     {
       name: "Forest Green",
-      textColor: "#ffffff",
+      mainColor: "#198754",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#198754",
+      fightModeColor: "#198754",
       scoreColor: "#198754",
-      scoreBackgroundColor: "#1a1d23",
-      titleColor: "#ffc107",
       backgroundColor: "#1a1d23",
+      borderColor: "#198754",
     },
     {
       name: "Purple Night",
-      textColor: "#ffffff",
+      mainColor: "#6f42c1",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#6f42c1",
+      fightModeColor: "#6f42c1",
       scoreColor: "#6f42c1",
-      scoreBackgroundColor: "#1a1d23",
-      titleColor: "#ffc107",
       backgroundColor: "#1a1d23",
+      borderColor: "#6f42c1",
     },
     {
       name: "Golden",
-      textColor: "#ffffff",
+      mainColor: "#ffc107",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#ffc107",
+      fightModeColor: "#ffc107",
       scoreColor: "#ffc107",
-      scoreBackgroundColor: "#1a1d23",
-      titleColor: "#dc3545",
       backgroundColor: "#23272f",
+      borderColor: "#ffc107",
     },
     {
       name: "Neon",
-      textColor: "#ffffff",
+      mainColor: "#00ff88",
+      playerNamesColor: "#ffffff",
+      tournamentTitleColor: "#0088ff",
+      fightModeColor: "#00ff88",
       scoreColor: "#00ff88",
-      scoreBackgroundColor: "#000000",
-      titleColor: "#0088ff",
       backgroundColor: "#000000",
+      borderColor: "#00ff88",
     },
   ];
 
@@ -113,8 +126,8 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 onClick={() => applyPreset(preset)}
                 className="fw-bold"
                 style={{
-                  borderColor: preset.scoreColor,
-                  color: preset.scoreColor,
+                  borderColor: preset.mainColor,
+                  color: preset.mainColor,
                   minWidth: 100,
                 }}
               >
@@ -128,145 +141,88 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
         <div>
           <h6 className="text-white fw-bold mb-3">Custom Colors:</h6>
           <Row className="g-3 d-flex justify-content-center">
-            <Col xs={6} md={2}>
+            <Col xs={6} md={3}>
               <Form.Group>
                 <Form.Label className="text-white fw-bold small">
-                  Text Color
+                  Main Color (Tags & Glow)
                 </Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="color"
-                    value={customColors.textColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("textColor", e.target.value)
-                    }
-                    className="p-1"
-                    style={{ width: 50, height: 38 }}
-                  />
-                  <Form.Control
-                    type="text"
-                    value={customColors.textColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("textColor", e.target.value)
-                    }
-                    className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
-                    style={{ fontSize: 12 }}
-                  />
-                </div>
+                <ColorPickerWithTransparency
+                  value={customColors.mainColor}
+                  onChange={(value) => handleCustomColorChange("mainColor", value)}
+                  placeholder="hex или rgba"
+                />
               </Form.Group>
             </Col>
-            <Col xs={6} md={2}>
+            <Col xs={6} md={3}>
+              <Form.Group>
+                <Form.Label className="text-white fw-bold small">
+                  Player Names
+                </Form.Label>
+                <ColorPickerWithTransparency
+                  value={customColors.playerNamesColor}
+                  onChange={(value) => handleCustomColorChange("playerNamesColor", value)}
+                  placeholder="hex или rgba"
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6} md={3}>
+              <Form.Group>
+                <Form.Label className="text-white fw-bold small">
+                  Tournament Title
+                </Form.Label>
+                <ColorPickerWithTransparency
+                  value={customColors.tournamentTitleColor}
+                  onChange={(value) => handleCustomColorChange("tournamentTitleColor", value)}
+                  placeholder="hex или rgba"
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6} md={3}>
+              <Form.Group>
+                <Form.Label className="text-white fw-bold small">
+                  Fight Mode
+                </Form.Label>
+                <ColorPickerWithTransparency
+                  value={customColors.fightModeColor}
+                  onChange={(value) => handleCustomColorChange("fightModeColor", value)}
+                  placeholder="hex или rgba"
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6} md={3}>
               <Form.Group>
                 <Form.Label className="text-white fw-bold small">
                   Score Color
                 </Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="color"
-                    value={customColors.scoreColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("scoreColor", e.target.value)
-                    }
-                    className="p-1"
-                    style={{ width: 50, height: 38 }}
-                  />
-                  <Form.Control
-                    type="text"
-                    value={customColors.scoreColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("scoreColor", e.target.value)
-                    }
-                    className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
-                    style={{ fontSize: 12 }}
-                  />
-                </div>
+                <ColorPickerWithTransparency
+                  value={customColors.scoreColor}
+                  onChange={(value) => handleCustomColorChange("scoreColor", value)}
+                  placeholder="hex или rgba"
+                />
               </Form.Group>
             </Col>
-            <Col xs={6} md={2}>
-              <Form.Group>
-                <Form.Label className="text-white fw-bold small">
-                  Score BG
-                </Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="color"
-                    value={customColors.scoreBackgroundColor}
-                    onChange={(e) =>
-                      handleCustomColorChange(
-                        "scoreBackgroundColor",
-                        e.target.value,
-                      )
-                    }
-                    className="p-1"
-                    style={{ width: 50, height: 38 }}
-                  />
-                  <Form.Control
-                    type="text"
-                    value={customColors.scoreBackgroundColor}
-                    onChange={(e) =>
-                      handleCustomColorChange(
-                        "scoreBackgroundColor",
-                        e.target.value,
-                      )
-                    }
-                    className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
-                    style={{ fontSize: 12 }}
-                  />
-                </div>
-              </Form.Group>
-            </Col>
-            <Col xs={6} md={2}>
-              <Form.Group>
-                <Form.Label className="text-white fw-bold small">
-                  Title Color
-                </Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="color"
-                    value={customColors.titleColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("titleColor", e.target.value)
-                    }
-                    className="p-1"
-                    style={{ width: 50, height: 38 }}
-                  />
-                  <Form.Control
-                    type="text"
-                    value={customColors.titleColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("titleColor", e.target.value)
-                    }
-                    className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
-                    style={{ fontSize: 12 }}
-                  />
-                </div>
-              </Form.Group>
-            </Col>
-            <Col xs={6} md={2}>
+            <Col xs={6} md={3}>
               <Form.Group>
                 <Form.Label className="text-white fw-bold small">
                   Background
                 </Form.Label>
-                <div className="d-flex gap-2">
-                  <Form.Control
-                    type="color"
-                    value={customColors.backgroundColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("backgroundColor", e.target.value)
-                    }
-                    className="p-1"
-                    style={{ width: 50, height: 38 }}
-                  />
-                  <Form.Control
-                    type="text"
-                    value={customColors.backgroundColor}
-                    onChange={(e) =>
-                      handleCustomColorChange("backgroundColor", e.target.value)
-                    }
-                    className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
-                    style={{ fontSize: 12 }}
-                  />
-                </div>
+                <ColorPickerWithTransparency
+                  value={customColors.backgroundColor}
+                  onChange={(value) => handleCustomColorChange("backgroundColor", value)}
+                  placeholder="hex или rgba"
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6} md={3}>
+              <Form.Group>
+                <Form.Label className="text-white fw-bold small">
+                  Border Color
+                </Form.Label>
+                <ColorPickerWithTransparency
+                  value={customColors.borderColor}
+                  onChange={(value) => handleCustomColorChange("borderColor", value)}
+                  placeholder="hex или rgba"
+                />
               </Form.Group>
             </Col>
           </Row>

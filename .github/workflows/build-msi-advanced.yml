@@ -28,6 +28,15 @@ jobs:
     - name: Restore .NET dependencies
       run: dotnet restore
       
+    - name: Build frontend first
+      run: |
+        cd scoreboard-app
+        npm install
+        # Очищаем dist папку перед сборкой
+        if (Test-Path "dist") { Remove-Item "dist" -Recurse -Force }
+        npm run build
+        cd ..
+        
     - name: Build and publish scoreboard-backend
       run: |
         dotnet publish scoreboard-backend/scoreboard-backend.csproj -c Release -o ./publish --self-contained false

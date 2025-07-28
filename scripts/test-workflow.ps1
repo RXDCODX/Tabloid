@@ -35,6 +35,30 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "✅ Зависимости восстановлены" -ForegroundColor Green
 
+# Собираем frontend сначала
+Write-Host "🔨 Собираем frontend..." -ForegroundColor Cyan
+Set-Location scoreboard-app
+
+# Очищаем dist папку перед сборкой
+if (Test-Path "dist") {
+    Write-Host "🗑️  Очищаем dist папку..." -ForegroundColor Cyan
+    Remove-Item "dist" -Recurse -Force
+}
+
+npm install
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Ошибка при установке npm зависимостей" -ForegroundColor Red
+    exit 1
+}
+
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Ошибка при сборке frontend" -ForegroundColor Red
+    exit 1
+}
+Set-Location ..
+Write-Host "✅ Frontend собран" -ForegroundColor Green
+
 # Собираем backend в Release
 Write-Host "🔨 Собираем scoreboard-backend в Release..." -ForegroundColor Cyan
 dotnet build scoreboard-backend/scoreboard-backend.csproj -c Release

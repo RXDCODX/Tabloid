@@ -9,25 +9,37 @@ import {
 } from "./types";
 
 export const useAdminState = () => {
-  // Состояние с timestamp
   const [player1, setPlayer1State] = useState<PlayerWithTimestamp>({
-    name: "Player 1",
-    sponsor: "",
-    score: 0,
-    tag: "",
+    name: "Daigo Umehara",
+    sponsor: "Red Bull",
+    score: 2,
+    tag: "The Beast",
+    flag: "jp",
     final: "none",
+    _lastEdit: 0,
+    _receivedAt: 0,
   });
+
   const [player2, setPlayer2State] = useState<PlayerWithTimestamp>({
-    name: "Player 2",
-    sponsor: "",
-    score: 0,
-    tag: "",
+    name: "Tokido",
+    sponsor: "Mad Catz",
+    score: 1,
+    tag: "Murder Face",
+    flag: "jp",
     final: "none",
+    _lastEdit: 0,
+    _receivedAt: 0,
   });
+
   const [meta, setMetaState] = useState<MetaInfoWithTimestamp>({
-    title: "",
-    fightRule: "",
+    title: "Street Fighter 6",
+    fightRule: "Grand Finals",
+    _lastEdit: 0,
+    _receivedAt: 0,
   });
+
+  const [isVisible, setIsVisibleState] = useState<boolean>(true);
+  const [animationDuration, setAnimationDurationState] = useState<number>(800);
 
   // Подписка на SignalR события
   useEffect(() => {
@@ -38,27 +50,36 @@ export const useAdminState = () => {
         _receivedAt: now,
       };
 
-      // Проверяем и обновляем только те поля, которые не были изменены локально недавно
+      // Обновляем состояние игроков, проверяя только timestamp последнего редактирования
       setPlayer1State((prev) => {
-        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000; // Если локальное изменение было больше 1 секунды назад
+        // Если локальное изменение было больше 500мс назад, обновляем с сервера
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 500;
         return shouldUpdate
-          ? { ...state.player1, _lastEdit: prev._lastEdit }
+          ? { ...state.player1, _lastEdit: prev._lastEdit, _receivedAt: now }
           : prev;
       });
 
       setPlayer2State((prev) => {
-        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000;
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 500;
         return shouldUpdate
-          ? { ...state.player2, _lastEdit: prev._lastEdit }
+          ? { ...state.player2, _lastEdit: prev._lastEdit, _receivedAt: now }
           : prev;
       });
 
       setMetaState((prev) => {
-        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 1000;
+        const shouldUpdate = !prev._lastEdit || prev._lastEdit < now - 500;
         return shouldUpdate
-          ? { ...state.meta, _lastEdit: prev._lastEdit }
+          ? { ...state.meta, _lastEdit: prev._lastEdit, _receivedAt: now }
           : prev;
       });
+
+      // Обновляем видимость без проверки timestamp, так как это глобальное состояние
+      setIsVisibleState(state.isVisible);
+      
+      // Обновляем время анимации
+      if (state.animationDuration) {
+        setAnimationDurationState(state.animationDuration);
+      }
     };
 
     SignalRContext.connection?.on("ReceiveState", handleReceiveState);
@@ -99,11 +120,28 @@ export const useAdminState = () => {
     [meta],
   );
 
+  const setVisibility = useCallback(
+    (isVisible: boolean) => {
+      setIsVisibleState(isVisible); // Оптимистичное обновление
+      SignalRContext.connection?.invoke("UpdateVisibility", isVisible);
+    },
+    [],
+  );
+
+  const setAnimationDuration = useCallback(
+    (duration: number) => {
+      setAnimationDurationState(duration); // Оптимистичное обновление
+      SignalRContext.connection?.invoke("UpdateAnimationDuration", duration);
+    },
+    [],
+  );
+
   const setState = useCallback((state: any) => {
     const now = Date.now();
     setPlayer1State({ ...state.player1, _lastEdit: now }); // Оптимистичное обновление
     setPlayer2State({ ...state.player2, _lastEdit: now }); // Оптимистичное обновление
     setMetaState({ ...state.meta, _lastEdit: now }); // Оптимистичное обновление
+    setIsVisibleState(state.isVisible);
     SignalRContext.invoke("SetState", state);
   }, []);
 
@@ -128,6 +166,7 @@ export const useAdminState = () => {
         sponsor: "",
         score: 0,
         tag: "",
+        flag: "none",
         final: "none",
       },
       player2: {
@@ -135,6 +174,7 @@ export const useAdminState = () => {
         sponsor: "",
         score: 0,
         tag: "",
+        flag: "none",
         final: "none",
       },
       meta: {
@@ -143,33 +183,56 @@ export const useAdminState = () => {
       },
       colors: {
         name: "Default",
-        textColor: "#ffffff",
-        scoreColor: "#0dcaf0",
-        scoreBackgroundColor: "#23272f",
-        titleColor: "#ffc107",
+        mainColor: "#3F00FF",
+        playerNamesColor: "#ffffff",
+        tournamentTitleColor: "#3F00FF",
+        fightModeColor: "#3F00FF",
+        scoreColor: "#ffffff",
         backgroundColor: "#23272f",
+        borderColor: "#3F00FF",
       },
+      isVisible: true,
+      animationDuration: 800,
     };
+
     setPlayer1State({ ...initialState.player1, _lastEdit: now });
     setPlayer2State({ ...initialState.player2, _lastEdit: now });
     setMetaState({ ...initialState.meta, _lastEdit: now });
+    setIsVisibleState(initialState.isVisible);
+    setAnimationDurationState(initialState.animationDuration);
     SignalRContext.invoke("SetState", initialState);
   }, []);
 
-  const handleColorChange = useCallback((colors: Partial<ColorPreset>) => {
-    // Отправляем на сервер
-    SignalRContext.connection?.invoke("UpdateColors", colors);
-    
-    console.log("Sending colors to server:", colors);
-  }, []);
+  // Обработчик изменения цветов
+  const handleColorChange = useCallback(
+    (colorUpdate: Partial<ColorPreset>) => {
+      const currentColors = {
+        name: "Custom",
+        mainColor: "#3F00FF",
+        playerNamesColor: "#ffffff",
+        tournamentTitleColor: "#3F00FF",
+        fightModeColor: "#3F00FF",
+        scoreColor: "#ffffff",
+        backgroundColor: "#23272f",
+        borderColor: "#3F00FF",
+        ...colorUpdate,
+      };
+      SignalRContext.invoke("UpdateColors", currentColors);
+    },
+    [],
+  );
 
   return {
     player1,
     player2,
     meta,
+    isVisible,
+    animationDuration,
     setPlayer1,
     setPlayer2,
     setMeta,
+    setVisibility,
+    setAnimationDuration,
     setState,
     getState,
     swapPlayers,

@@ -40,6 +40,18 @@ public class ScoreboardStateService
         SaveState();
     }
 
+    public void UpdateVisibility(bool isVisible)
+    {
+        _state.IsVisible = isVisible;
+        SaveState();
+    }
+
+    public void UpdateAnimationDuration(int animationDuration)
+    {
+        _state.AnimationDuration = animationDuration;
+        SaveState();
+    }
+
     public void SetState(ScoreboardState state)
     {
         _state = state;
@@ -53,23 +65,31 @@ public class ScoreboardStateService
         _config.Set("Player1", "Sponsor", _state.Player1.Sponsor);
         _config.Set("Player1", "Score", _state.Player1.Score.ToString());
         _config.Set("Player1", "Tag", _state.Player1.Tag);
+        _config.Set("Player1", "Flag", _state.Player1.Flag);
         _config.Set("Player1", "Final", _state.Player1.Final);
         // Player2
         _config.Set("Player2", "Name", _state.Player2.Name);
         _config.Set("Player2", "Sponsor", _state.Player2.Sponsor);
         _config.Set("Player2", "Score", _state.Player2.Score.ToString());
         _config.Set("Player2", "Tag", _state.Player2.Tag);
+        _config.Set("Player2", "Flag", _state.Player2.Flag);
         _config.Set("Player2", "Final", _state.Player2.Final);
         // Meta
         _config.Set("Meta", "Title", _state.Meta.Title);
         _config.Set("Meta", "FightRule", _state.Meta.FightRule);
         // Colors
         _config.Set("Colors", "Name", _state.Colors.Name);
-        _config.Set("Colors", "TextColor", _state.Colors.TextColor);
+        _config.Set("Colors", "MainColor", _state.Colors.MainColor);
+        _config.Set("Colors", "PlayerNamesColor", _state.Colors.PlayerNamesColor);
+        _config.Set("Colors", "TournamentTitleColor", _state.Colors.TournamentTitleColor);
+        _config.Set("Colors", "FightModeColor", _state.Colors.FightModeColor);
         _config.Set("Colors", "ScoreColor", _state.Colors.ScoreColor);
-        _config.Set("Colors", "ScoreBackgroundColor", _state.Colors.ScoreBackgroundColor);
-        _config.Set("Colors", "TitleColor", _state.Colors.TitleColor);
         _config.Set("Colors", "BackgroundColor", _state.Colors.BackgroundColor);
+        _config.Set("Colors", "BorderColor", _state.Colors.BorderColor);
+        // Visibility
+        _config.Set("Scoreboard", "IsVisible", _state.IsVisible.ToString());
+        // Animation Duration
+        _config.Set("Scoreboard", "AnimationDuration", _state.AnimationDuration.ToString());
         _config.Save();
     }
 
@@ -82,6 +102,7 @@ public class ScoreboardStateService
             Score = int.TryParse(_config.Get("Player1", "Score", "0"), out var s1) ? s1 : 0,
             Tag = _config.Get("Player1", "Tag", "")!,
             Final = _config.Get("Player1", "Final", "none")!,
+            Flag = _config.Get("Player1", "Flag", "none")!,
         };
         var p2 = new Player
         {
@@ -90,6 +111,7 @@ public class ScoreboardStateService
             Score = int.TryParse(_config.Get("Player2", "Score", "0"), out var s2) ? s2 : 0,
             Tag = _config.Get("Player2", "Tag", "")!,
             Final = _config.Get("Player2", "Final", "none")!,
+            Flag = _config.Get("Player2", "Flag", "none")!,
         };
         var meta = new MetaInfo
         {
@@ -99,18 +121,30 @@ public class ScoreboardStateService
         var colors = new ColorPreset
         {
             Name = _config.Get("Colors", "Name", "Default")!,
-            TextColor = _config.Get("Colors", "TextColor", "#ffffff")!,
-            ScoreColor = _config.Get("Colors", "ScoreColor", "#0dcaf0")!,
-            ScoreBackgroundColor = _config.Get("Colors", "ScoreBackgroundColor", "#23272f")!,
-            TitleColor = _config.Get("Colors", "TitleColor", "#ffc107")!,
+            MainColor = _config.Get("Colors", "MainColor", "#3F00FF")!,
+            PlayerNamesColor = _config.Get("Colors", "PlayerNamesColor", "#ffffff")!,
+            TournamentTitleColor = _config.Get("Colors", "TournamentTitleColor", "#3F00FF")!,
+            FightModeColor = _config.Get("Colors", "FightModeColor", "#3F00FF")!,
+            ScoreColor = _config.Get("Colors", "ScoreColor", "#ffffff")!,
             BackgroundColor = _config.Get("Colors", "BackgroundColor", "#23272f")!,
+            BorderColor = _config.Get("Colors", "BorderColor", "#3F00FF")!,
         };
+        var isVisible =
+            !bool.TryParse(_config.Get("Scoreboard", "IsVisible", "true"), out var visible)
+            || visible;
+
+        var animationDuration =
+            int.TryParse(_config.Get("Scoreboard", "AnimationDuration", "800"), out var duration)
+            ? duration : 800;
+
         _state = new ScoreboardState
         {
             Player1 = p1,
             Player2 = p2,
             Meta = meta,
             Colors = colors,
+            IsVisible = isVisible,
+            AnimationDuration = animationDuration,
         };
     }
 

@@ -5,16 +5,22 @@ import ActionButtons from "./ActionButtons";
 import ColorPresetCard from "./ColorPresetCard";
 import MetaPanel from "./MetaPanel";
 import PlayerCard from "./PlayerCard";
+import VisibilityCard from "./VisibilityCard";
 import { useAdminState } from "./useAdminState";
+import styles from "./AdminPanel.module.scss";
 
 const AdminPanel = () => {
   const {
     player1,
     player2,
     meta,
+    isVisible,
+    animationDuration,
     setPlayer1,
     setPlayer2,
     setMeta,
+    setVisibility,
+    setAnimationDuration,
     swapPlayers,
     reset,
     handleColorChange,
@@ -34,9 +40,21 @@ const AdminPanel = () => {
   };
 
   return (
-    <Container className="py-4">
-      {/* Meta Panel */}
-      <MetaPanel setMeta={setMeta} meta={meta} />
+    <Container className={`py-4 admin-panel ${styles.adminPanel}`}>
+      {/* Visibility Panel и Meta Panel в один ряд с одинаковой шириной */}
+      <Row className="mb-4">
+        <Col xs={12} md={6} lg={6}>
+          <VisibilityCard 
+            isVisible={isVisible} 
+            onVisibilityChange={setVisibility}
+            animationDuration={animationDuration} // Настраиваемое время анимации (800мс)
+            onAnimationDurationChange={setAnimationDuration} // Callback для изменения времени анимации
+          />
+        </Col>
+        <Col xs={12} md={6} lg={6}>
+          <MetaPanel setMeta={setMeta} meta={meta} />
+        </Col>
+      </Row>
 
       {/* Color Preset Panel */}
       <ColorPresetCard onColorChange={handleColorChange} />
@@ -62,6 +80,7 @@ const AdminPanel = () => {
             onWin={() => setPlayer1({ ...player1, final: "winner" })}
             onLose={() => setPlayer1({ ...player1, final: "loser" })}
             onTag={(tag) => setPlayer1({ ...player1, tag })}
+            onFlag={(flag) => setPlayer1({ ...player1, flag })}
             onClearFinal={() => setPlayer1({ ...player1, final: "none" })}
             label="Player 1"
             accent="#0dcaf0"
@@ -79,7 +98,12 @@ const AdminPanel = () => {
             onReset={reset}
           />
         </Col>
-        <Col xs={12} md={5} lg={4} className="d-flex justify-content-center">
+        <Col
+          xs={12}
+          md={5}
+          lg={4}
+          className="d-flex justify-content-center mb-3 mb-md-0"
+        >
           <PlayerCard
             player={player2}
             onName={(name) => setPlayer2({ ...player2, name })}
@@ -93,6 +117,7 @@ const AdminPanel = () => {
             onWin={() => setPlayer2({ ...player2, final: "winner" })}
             onLose={() => setPlayer2({ ...player2, final: "loser" })}
             onTag={(tag) => setPlayer2({ ...player2, tag })}
+            onFlag={(flag) => setPlayer2({ ...player2, flag })}
             onClearFinal={() => setPlayer2({ ...player2, final: "none" })}
             label="Player 2"
             accent="#6610f2"

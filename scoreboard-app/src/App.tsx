@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AdminPanel from "./AdminPanel/AdminPanel";
 import "./App.css";
+import "./global.scss";
 import Scoreboard from "./Scoreboard/Scoreboard";
 import { SignalRContext } from "./SignalRProvider";
 
@@ -46,7 +47,7 @@ function App() {
               boxShadow: "0 4px 24px rgba(0,0,0,0.25)",
               padding: "8px 32px",
               marginBottom: 20,
-              opacity: 0.1,
+              opacity: 0,
               transition: "opacity 0.5s",
               pointerEvents: "auto",
               display: "flex",

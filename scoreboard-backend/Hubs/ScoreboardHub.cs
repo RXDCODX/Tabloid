@@ -41,6 +41,18 @@ public class ScoreboardHub(ScoreboardStateService stateService) : Hub
         await Clients.All.SendAsync("ReceiveState", stateService.GetState());
     }
 
+    public async Task UpdateVisibility(bool isVisible)
+    {
+        stateService.UpdateVisibility(isVisible);
+        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+    }
+
+    public async Task UpdateAnimationDuration(int animationDuration)
+    {
+        stateService.UpdateAnimationDuration(animationDuration);
+        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+    }
+
     public async Task SetState(ScoreboardState state)
     {
         stateService.SetState(state);

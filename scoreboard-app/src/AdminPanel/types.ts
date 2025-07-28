@@ -3,6 +3,7 @@ export type Player = {
   sponsor: string;
   score: number;
   tag: string;
+  flag: string;
   final: string; // "winner", "loser", "none"
 };
 
@@ -16,6 +17,8 @@ export type ScoreboardState = {
   player2: Player;
   meta: MetaInfo;
   colors: ColorPreset;
+  isVisible: boolean; // Новое поле для управления видимостью
+  animationDuration?: number; // Время анимации в миллисекундах
 };
 
 // Типы с timestamp для отслеживания времени изменений
@@ -36,18 +39,22 @@ export type ScoreboardStateWithTimestamp = {
 
 export type ColorPreset = {
   name: string;
-  textColor: string; // primary -> textColor (цвет текста)
-  scoreColor: string; // secondary -> scoreColor (цвет чисел счетчиков)
-  scoreBackgroundColor: string; // фон счетчиков
-  titleColor: string; // accent -> titleColor (цвет metaTitle)
-  backgroundColor: string; // background -> backgroundColor (фон для left, middle, right, subBar1, subBar2)
+  mainColor: string; // Основной цвет для тегов и неонового свечения
+  playerNamesColor: string; // Цвет имен игроков
+  tournamentTitleColor: string; // Цвет названия турнира
+  fightModeColor: string; // Цвет режима драки
+  scoreColor: string; // Цвет счета
+  backgroundColor: string; // Цвет фона всех дивов
+  borderColor: string; // Цвет обводки всех дивов
 };
 
 export const defaultPreset: ColorPreset = {
   name: "Default",
-  textColor: "#3F00FF",
-  scoreColor: "#fff",
-  scoreBackgroundColor: "#23272f",
-  titleColor: "#3F00FF",
-  backgroundColor: "#fff",
+  mainColor: "#3F00FF",
+  playerNamesColor: "#ffffff",
+  tournamentTitleColor: "#3F00FF",
+  fightModeColor: "#3F00FF",
+  scoreColor: "#ffffff",
+  backgroundColor: "#23272f",
+  borderColor: "#3F00FF",
 };

@@ -16,19 +16,51 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
   </ItemGroup>
 
-  <Target Name="BuildFrontendAndCopyToWwwroot" AfterTargets="Build">
-    <Exec WorkingDirectory="..\scoreboard-app" Command="npm install" />
-    <Exec WorkingDirectory="..\scoreboard-app" Command="npm run build" />
-    <RemoveDir Directories="wwwroot" />
+  <!-- Основной Target для копирования frontend файлов -->
+  <Target Name="CopyFrontendToWwwroot" AfterTargets="Build">
+    <PropertyGroup>
+      <FrontendDistPath>..\scoreboard-app\dist</FrontendDistPath>
+    </PropertyGroup>
+    
+    <!-- Проверяем существование dist папки -->
+    <PropertyGroup Condition="Exists('$(FrontendDistPath)')">
+      <DistFolderExists>true</DistFolderExists>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="!Exists('$(FrontendDistPath)')">
+      <DistFolderExists>false</DistFolderExists>
+    </PropertyGroup>
+    
+    <!-- Очищаем wwwroot -->
+    <RemoveDir Directories="wwwroot" Condition="Exists('wwwroot')" />
     <MakeDir Directories="wwwroot" />
-    <Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Retries="3" />
+    
+    <!-- Копируем все файлы из dist, если папка существует -->
+    <ItemGroup Condition="'$(DistFolderExists)' == 'true'">
+      <DistFiles Include="$(FrontendDistPath)\**\*.*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(DistFiles)" 
+          DestinationFolder="wwwroot\%(RecursiveDir)" 
+          SkipUnchangedFiles="true" 
+          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
+          ContinueOnError="true" />
+    
+    <!-- Логируем результат -->
+    <Message Text="Frontend dist folder found: $(DistFolderExists)" Importance="high" />
+    <Message Text="Files to copy: @(DistFiles)" Importance="normal" Condition="'$(DistFolderExists)' == 'true'" />
+    <Message Text="No frontend files found, using fallback" Importance="high" Condition="'$(DistFolderExists)' != 'true'" />
+    
+    <!-- Создаем fallback index.html если копирование не удалось -->
+    <WriteLinesToFile File="wwwroot\index.html" 
+                      Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" 
+                      Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
   </Target>
-  <ItemGroup>
-    <FrontendDistFiles Include="..\scoreboard-app\dist\**\*.*" />
-  </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="Serialization\" />
-  </ItemGroup>
+      <ItemGroup>
+      <Folder Include="Serialization\" />
+    </ItemGroup>
+
+
 
 </Project>
