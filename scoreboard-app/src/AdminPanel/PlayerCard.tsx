@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import {
     ArrowDown,
@@ -10,6 +10,8 @@ import {
 } from "react-bootstrap-icons";
 import { PlayerWithTimestamp } from "./types";
 import FlagSelector from "./FlagSelector";
+import { playerPresetRepository } from "./services/PlayerPresetService";
+import { getFlagPath } from "./flagUtils";
 
 type PlayerCardProps = {
   player: PlayerWithTimestamp;
@@ -37,7 +39,39 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   onTag,
   onFlag,
   onClearFinal,
-}) => (
+}) => {
+  const [isNameOpen, setIsNameOpen] = useState(false);
+  const [presetsVersion, setPresetsVersion] = useState(0);
+
+  const nameQuery = player.name || "";
+
+  const filteredPresets = useMemo(() => {
+    const query = (nameQuery || "").trim().toLowerCase();
+    if (!query) return [] as { name: string; tag: string; flag: string; sponsor?: string }[];
+    return playerPresetRepository
+      .getAll()
+      .filter((p) => p.name.toLowerCase().includes(query))
+      .slice(0, 8);
+  }, [nameQuery, presetsVersion]);
+
+  const handleSelectPreset = (p: { name: string; tag: string; flag: string }) => {
+    onName(p.name);
+    onTag(p.tag || "");
+    onFlag(p.flag || "");
+    setIsNameOpen(false);
+  };
+
+  const handleSavePreset = () => {
+    playerPresetRepository.save({
+      name: player.name,
+      tag: player.tag,
+      flag: player.flag,
+      sponsor: player.sponsor,
+    });
+    setPresetsVersion((v) => v + 1);
+  };
+
+  return (
   <Card
     className="shadow-lg p-4 mb-2 player-card-responsive"
     style={{
@@ -66,23 +100,63 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           className="bg-dark text-info border-info border-2 fw-bold rounded-3"
           style={{ maxWidth: 90 }}
         />
-        <Form.Control
-          placeholder="Name"
-          value={
-            (player.final === "winner"
-              ? "[W] "
-              : player.final === "loser"
-              ? "[L] "
-              : "") + player.name
-          }
-          onChange={(e) => {
-            let val = e.target.value.replace(/^\[W\] |^\[L\] /, "");
-            onName(val);
-          }}
-          size="sm"
-          className="fw-bold bg-dark text-white border-primary border-2 rounded-3"
-          style={{ maxWidth: 110 }}
-        />
+        <div className="position-relative" style={{ maxWidth: 110, width: 110 }}>
+          <Form.Control
+            placeholder="Name"
+            value={
+              (player.final === "winner"
+                ? "[W] "
+                : player.final === "loser"
+                ? "[L] "
+                : "") + player.name
+            }
+            onChange={(e) => {
+              let val = e.target.value.replace(/^\[W\] |^\[L\] /, "");
+              onName(val);
+              setIsNameOpen(true);
+            }}
+            onFocus={() => setIsNameOpen(true)}
+            onBlur={() => setTimeout(() => setIsNameOpen(false), 150)}
+            size="sm"
+            className="fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100"
+          />
+          {isNameOpen && filteredPresets.length > 0 && (
+            <div
+              className="position-absolute w-100 bg-dark border border-primary rounded-3 mt-1"
+              style={{
+                maxHeight: "200px",
+                overflowY: "auto",
+                zIndex: 1000,
+                top: "100%",
+              }}
+            >
+              {filteredPresets.map((p) => (
+                <div
+                  key={`${p.name}-${p.tag}-${p.flag}`}
+                  className="d-flex align-items-center gap-2 p-2 text-white"
+                  style={{ cursor: "pointer", borderBottom: "1px solid #333" }}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => handleSelectPreset(p)}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#495057")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                >
+                  <img
+                    src={getFlagPath(p.flag)}
+                    alt={p.flag}
+                    style={{ width: "20px", height: "15px", objectFit: "cover" }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <div className="d-flex flex-column">
+                    <span className="small fw-bold">{p.name}</span>
+                    {p.tag && <span className="small text-info">{p.tag}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <div className="d-flex align-items-center gap-2 mb-3">
         <FlagSelector
@@ -90,6 +164,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           onFlagChange={onFlag}
           placeholder="Флаг"
         />
+        <Button
+          variant="outline-success"
+          size="sm"
+          className="ms-2"
+          onClick={handleSavePreset}
+          title="Сохранить пресет игрока"
+        >
+          Сохранить
+        </Button>
       </div>
       <div className="d-flex align-items-center justify-content-between mb-3 gap-2">
         <Button
@@ -158,6 +241,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       </div>
     </Card.Body>
   </Card>
-);
+  );
+};
 
 export default PlayerCard; 

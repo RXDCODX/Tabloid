@@ -8,6 +8,7 @@ import PlayerCard from "./PlayerCard";
 import VisibilityCard from "./VisibilityCard";
 import { useAdminState } from "./useAdminState";
 import styles from "./AdminPanel.module.scss";
+import { playerPresetRepository } from "./services/PlayerPresetService";
 
 const AdminPanel = () => {
   const {
@@ -33,6 +34,11 @@ const AdminPanel = () => {
       navigate("/admin");
     }
   }, [navigate]);
+
+  // Load presets once on admin panel mount
+  useEffect(() => {
+    playerPresetRepository.load?.();
+  }, []);
 
   const handleSwapNames = () => {
     setPlayer1({ ...player1, name: player2.name });

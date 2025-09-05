@@ -14,6 +14,8 @@ public static class Program
 
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
+        builder.Services.AddSingleton<PlayerPresetService>();
+        builder.Services.AddControllers();
         builder
             .Services.AddSignalR()
             .AddJsonProtocol(options =>
@@ -114,6 +116,7 @@ public static class Program
         app.UseCors("CorsPolicy");
 
         app.MapHub<ScoreboardHub>("/scoreboardHub");
+        app.MapControllers();
         app.MapFallbackToFile("index.html");
 
         app.Run("http://localhost:5035");
