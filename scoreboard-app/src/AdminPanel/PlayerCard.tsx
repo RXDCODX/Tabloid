@@ -164,15 +164,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           onFlagChange={onFlag}
           placeholder="Флаг"
         />
-        <Button
-          variant="outline-success"
-          size="sm"
-          className="ms-2"
-          onClick={handleSavePreset}
-          title="Сохранить пресет игрока"
-        >
-          Сохранить
-        </Button>
       </div>
       <div className="d-flex align-items-center justify-content-between mb-3 gap-2">
         <Button
@@ -238,6 +229,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             ✕
           </Button>
         )}
+        <Button
+          variant="outline-success"
+          size="sm"
+          className="ms-2"
+          onClick={handleSavePreset}
+          title="Сохранить пресет игрока"
+        >
+          Сохранить
+        </Button>
       </div>
     </Card.Body>
   </Card>
