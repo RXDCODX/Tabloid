@@ -1,0 +1,14 @@
+# Зависимости
+node_modules/
+
+# Сборка
+dist/
+build/
+
+# Конфигурационные файлы
+*.config.js
+*.config.ts
+
+# Другие файлы
+coverage/
+.nyc_output/
