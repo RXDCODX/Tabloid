@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import AdminPanel from "./AdminPanel/AdminPanel";
+import AdminPanel from "./components/AdminPanel/AdminPanel";
 import "./App.css";
 import "./global.scss";
-import Scoreboard from "./Scoreboard/Scoreboard";
-import { SignalRContext } from "./SignalRProvider";
+import Scoreboard from "./components/Scoreboard/Scoreboard";
+import { SignalRContext } from "./providers/SignalRProvider";
 
 interface Forecast {
   date: string;
