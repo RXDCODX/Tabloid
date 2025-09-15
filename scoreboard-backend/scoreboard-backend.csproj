@@ -8,11 +8,23 @@
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+
+    <!-- SpaYarp configuration -->
+    <SpaRoot>../scoreboard-app</SpaRoot>
+    <SpaClientUrl>http://localhost:5173</SpaClientUrl>
+    <SpaLaunchCommand>npm run dev</SpaLaunchCommand>
+    <!-- Change the timeout of the proxy (defaults to 120 seconds) -->
+    <SpaProxyTimeoutInSeconds>1200</SpaProxyTimeoutInSeconds>
+    <!-- Optionally forward only request starting with the specified path 
+    <SpaPublicPath>/dist</SpaPublicPath> -->
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.SpaYarp" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
   </ItemGroup>
 
@@ -40,11 +52,7 @@
       <DistFiles Include="$(FrontendDistPath)\**\*.*" />
     </ItemGroup>
     
-    <Copy SourceFiles="@(DistFiles)" 
-          DestinationFolder="wwwroot\%(RecursiveDir)" 
-          SkipUnchangedFiles="true" 
-          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
-          ContinueOnError="true" />
+    <Copy SourceFiles="@(DistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" ContinueOnError="true" />
     
     <!-- Логируем результат -->
     <Message Text="Frontend dist folder found: $(DistFolderExists)" Importance="high" />
@@ -52,9 +60,7 @@
     <Message Text="No frontend files found, using fallback" Importance="high" Condition="'$(DistFolderExists)' != 'true'" />
     
     <!-- Создаем fallback index.html если копирование не удалось -->
-    <WriteLinesToFile File="wwwroot\index.html" 
-                      Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" 
-                      Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
+    <WriteLinesToFile File="wwwroot\index.html" Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
   </Target>
   
       <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using scoreboard_backend.Hubs;
 using scoreboard_backend.Serialization;
 using scoreboard_backend.Services;
@@ -11,6 +12,9 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Добавляем SPA сервисы
+        builder.Services.AddSpaYarp();
 
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
@@ -38,6 +42,7 @@ public static class Program
                 }
             )
         );
+
         builder.Services.AddEndpointsApiExplorer();
         if (builder.Environment.IsDevelopment())
         {
@@ -51,6 +56,9 @@ public static class Program
         }
 
         var app = builder.Build();
+
+        // Настройка SpaYarp для обработки SPA маршрутов
+        app.UseSpaYarp();
 
         if (app.Environment.IsDevelopment())
         {
@@ -98,7 +106,7 @@ public static class Program
                     );
                     ctx.Context.Response.Headers.Append("Pragma", "no-cache");
                     ctx.Context.Response.Headers.Append("Expires", "0");
-                    
+
                     // Для HTML файлов добавляем дополнительный заголовок
                     if (ctx.File.Name.EndsWith(".html"))
                     {
@@ -117,7 +125,6 @@ public static class Program
 
         app.MapHub<ScoreboardHub>("/scoreboardHub");
         app.MapControllers();
-        app.MapFallbackToFile("index.html");
 
         app.Run("http://localhost:5035");
     }

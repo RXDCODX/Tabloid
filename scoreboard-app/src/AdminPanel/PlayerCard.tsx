@@ -100,7 +100,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           className="bg-dark text-info border-info border-2 fw-bold rounded-3"
           style={{ maxWidth: 90 }}
         />
-        <div className="position-relative" style={{ maxWidth: 110, width: 110 }}>
+        <div className="position-relative" style={{ width: "100%" }}>
           <Form.Control
             placeholder="Name"
             value={

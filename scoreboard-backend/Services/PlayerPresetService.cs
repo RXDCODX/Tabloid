@@ -7,7 +7,8 @@ public class PlayerPresetService
 {
     private readonly string _presetsPath;
     private readonly List<PlayerPreset> _presets;
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
+    private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
 
     public PlayerPresetService()
     {
@@ -20,14 +21,17 @@ public class PlayerPresetService
     {
         lock (_lock)
         {
-            return _presets.ToList();
+            return [.. _presets];
         }
     }
 
     public void Upsert(PlayerPreset preset)
     {
         if (string.IsNullOrWhiteSpace(preset.Name))
+        {
             return;
+        }
+
         lock (_lock)
         {
             var idx = _presets.FindIndex(p =>
@@ -48,7 +52,10 @@ public class PlayerPresetService
     public void RemoveByName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             return;
+        }
+
         lock (_lock)
         {
             _presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -71,15 +78,17 @@ public class PlayerPresetService
         try
         {
             if (!File.Exists(_presetsPath))
-                return new List<PlayerPreset>();
+            {
+                return [];
+            }
+
             var json = File.ReadAllText(_presetsPath);
-            var data =
-                JsonSerializer.Deserialize<List<PlayerPreset>>(json) ?? new List<PlayerPreset>();
+            var data = JsonSerializer.Deserialize<List<PlayerPreset>>(json) ?? [];
             return data;
         }
         catch
         {
-            return new List<PlayerPreset>();
+            return [];
         }
     }
 
@@ -92,10 +101,7 @@ public class PlayerPresetService
             {
                 Directory.CreateDirectory(dir);
             }
-            var json = JsonSerializer.Serialize(
-                _presets,
-                new JsonSerializerOptions { WriteIndented = true }
-            );
+            var json = JsonSerializer.Serialize(_presets, jsonSerializerOptions);
             File.WriteAllText(_presetsPath, json);
         }
         catch
