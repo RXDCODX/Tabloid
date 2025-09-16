@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Button, ButtonGroup, Card, Form } from "react-bootstrap";
 import { InfoCircle } from "react-bootstrap-icons";
-import { MetaInfoWithTimestamp } from "./types";
+import { MetaInfoWithTimestamp } from "../types";
+import styles from "./MetaPanel.module.scss";
 
 type MetaPanelProps = {
   setMeta: (meta: any) => void;
@@ -28,29 +29,18 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
   };
 
   return (
-    <Card
-      className="shadow-lg p-3 mb-4"
-      style={{
-        background: "#1a1d23",
-        borderRadius: 18,
-        border: "2px solid #6f42c1",
-        height: "100%", // Для выравнивания с VisibilityCard
-      }}
-    >
-      <Card.Body className="d-flex flex-column h-100">
-        <div className="d-flex flex-column align-items-center mb-3 gap-2 text-center">
+    <Card className={styles.metaPanel}>
+      <Card.Body className={styles.cardBody}>
+        <div className={styles.cardHeader}>
           <InfoCircle color="#6f42c1" size={20} />
-          <span
-            className="fw-bold text-uppercase"
-            style={{ color: "#6f42c1", letterSpacing: 1, fontSize: 14 }}
-          >
+          <span className={styles.cardTitle}>
             Meta Panel
           </span>
         </div>
         
-        <div className="d-flex flex-column gap-3 flex-grow-1">
+        <div className={styles.formSection}>
           <Form.Group>
-            <Form.Label className="text-white fw-bold" style={{ fontSize: 12 }}>
+            <Form.Label className={styles.fieldLabel}>
               Название турнира
             </Form.Label>
             <Form.Control
@@ -58,16 +48,16 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
               placeholder="Введите название турнира"
               value={meta.title}
               onChange={(e) => setMeta({ title: e.target.value })}
-              className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
+              className={`${styles.textInput} bg-dark text-white border-primary border-2 fw-bold rounded-3`}
               style={{ fontSize: 14 }}
             />
           </Form.Group>
           
           <Form.Group>
-            <Form.Label className="text-white fw-bold" style={{ fontSize: 12 }}>
+            <Form.Label className={styles.fieldLabel}>
               Режим драки
             </Form.Label>
-            <div className="d-flex gap-1 flex-wrap mb-2">
+            <div className={styles.fightRulesContainer}>
               <ButtonGroup size="sm" className="w-100">
                 {fightRules.map((rule) => (
                   <Button
@@ -76,14 +66,10 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
                       meta.fightRule === rule ? "primary" : "outline-primary"
                     }
                     onClick={() => handleFightRuleChange(rule)}
-                    className="fw-bold"
+                    className={`${styles.fightRuleButton} fw-bold`}
                     style={{
-                      minWidth: 50,
-                      fontSize: 12,
-                      background:
-                        meta.fightRule === rule ? "#0d6efd" : "transparent",
-                      borderColor: "#0d6efd",
-                    }}
+                      '--button-bg': meta.fightRule === rule ? "#0d6efd" : "transparent",
+                    } as React.CSSProperties}
                   >
                     {rule}
                   </Button>
@@ -98,12 +84,10 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
                   meta.fightRule === "None" ? "secondary" : "outline-secondary"
                 }
                 onClick={() => handleFightRuleChange("None")}
-                className="fw-bold w-100"
+                className={`${styles.noneButton} fw-bold`}
                 style={{
-                  fontSize: 12,
-                  background: meta.fightRule === "None" ? "#6c757d" : "transparent",
-                  borderColor: "#6c757d",
-                }}
+                  '--button-bg': meta.fightRule === "None" ? "#6c757d" : "transparent",
+                } as React.CSSProperties}
               >
                 None
               </Button>
@@ -117,14 +101,12 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
                     : "outline-primary"
                 }
                 onClick={() => handleFightRuleChange("Custom")}
-                className="fw-bold w-100"
+                className={`${styles.customButton} fw-bold`}
                 style={{
-                  fontSize: 12,
-                  background: meta.fightRule === "Custom" || (!fightRules.includes(meta.fightRule) && meta.fightRule !== "None")
+                  '--button-bg': meta.fightRule === "Custom" || (!fightRules.includes(meta.fightRule) && meta.fightRule !== "None")
                     ? "#0d6efd"
                     : "transparent",
-                  borderColor: "#0d6efd",
-                }}
+                } as React.CSSProperties}
               >
                 Custom
               </Button>
@@ -135,7 +117,7 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
                   placeholder="Кастомный режим (например: FT10, BO3)"
                   value={customFightRule || ""}
                   onChange={(e) => handleCustomFightRuleChange(e.target.value)}
-                  className="bg-dark text-warning border-warning border-2 fw-bold rounded-3"
+                  className={`${styles.customInput} bg-dark text-warning border-warning border-2 fw-bold rounded-3`}
                   style={{ fontSize: 12 }}
                 />
               )}
@@ -147,4 +129,4 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
   );
 };
 
-export default MetaPanel; 
+export default MetaPanel;

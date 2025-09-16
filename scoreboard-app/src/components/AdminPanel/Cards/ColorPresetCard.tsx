@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { Palette } from "react-bootstrap-icons";
-import { ColorPreset, defaultPreset } from "./types";
-import ColorPickerWithTransparency from "./ColorPickerWithTransparency";
+import { ColorPreset, defaultPreset } from "../types";
+import ColorPickerWithTransparency from "../Forms/ColorPickerWithTransparency";
+import styles from "./ColorPresetCard.module.scss";
 
 type ColorPresetCardProps = {
   onColorChange: (colors: Partial<ColorPreset>) => void;
@@ -95,41 +96,29 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
   };
 
   return (
-    <Card
-      className="shadow-lg p-4 mb-4"
-      style={{
-        background: "#1a1d23",
-        borderRadius: 18,
-        border: "2px solid #6f42c1",
-      }}
-    >
+    <Card className={styles.colorPresetCard}>
       <Card.Body>
-        <div className="d-flex flex-column align-items-center mb-3 gap-2 text-center">
+        <div className={styles.cardHeader}>
           <Palette color="#6f42c1" size={22} />
-          <span
-            className="fw-bold text-uppercase"
-            style={{ color: "#6f42c1", letterSpacing: 1 }}
-          >
+          <span className={styles.cardTitle}>
             Color Presets
           </span>
         </div>
 
         {/* Пресеты цветов */}
-        <div className="mb-4">
-          <h6 className="text-white fw-bold mb-3">Presets:</h6>
-          <div className="d-flex flex-wrap justify-content-center gap-2">
+        <div className={styles.presetsSection}>
+          <h6 className={styles.sectionTitle}>Presets:</h6>
+          <div className={styles.presetsContainer}>
             {colorPresets.map((preset) => (
               <Button
                 key={preset.name}
                 variant="outline-primary"
                 size="sm"
                 onClick={() => applyPreset(preset)}
-                className="fw-bold"
+                className={`${styles.presetButton} fw-bold`}
                 style={{
-                  borderColor: preset.mainColor,
-                  color: preset.mainColor,
-                  minWidth: 100,
-                }}
+                  '--preset-color': preset.mainColor,
+                } as React.CSSProperties}
               >
                 {preset.name}
               </Button>
@@ -138,12 +127,12 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
         </div>
 
         {/* Кастомные цвета */}
-        <div>
-          <h6 className="text-white fw-bold mb-3">Custom Colors:</h6>
+        <div className={styles.customColorsSection}>
+          <h6 className={styles.sectionTitle}>Custom Colors:</h6>
           <Row className="g-3 d-flex justify-content-center">
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Main Color (Tags & Glow)
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -153,9 +142,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Player Names
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -165,9 +154,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Tournament Title
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -177,9 +166,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Fight Mode
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -189,9 +178,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Score Color
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -201,9 +190,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Background
                 </Form.Label>
                 <ColorPickerWithTransparency
@@ -213,9 +202,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            <Col xs={6} md={3}>
+            <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
-                <Form.Label className="text-white fw-bold small">
+                <Form.Label className={styles.fieldLabel}>
                   Border Color
                 </Form.Label>
                 <ColorPickerWithTransparency

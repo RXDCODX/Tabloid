@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Form, Dropdown } from 'react-bootstrap';
-import { searchCountries, getFlagPath, Country } from './flagUtils';
+import { Form } from 'react-bootstrap';
+import { searchCountries, getFlagPath, Country } from '../Utils/flagUtils';
+import styles from './FlagSelector.module.scss';
 
 type FlagSelectorProps = {
   selectedFlag: string;
@@ -45,7 +46,7 @@ const FlagSelector: React.FC<FlagSelectorProps> = ({
   const selectedCountry = filteredCountries.find(c => c.code === selectedFlag);
 
   return (
-    <div className="position-relative w-100">
+    <div className={styles.flagSelectorContainer}>
       <Form.Control
         ref={inputRef}
         type="text"
@@ -55,35 +56,21 @@ const FlagSelector: React.FC<FlagSelectorProps> = ({
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         size="sm"
-        className="bg-dark text-white border-info border-2 fw-bold rounded-3"
+        className={`${styles.searchInput} bg-dark text-white border-info border-2 fw-bold rounded-3`}
       />
       
       {isOpen && (
-        <div 
-          className="position-absolute w-100 bg-dark border border-info rounded-3 mt-1"
-          style={{ 
-            maxHeight: '200px', 
-            overflowY: 'auto', 
-            zIndex: 1000,
-            top: '100%'
-          }}
-        >
+        <div className={styles.dropdown}>
           {filteredCountries.map((country) => (
             <div
               key={country.code}
-              className="d-flex align-items-center gap-2 p-2 text-white cursor-pointer hover-bg-secondary"
-              style={{ 
-                cursor: 'pointer',
-                borderBottom: '1px solid #333'
-              }}
+              className={styles.dropdownItem}
               onClick={() => handleSelect(country.code)}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#495057'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               <img
                 src={getFlagPath(country.code)}
                 alt={country.name}
-                style={{ width: '20px', height: '15px', objectFit: 'cover' }}
+                className={styles.flagImage}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -92,7 +79,7 @@ const FlagSelector: React.FC<FlagSelectorProps> = ({
             </div>
           ))}
           {filteredCountries.length === 0 && (
-            <div className="p-2 text-muted small">
+            <div className={styles.noResults}>
               Страна не найдена
             </div>
           )}
@@ -100,11 +87,11 @@ const FlagSelector: React.FC<FlagSelectorProps> = ({
       )}
       
       {selectedFlag && !isOpen && (
-        <div className="position-absolute top-0 start-0 p-1">
+        <div className={styles.selectedFlag}>
           <img
             src={getFlagPath(selectedFlag)}
             alt="Selected flag"
-            style={{ width: '20px', height: '15px', objectFit: 'cover' }}
+            className={styles.flagImage}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
@@ -115,4 +102,4 @@ const FlagSelector: React.FC<FlagSelectorProps> = ({
   );
 };
 
-export default FlagSelector; 
+export default FlagSelector;

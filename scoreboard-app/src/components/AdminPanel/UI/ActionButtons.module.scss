@@ -1,0 +1,46 @@
+// Стили для кнопок действий
+.actionButtons {
+  gap: 1rem;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: auto;
+  }
+
+  align-items: center;
+}
+
+.actionButton {
+  font-weight: bold;
+  padding: 0.5rem 0;
+  text-align: center;
+  font-size: 18px;
+  border: none;
+  position: relative;
+
+  @media (min-width: 768px) {
+    width: auto;
+    margin: 0 0.5rem;
+  }
+
+  width: 100%;
+  margin: 0 0.5rem;
+}
+
+.swapButton {
+  background: #0dcaf0;
+  box-shadow: 0 2px 8px #0dcaf055;
+
+  &:hover {
+    background: #0bb5d4;
+  }
+}
+
+.resetButton {
+  background: #dc3545;
+  box-shadow: 0 2px 8px #dc354555;
+
+  &:hover {
+    background: #c82333;
+  }
+}

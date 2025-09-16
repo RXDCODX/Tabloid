@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import AdminPanel from "../components/AdminPanel/AdminPanel";
+import { AdminPanel } from "../components/AdminPanel";
 import styles from "./App.module.scss";
 import "../global.scss";
 import Scoreboard from "../components/Scoreboard/Scoreboard";

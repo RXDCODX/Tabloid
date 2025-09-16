@@ -1,0 +1,82 @@
+// Стили для карточки пресетов цветов
+.colorPresetCard {
+  background: #1a1d23;
+  border-radius: 18px;
+  border: 2px solid #6f42c1;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.cardTitle {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #6f42c1;
+  letter-spacing: 1px;
+}
+
+.presetsSection {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+.presetsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.presetButton {
+  border-color: var(--preset-color);
+  color: var(--preset-color);
+  min-width: 100px;
+  font-weight: bold;
+}
+
+.customColorsSection {
+  .sectionTitle {
+    color: white;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.customColorsGrid {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.colorField {
+  flex: 0 0 auto;
+
+  @media (min-width: 576px) {
+    flex: 0 0 50%;
+  }
+
+  @media (min-width: 768px) {
+    flex: 0 0 25%;
+  }
+}
+
+.fieldLabel {
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+}

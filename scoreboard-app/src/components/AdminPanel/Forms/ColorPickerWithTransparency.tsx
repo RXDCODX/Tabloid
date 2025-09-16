@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
+import styles from "./ColorPickerWithTransparency.module.scss";
 
 type ColorPickerWithTransparencyProps = {
   value: string;
@@ -63,33 +64,26 @@ const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = 
   };
 
   return (
-    <div className="d-flex gap-2">
+    <div className={styles.colorPickerContainer}>
       <Form.Control
         type="color"
         value={isTransparent ? '#ffffff' : value}
         onChange={handleColorPickerChange}
-        className="p-1"
-        style={{ width: 50, height: 38 }}
+        className={styles.colorInput}
       />
       <Form.Control
         type="text"
         value={value}
         onChange={handleTextChange}
         placeholder={placeholder}
-        className="bg-dark text-white border-primary border-2 fw-bold rounded-3"
+        className={`${styles.textInput} bg-dark text-white border-primary border-2 fw-bold rounded-3`}
         style={{ fontSize: 12 }}
       />
       <Button
         variant={isTransparent ? "success" : "outline-secondary"}
         size="sm"
         onClick={isTransparent ? setOpaque : setTransparent}
-        className="d-flex align-items-center justify-content-center"
-        style={{ 
-          width: 38, 
-          height: 38,
-          minWidth: 38,
-          fontSize: 12
-        }}
+        className={styles.transparencyButton}
         title={isTransparent ? "Сделать непрозрачным" : "Сделать прозрачным"}
       >
         {isTransparent ? <EyeSlash size={14} /> : <Eye size={14} />}
@@ -98,4 +92,4 @@ const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = 
   );
 };
 
-export default ColorPickerWithTransparency; 
+export default ColorPickerWithTransparency;

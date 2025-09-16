@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import ActionButtons from './ActionButtons';
-import ColorPresetCard from './ColorPresetCard';
-import MetaPanel from './MetaPanel';
-import PlayerCard from './PlayerCard';
-import VisibilityCard from './VisibilityCard';
+import ActionButtons from './UI/ActionButtons';
+import ColorPresetCard from './Cards/ColorPresetCard';
+import MetaPanel from './Cards/MetaPanel';
+import PlayerCard from './Cards/PlayerCard';
+import VisibilityCard from './Cards/VisibilityCard';
 import { useAdminState } from '../../hooks/useAdminState';
 import styles from './AdminPanel.module.scss';
-import { playerPresetRepository } from '../../services/PlayerPresetService';
+import { playerPresetRepository } from './services/PlayerPresetService';
 
 const AdminPanel = () => {
   const {
