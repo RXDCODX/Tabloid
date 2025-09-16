@@ -133,9 +133,12 @@ function App() {
         </div>
       </div>
       <SignalRContext.Provider
-        automaticReconnect
-        withCredentials={false}
-        url="http://localhost:5035/scoreboardHub"
+        value={{
+          connection: null,
+          automaticReconnect: true,
+          withCredentials: false,
+          url: "http://localhost:5035/scoreboardHub"
+        }}
       >
         <Routes>
           <Route path="/scoreboard" element={<Scoreboard />} />

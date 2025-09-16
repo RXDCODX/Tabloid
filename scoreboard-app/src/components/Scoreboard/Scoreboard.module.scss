@@ -1,0 +1,206 @@
+// Scoreboard.module.scss
+.centerDiv {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 540px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+
+  h5 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+}
+
+.leftDiv {
+  position: absolute;
+  top: 15px;
+  left: 167px;
+  width: 540px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-radius: 8px;
+  z-index: 5;
+
+  .playerInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .playerName {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .flag {
+    width: 40px;
+    height: 40px;
+    margin: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .score {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    h2 {
+      margin: 0;
+      font-size: 48px;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+
+.rightDiv {
+  position: absolute;
+  top: 15px;
+  right: 167px;
+  width: 540px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-radius: 8px;
+  z-index: 5;
+
+  .playerInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .playerName {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .flag {
+    width: 40px;
+    height: 40px;
+    margin: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .score {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    h2 {
+      margin: 0;
+      font-size: 48px;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+
+.fightModeDiv {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 5;
+
+  h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+  }
+}
+
+// Адаптивность для мобильных устройств
+@media (max-width: 768px) {
+  .centerDiv {
+    width: 90%;
+    height: 50px;
+
+    h5 {
+      font-size: 18px;
+    }
+  }
+
+  .leftDiv,
+  .rightDiv {
+    position: relative;
+    left: auto;
+    right: auto;
+    width: 100%;
+    height: 80px;
+    margin: 10px 0;
+    padding: 0 15px;
+
+    .playerName {
+      font-size: 16px;
+    }
+
+    .score h2 {
+      font-size: 36px;
+    }
+
+    .flag {
+      width: 30px;
+      height: 30px;
+      margin: 0 10px;
+    }
+  }
+
+  .fightModeDiv {
+    position: relative;
+    left: auto;
+    transform: none;
+    width: 100%;
+    height: 40px;
+    margin: 10px 0;
+
+    h4 {
+      font-size: 16px;
+    }
+  }
+}

@@ -49,8 +49,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     const query = (nameQuery || "").trim().toLowerCase();
     if (!query) return [] as { name: string; tag: string; flag: string; sponsor?: string }[];
     return playerPresetRepository
-      .getAll()
-      .filter((p) => p.name.toLowerCase().includes(query))
+      .getAllPresets()
+      .filter((p: any) => p.name.toLowerCase().includes(query))
       .slice(0, 8);
   }, [nameQuery, presetsVersion]);
 
@@ -130,7 +130,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                 top: "100%",
               }}
             >
-              {filteredPresets.map((p) => (
+              {filteredPresets.map((p: any) => (
                 <div
                   key={`${p.name}-${p.tag}-${p.flag}`}
                   className="d-flex align-items-center gap-2 p-2 text-white"
