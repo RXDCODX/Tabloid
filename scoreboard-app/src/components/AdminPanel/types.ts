@@ -11,7 +11,7 @@ export interface ColorPreset {
 export interface MetaInfoWithTimestamp {
   title: string;
   fightRule: string;
-  timestamp: number;
+  timestamp?: number;
 }
 
 export interface PlayerWithTimestamp {
@@ -21,7 +21,7 @@ export interface PlayerWithTimestamp {
   tag: string;
   flag: string;
   final: string;
-  timestamp: number;
+  timestamp?: number;
 }
 
 export const defaultPreset: ColorPreset = {

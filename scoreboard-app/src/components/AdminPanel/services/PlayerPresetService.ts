@@ -18,6 +18,11 @@ class PlayerPresetService {
     this.loadPresets();
   }
 
+  // Публичная загрузка на случай, если нужно инициировать повторно
+  public load(): void {
+    this.loadPresets();
+  }
+
   private loadPresets(): void {
     const saved = localStorage.getItem('playerPresets');
     if (saved) {
@@ -52,6 +57,11 @@ class PlayerPresetService {
     this.presets.push(newPreset);
     this.savePresets();
     return newPreset;
+  }
+
+  // Совместимость с использованием playerPresetRepository.save({...})
+  save(preset: Omit<PlayerPreset, 'id' | 'timestamp'>): PlayerPreset {
+    return this.addPreset(preset);
   }
 
   updatePreset(
