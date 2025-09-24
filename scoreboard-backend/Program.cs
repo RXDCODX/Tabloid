@@ -126,6 +126,6 @@ public static class Program
         app.MapHub<ScoreboardHub>("/scoreboardHub");
         app.MapControllers();
 
-        app.Run("http://localhost:5035");
+        app.Run();
     }
 }

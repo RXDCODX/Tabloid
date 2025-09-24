@@ -22,11 +22,29 @@ export interface ColorPreset {
   borderColor?: string;
 }
 
+export interface TextConfiguration {
+  player1NameText?: string;
+  player2NameText?: string;
+  tournamentTitleText?: string;
+  fightModeText?: string;
+  player1ScoreText?: string;
+  player2ScoreText?: string;
+}
+
+export interface BackgroundImages {
+  centerImage?: string;
+  leftImage?: string;
+  rightImage?: string;
+  fightModeImage?: string;
+}
+
 export interface ScoreboardState {
   player1: Player;
   player2: Player;
   meta: MetaInfo;
   colors: ColorPreset;
+  textConfig: TextConfiguration;
+  backgroundImages: BackgroundImages;
   isVisible: boolean;
   animationDuration?: number;
 }

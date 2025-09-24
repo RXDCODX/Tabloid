@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scoreboard-backend", "score
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "scoreboard-app", "scoreboard-app\scoreboard-app.esproj", "{D4E5F350-DFD3-6338-858E-9C23F3AB215A}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Install", "Install\Install.vdproj", "{0F48EF4B-3063-23E4-72C6-21544904F984}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,12 +49,6 @@ Global
 		{D4E5F350-DFD3-6338-858E-9C23F3AB215A}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4E5F350-DFD3-6338-858E-9C23F3AB215A}.Release|x86.Build.0 = Release|Any CPU
 		{D4E5F350-DFD3-6338-858E-9C23F3AB215A}.Release|x86.Deploy.0 = Release|Any CPU
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Debug|Any CPU.ActiveCfg = Debug
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Debug|x64.ActiveCfg = Debug
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Debug|x86.ActiveCfg = Debug
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Release|Any CPU.ActiveCfg = Release
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Release|x64.ActiveCfg = Release
-		{0F48EF4B-3063-23E4-72C6-21544904F984}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

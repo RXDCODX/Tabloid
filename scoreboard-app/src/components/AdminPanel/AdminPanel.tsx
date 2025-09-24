@@ -6,6 +6,8 @@ import ColorPresetCard from './Cards/ColorPresetCard';
 import MetaPanel from './Cards/MetaPanel';
 import PlayerCard from './Cards/PlayerCard';
 import VisibilityCard from './Cards/VisibilityCard';
+import BackgroundImagesCard from './Cards/BackgroundImagesCard';
+import BordersToggleCard from './Cards/BordersToggleCard';
 import { useAdminState } from '../../hooks/useAdminState';
 import styles from './AdminPanel.module.scss';
 import { playerPresetRepository } from './services/PlayerPresetService';
@@ -17,11 +19,13 @@ const AdminPanel = () => {
     meta,
     isVisible,
     animationDuration,
+    backgroundImages,
     setPlayer1,
     setPlayer2,
     setMeta,
     setVisibility,
     setAnimationDuration,
+    setBackgroundImages,
     swapPlayers,
     reset,
     handleColorChange,
@@ -64,6 +68,19 @@ const AdminPanel = () => {
 
       {/* Color Preset Panel */}
       <ColorPresetCard onColorChange={handleColorChange} />
+
+      {/* Borders Toggle */}
+      <Row className="mb-4">
+        <Col xs={12} md={6} lg={6}>
+          <BordersToggleCard />
+        </Col>
+      </Row>
+
+      {/* Background Images Panel */}
+      <BackgroundImagesCard 
+        backgroundImages={backgroundImages}
+        onBackgroundImagesChange={setBackgroundImages}
+      />
 
       {/* Players Cards */}
       <Row className="justify-content-center align-items-center g-4">

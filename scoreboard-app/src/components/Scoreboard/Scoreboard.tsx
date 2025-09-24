@@ -243,10 +243,14 @@ const Scoreboard: React.FC = () => {
               </h4>
             </div>
             {player1.flag && player1.flag !== "none" && (
-              <div className={styles.flag}>
+              <div
+                className={styles.flag}
+                style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+              >
                 <img
                   src={getFlagPath(player1.flag)}
                   alt="Player 1 flag"
+                  style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -280,10 +284,14 @@ const Scoreboard: React.FC = () => {
               </h2>
             </div>
             {player2.flag && player2.flag !== "none" && (
-              <div className={styles.flag}>
+              <div
+                className={styles.flag}
+                style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+              >
                 <img
                   src={getFlagPath(player2.flag)}
                   alt="Player 2 flag"
+                  style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}

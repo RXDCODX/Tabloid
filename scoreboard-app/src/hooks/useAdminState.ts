@@ -1,5 +1,11 @@
 import { useState, useCallback } from 'react';
-import { Player, MetaInfo, ColorPreset } from '../types/types';
+import {
+  Player,
+  MetaInfo,
+  ColorPreset,
+  TextConfiguration,
+  BackgroundImages,
+} from '../types/types';
 
 export const useAdminState = () => {
   const [player1, setPlayer1] = useState<Player>({
@@ -27,6 +33,10 @@ export const useAdminState = () => {
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [animationDuration, setAnimationDuration] = useState<number>(800);
+  const [textConfig, setTextConfig] = useState<TextConfiguration>({});
+  const [backgroundImages, setBackgroundImages] = useState<BackgroundImages>(
+    {}
+  );
 
   const swapPlayers = useCallback(() => {
     const temp = player1;
@@ -55,6 +65,8 @@ export const useAdminState = () => {
       title: 'Tournament',
       fightRule: 'Grand Finals',
     });
+    setTextConfig({});
+    setBackgroundImages({});
   }, []);
 
   const handleColorChange = useCallback((colors: ColorPreset) => {
@@ -68,11 +80,15 @@ export const useAdminState = () => {
     meta,
     isVisible,
     animationDuration,
+    textConfig,
+    backgroundImages,
     setPlayer1,
     setPlayer2,
     setMeta,
     setVisibility: setIsVisible,
     setAnimationDuration,
+    setTextConfig,
+    setBackgroundImages,
     swapPlayers,
     reset,
     handleColorChange,

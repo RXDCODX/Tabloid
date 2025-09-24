@@ -1,0 +1,183 @@
+/* 
+ * Пользовательские стили для скорборда
+ * Этот файл позволяет настроить внешний вид всех элементов скорборда
+ * 
+ * Инструкция по использованию:
+ * 1. Измените стили в этом файле согласно вашим предпочтениям
+ * 2. Сохраните файл
+ * 3. Стили автоматически применятся к скорборду
+ */
+
+/* ===== ОСНОВНЫЕ БЛОКИ ===== */
+
+/* Центральный блок (название турнира) */
+.centerDiv {
+  background-color: #1a1a1a !important;
+  border: 2px solid #3F00FF !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 10px rgba(63, 0, 255, 0.5) !important;
+}
+
+/* Левый блок (игрок 1) */
+.leftDiv {
+  background-color: #1a1a1a !important;
+  border: 2px solid #3F00FF !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 10px rgba(63, 0, 255, 0.5) !important;
+}
+
+/* Правый блок (игрок 2) */
+.rightDiv {
+  background-color: #1a1a1a !important;
+  border: 2px solid #3F00FF !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 10px rgba(63, 0, 255, 0.5) !important;
+}
+
+/* Блок режима драки */
+.fightModeDiv {
+  background-color: #1a1a1a !important;
+  border: 2px solid #3F00FF !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 10px rgba(63, 0, 255, 0.5) !important;
+}
+
+/* ===== ТЕКСТОВЫЕ ЭЛЕМЕНТЫ ===== */
+
+/* Название турнира */
+.tournamentTitle {
+  color: #ffffff !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  font-family: 'Arial', sans-serif !important;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Имена игроков */
+.playerNameText {
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  font-family: 'Arial', sans-serif !important;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Счет игроков */
+.scoreText {
+  color: #ffffff !important;
+  font-size: 48px !important;
+  font-weight: bold !important;
+  font-family: 'Arial', sans-serif !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Текст режима драки */
+.fightModeText {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  font-family: 'Arial', sans-serif !important;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ===== */
+
+/* Эффекты при наведении (опционально) */
+.centerDiv:hover,
+.leftDiv:hover,
+.rightDiv:hover,
+.fightModeDiv:hover {
+  transform: scale(1.02) !important;
+  transition: transform 0.3s ease !important;
+}
+
+/* Анимация появления текста (опционально) */
+.tournamentTitle,
+.playerNameText,
+.scoreText,
+.fightModeText {
+  animation: fadeIn 0.5s ease-in !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+  .tournamentTitle {
+    font-size: 18px !important;
+  }
+  
+  .playerNameText {
+    font-size: 16px !important;
+  }
+  
+  .scoreText {
+    font-size: 36px !important;
+  }
+  
+  .fightModeText {
+    font-size: 16px !important;
+  }
+}
+
+/* ===== ПРИМЕРЫ ДОПОЛНИТЕЛЬНЫХ СТИЛЕЙ ===== */
+
+/* 
+ * Пример: Стиль в стиле киберпанка
+ * Раскомментируйте для применения
+ */
+
+/*
+.centerDiv,
+.leftDiv,
+.rightDiv,
+.fightModeDiv {
+  background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e) !important;
+  border: 2px solid #00ffff !important;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6) !important;
+}
+
+.tournamentTitle,
+.playerNameText,
+.scoreText,
+.fightModeText {
+  color: #00ffff !important;
+  text-shadow: 0 0 10px #00ffff !important;
+}
+*/
+
+/* 
+ * Пример: Стиль в стиле ретро
+ * Раскомментируйте для применения
+ */
+
+/*
+.centerDiv,
+.leftDiv,
+.rightDiv,
+.fightModeDiv {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: 3px solid #ff6b6b !important;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.4) !important;
+}
+
+.tournamentTitle,
+.playerNameText,
+.scoreText,
+.fightModeText {
+  color: #ff6b6b !important;
+  font-family: 'Courier New', monospace !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+*/
