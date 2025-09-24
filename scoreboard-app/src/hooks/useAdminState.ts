@@ -5,6 +5,7 @@ import {
   ColorPreset,
   TextConfiguration,
   BackgroundImages,
+  LayoutConfig,
 } from '../types/types';
 
 export const useAdminState = () => {
@@ -38,6 +39,13 @@ export const useAdminState = () => {
     {}
   );
 
+  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>({
+    center: { top: '15px', left: '50%', width: '540px', height: '60px' },
+    left: { top: '15px', left: '167px', width: '540px', height: '120px' },
+    right: { top: '15px', right: '167px', width: '540px', height: '120px' },
+    fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
+  });
+
   const swapPlayers = useCallback(() => {
     const temp = player1;
     setPlayer1(player2);
@@ -67,6 +75,12 @@ export const useAdminState = () => {
     });
     setTextConfig({});
     setBackgroundImages({});
+    setLayoutConfig({
+      center: { top: '15px', left: '50%', width: '540px', height: '60px' },
+      left: { top: '15px', left: '167px', width: '540px', height: '120px' },
+      right: { top: '15px', right: '167px', width: '540px', height: '120px' },
+      fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
+    });
   }, []);
 
   const handleColorChange = useCallback((colors: ColorPreset) => {
@@ -82,6 +96,7 @@ export const useAdminState = () => {
     animationDuration,
     textConfig,
     backgroundImages,
+    layoutConfig,
     setPlayer1,
     setPlayer2,
     setMeta,
@@ -89,6 +104,7 @@ export const useAdminState = () => {
     setAnimationDuration,
     setTextConfig,
     setBackgroundImages,
+    setLayoutConfig,
     swapPlayers,
     reset,
     handleColorChange,

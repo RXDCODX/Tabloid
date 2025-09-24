@@ -8,6 +8,7 @@ import PlayerCard from './Cards/PlayerCard';
 import VisibilityCard from './Cards/VisibilityCard';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
+import LayoutConfigCard from './Cards/LayoutConfigCard';
 import { useAdminState } from '../../hooks/useAdminState';
 import styles from './AdminPanel.module.scss';
 import { playerPresetRepository } from './services/PlayerPresetService';
@@ -20,12 +21,14 @@ const AdminPanel = () => {
     isVisible,
     animationDuration,
     backgroundImages,
+    layoutConfig,
     setPlayer1,
     setPlayer2,
     setMeta,
     setVisibility,
     setAnimationDuration,
     setBackgroundImages,
+    setLayoutConfig,
     swapPlayers,
     reset,
     handleColorChange,
@@ -71,7 +74,7 @@ const AdminPanel = () => {
 
       {/* Borders Toggle */}
       <Row className="mb-4">
-        <Col xs={12} md={6} lg={6}>
+        <Col xs={12}>
           <BordersToggleCard />
         </Col>
       </Row>
@@ -80,6 +83,12 @@ const AdminPanel = () => {
       <BackgroundImagesCard 
         backgroundImages={backgroundImages}
         onBackgroundImagesChange={setBackgroundImages}
+      />
+
+      {/* Layout Config Panel */}
+      <LayoutConfigCard
+        layoutConfig={layoutConfig}
+        onChange={setLayoutConfig}
       />
 
       {/* Players Cards */}

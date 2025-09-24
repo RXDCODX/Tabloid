@@ -6,8 +6,4 @@ export { default as PlayerCard } from './PlayerCard';
 export { default as TextConfigurationCard } from './TextConfigurationCard';
 export { default as VisibilityCard } from './VisibilityCard';
 export { default as BordersToggleCard } from './BordersToggleCard';
-
-
-
-
-
+export { default as LayoutConfigCard } from './LayoutConfigCard';

@@ -38,6 +38,21 @@ export interface BackgroundImages {
   fightModeImage?: string;
 }
 
+export interface LayoutBlockSizeAndPosition {
+  top?: string; // e.g. "15px" | "10%"
+  left?: string; // e.g. "167px" | "5%"
+  right?: string; // e.g. "167px" | "5%"
+  width?: string; // e.g. "540px" | "50%"
+  height?: string; // e.g. "120px" | "10%"
+}
+
+export interface LayoutConfig {
+  center?: LayoutBlockSizeAndPosition; // Заголовок турнира
+  left?: LayoutBlockSizeAndPosition; // Контейнер игрока 1
+  right?: LayoutBlockSizeAndPosition; // Контейнер игрока 2
+  fightMode?: LayoutBlockSizeAndPosition; // Контейнер режима боя
+}
+
 export interface ScoreboardState {
   player1: Player;
   player2: Player;
@@ -47,6 +62,7 @@ export interface ScoreboardState {
   backgroundImages: BackgroundImages;
   isVisible: boolean;
   animationDuration?: number;
+  layoutConfig?: LayoutConfig;
 }
 
 export const defaultPreset: ColorPreset = {

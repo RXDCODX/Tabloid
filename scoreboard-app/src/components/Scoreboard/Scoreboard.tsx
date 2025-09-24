@@ -1,7 +1,7 @@
 // Компонент создан на основе Scoreboard.cshtml из Tabloid
 import React, { useEffect, useState, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { defaultPreset } from "../../types/types";
+import { defaultPreset, LayoutConfig } from "../../types/types";
 import { SignalRContext } from "../../providers/SignalRProvider";
 import styles from "./Scoreboard.module.scss";
 
@@ -36,6 +36,7 @@ type ScoreboardState = {
   colors: ColorPreset;
   isVisible: boolean; // Новое поле для управления видимостью
   animationDuration?: number; // Время анимации в миллисекундах
+  layoutConfig?: LayoutConfig;
 };
 
 const Scoreboard: React.FC = () => {
@@ -79,6 +80,12 @@ const Scoreboard: React.FC = () => {
   const [colors, setColors] = useState<ColorPreset>(defaultPreset);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [animationDuration, setAnimationDuration] = useState<number>(800);
+  const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>({
+    center: { top: '15px', left: '50%', width: '540px', height: '60px' },
+    left: { top: '15px', left: '167px', width: '540px', height: '120px' },
+    right: { top: '15px', right: '167px', width: '540px', height: '120px' },
+    fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
+  });
 
   // Подписка на SignalR события
   useEffect(() => {
@@ -96,6 +103,10 @@ const Scoreboard: React.FC = () => {
       // Обновляем время анимации
       if (state.animationDuration) {
         setAnimationDuration(state.animationDuration);
+      }
+
+      if (state as any && (state as any).layoutConfig) {
+        setLayoutConfig((state as any).layoutConfig as LayoutConfig);
       }
     };
 
@@ -206,7 +217,12 @@ const Scoreboard: React.FC = () => {
             style={{ 
               backgroundColor: colors.backgroundColor,
               border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF")
+              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              top: layoutConfig.center?.top,
+              left: layoutConfig.center?.left,
+              right: layoutConfig.center?.right,
+              width: layoutConfig.center?.width,
+              height: layoutConfig.center?.height,
             }}
           >
             <h5 id="metaTitle" style={{ color: colors.tournamentTitleColor }}>
@@ -221,7 +237,12 @@ const Scoreboard: React.FC = () => {
             style={{ 
               backgroundColor: colors.backgroundColor,
               border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF")
+              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              top: layoutConfig.left?.top,
+              left: layoutConfig.left?.left,
+              right: layoutConfig.left?.right,
+              width: layoutConfig.left?.width,
+              height: layoutConfig.left?.height,
             }}
           >
             <div className={styles.playerInfo}>
@@ -273,7 +294,12 @@ const Scoreboard: React.FC = () => {
             style={{ 
               backgroundColor: colors.backgroundColor,
               border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF")
+              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              top: layoutConfig.right?.top,
+              left: layoutConfig.right?.left,
+              right: layoutConfig.right?.right,
+              width: layoutConfig.right?.width,
+              height: layoutConfig.right?.height,
             }}
           >
             <div 
@@ -326,7 +352,12 @@ const Scoreboard: React.FC = () => {
               style={{ 
                 backgroundColor: colors.backgroundColor,
                 border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-                boxShadow: getNeonGlow(colors.mainColor || "#3F00FF")
+                boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+                top: layoutConfig.fightMode?.top,
+                left: layoutConfig.fightMode?.left,
+                right: layoutConfig.fightMode?.right,
+                width: layoutConfig.fightMode?.width,
+                height: layoutConfig.fightMode?.height,
               }}
             >
               <h4 style={{ color: colors.fightModeColor }}>
