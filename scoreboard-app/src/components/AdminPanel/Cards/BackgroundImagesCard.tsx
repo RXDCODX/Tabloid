@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
+import { Image } from 'react-bootstrap-icons';
 import { BackgroundImages } from '../../../types/types';
 import styles from './BackgroundImagesCard.module.scss';
 
@@ -82,7 +83,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
     return (
       <Col md={6} className="mb-3">
         <Form.Group>
-          <Form.Label>{label}</Form.Label>
+          <Form.Label className={styles.formLabel}>{label}</Form.Label>
           <div className={styles.imageUploadContainer}>
             {hasImage ? (
               <div className={styles.imagePreview}>
@@ -114,7 +115,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
               className={styles.hiddenInput}
             />
           </div>
-          <Form.Text className="text-muted">
+          <Form.Text className={styles.formText}>
             {description}
           </Form.Text>
         </Form.Group>
@@ -123,11 +124,14 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
   };
 
   return (
-    <Card className={`mb-4 ${styles.backgroundImagesCard}`}>
-      <Card.Header className="bg-success text-white">
-        <h5 className="mb-0">Фоновые изображения</h5>
-      </Card.Header>
-      <Card.Body>
+    <Card className={styles.backgroundImagesCard}>
+      <Card.Body className={styles.cardBody}>
+        <div className={styles.cardHeader}>
+          <Image color="#6f42c1" size={20} />
+          <span className={styles.cardTitle}>
+            Фоновые изображения
+          </span>
+        </div>
         <Row>
           <ImageUploadField
             field="centerImage"
@@ -158,6 +162,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
             variant="outline-danger"
             size="sm"
             onClick={handleClearAll}
+            className={styles.btnOutlineDanger}
           >
             Удалить все изображения
           </Button>

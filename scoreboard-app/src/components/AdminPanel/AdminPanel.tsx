@@ -13,6 +13,8 @@ import { useAdminState } from '../../hooks/useAdminState';
 import styles from './AdminPanel.module.scss';
 import { playerPresetRepository } from './services/PlayerPresetService';
 
+import "./body.css";
+
 const AdminPanel = () => {
   const {
     player1,

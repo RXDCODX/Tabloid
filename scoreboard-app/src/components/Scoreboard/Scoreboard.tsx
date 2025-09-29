@@ -1,5 +1,5 @@
 // Компонент создан на основе Scoreboard.cshtml из Tabloid
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { defaultPreset, LayoutConfig } from "../../types/types";
 import { SignalRContext } from "../../providers/SignalRProvider";
@@ -89,50 +89,50 @@ const Scoreboard: React.FC = () => {
   });
   const [showBorders, setShowBorders] = useState<boolean>(false);
 
+  const handleReceiveState = useCallback((stateJson: string) => {
+    try {
+      const state = JSON.parse(stateJson);
+      
+      if (state.player1) {
+        setPlayer1(state.player1);
+      }
+      if (state.player2) {
+        setPlayer2(state.player2);
+      }
+      if (state.meta) {
+        setMeta(state.meta);
+      }
+      if (typeof state.isVisible === 'boolean') {
+        setIsVisible(state.isVisible);
+      }
+
+      // Обновляем цвета с сервера
+      if (state.colors) {
+        setColors(state.colors);
+      }
+
+      // Обновляем время анимации
+      if (typeof state.animationDuration === 'number') {
+        setAnimationDuration(state.animationDuration);
+      }
+
+      if (state.layoutConfig) {
+        setLayoutConfig(state.layoutConfig);
+      }
+      if (typeof state.showBorders === 'boolean') {
+        setShowBorders(state.showBorders);
+      }
+    } catch (error) {
+      console.error('Ошибка парсинга состояния:', error);
+    }
+  }, []);
+
+  signalRContext.connection?.on("receivestate", handleReceiveState);
+
   // Подписка на SignalR события
   useEffect(() => {
-    const handleReceiveState = (stateJson: string) => {
-      try {
-        const state = JSON.parse(stateJson);
-        
-        if (state.player1) {
-          setPlayer1(state.player1);
-        }
-        if (state.player2) {
-          setPlayer2(state.player2);
-        }
-        if (state.meta) {
-          setMeta(state.meta);
-        }
-        if (typeof state.isVisible === 'boolean') {
-          setIsVisible(state.isVisible);
-        }
-
-        // Обновляем цвета с сервера
-        if (state.colors) {
-          setColors(state.colors);
-        }
-
-        // Обновляем время анимации
-        if (typeof state.animationDuration === 'number') {
-          setAnimationDuration(state.animationDuration);
-        }
-
-        if (state.layoutConfig) {
-          setLayoutConfig(state.layoutConfig);
-        }
-        if (typeof state.showBorders === 'boolean') {
-          setShowBorders(state.showBorders);
-        }
-      } catch (error) {
-        console.error('Ошибка парсинга состояния:', error);
-      }
-    };
-
-    signalRContext.connection?.on("ReceiveState", handleReceiveState);
-
     return () => {
-      signalRContext.connection?.off("ReceiveState", handleReceiveState);
+      signalRContext.connection?.off("receivestate", handleReceiveState);
     };
   }, []);
 
@@ -229,6 +229,11 @@ const Scoreboard: React.FC = () => {
           animate="visible"
           exit="hidden"
           transition={{ duration: animationDuration / 1000 }}
+          style={{
+            minHeight: '100vh',
+            width: '100%',
+            position: 'relative'
+          }}
         >
           {/* Центральный див - в самом верху по центру */}
           <motion.div 

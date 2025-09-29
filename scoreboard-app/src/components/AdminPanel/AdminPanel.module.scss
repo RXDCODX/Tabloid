@@ -1,12 +1,15 @@
 // Стили для админ панели
 
-// Белые плейсхолдеры для всех input полей в админ панели
+// Темный фон для админ панели
 :global(.admin-panel) {
+  background-color: #1a1a1a !important;
+  min-height: 100vh;
+
   input::placeholder {
     color: #ffffff !important;
     opacity: 0.7;
   }
-  
+
   input:focus::placeholder {
     opacity: 0.5;
   }
@@ -18,8 +21,12 @@
     color: #ffffff !important;
     opacity: 0.7;
   }
-  
+
   &:focus::placeholder {
     opacity: 0.5;
   }
-} 
+}
+
+#root {
+  background-color: black;
+}

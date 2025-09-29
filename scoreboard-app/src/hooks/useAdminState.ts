@@ -195,10 +195,35 @@ export const useAdminState = () => {
       const incoming = JSON.stringify(newColors || {});
       if (current !== incoming) {
         setColors(newColors);
-        setTimeout(sendCurrentState, 0);
+        // Создаем временное состояние с новыми цветами для немедленной отправки
+        const tempState = {
+          player1,
+          player2,
+          meta,
+          colors: newColors,
+          textConfig,
+          backgroundImages,
+          layoutConfig,
+          isVisible,
+          animationDuration,
+          showBorders,
+        };
+        await sendState(tempState);
       }
     },
-    [colors, sendCurrentState]
+    [
+      player1,
+      player2,
+      meta,
+      colors,
+      textConfig,
+      backgroundImages,
+      layoutConfig,
+      isVisible,
+      animationDuration,
+      showBorders,
+      sendState,
+    ]
   );
 
   // Функции-обертки для автоматической отправки состояния

@@ -18,6 +18,7 @@ export const SignalRContext = createContext<SignalRContextType>({
 // Создаем соединение SignalR
 const createConnection = (url: string, withCredentials: boolean) => {
   return new signalR.HubConnectionBuilder()
+    .configureLogging(signalR.LogLevel.Debug)
     .withUrl(url, { withCredentials })
     .withAutomaticReconnect()
     .build();
