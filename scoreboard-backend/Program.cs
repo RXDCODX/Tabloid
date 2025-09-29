@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using scoreboard_backend.Hubs;
-using scoreboard_backend.Serialization;
 using scoreboard_backend.Services;
+using scoreboard_backend.Serialization;
 
 namespace scoreboard_backend;
 
@@ -19,16 +19,14 @@ public static class Program
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
         builder.Services.AddSingleton<PlayerPresetService>();
-        builder.Services.AddControllers();
-        builder
-            .Services.AddSignalR()
-            .AddJsonProtocol(options =>
-            {
-                options.PayloadSerializerOptions.TypeInfoResolverChain.Insert(
-                    0,
-                    ScoreboardJsonContext.Default
-                );
-            });
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.TypeInfoResolver = AppJsonContext.Default;
+        });
+        builder.Services.AddSignalR().AddJsonProtocol(options =>
+        {
+            options.PayloadSerializerOptions.TypeInfoResolver = AppJsonContext.Default;
+        });
         builder.Services.AddCors(options =>
             options.AddPolicy(
                 "CorsPolicy",
@@ -126,6 +124,6 @@ public static class Program
         app.MapHub<ScoreboardHub>("/scoreboardHub");
         app.MapControllers();
 
-        app.Run();
+        app.Run("http://*:5035");
     }
 }

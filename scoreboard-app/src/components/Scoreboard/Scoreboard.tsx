@@ -37,6 +37,7 @@ type ScoreboardState = {
   isVisible: boolean; // Новое поле для управления видимостью
   animationDuration?: number; // Время анимации в миллисекундах
   layoutConfig?: LayoutConfig;
+  showBorders?: boolean; // Поле для управления отображением границ
 };
 
 const Scoreboard: React.FC = () => {
@@ -86,27 +87,45 @@ const Scoreboard: React.FC = () => {
     right: { top: '15px', right: '167px', width: '540px', height: '120px' },
     fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
   });
+  const [showBorders, setShowBorders] = useState<boolean>(false);
 
   // Подписка на SignalR события
   useEffect(() => {
-    const handleReceiveState = (state: ScoreboardState) => {
-      setPlayer1(state.player1);
-      setPlayer2(state.player2);
-      setMeta(state.meta);
-      setIsVisible(state.isVisible);
+    const handleReceiveState = (stateJson: string) => {
+      try {
+        const state = JSON.parse(stateJson);
+        
+        if (state.player1) {
+          setPlayer1(state.player1);
+        }
+        if (state.player2) {
+          setPlayer2(state.player2);
+        }
+        if (state.meta) {
+          setMeta(state.meta);
+        }
+        if (typeof state.isVisible === 'boolean') {
+          setIsVisible(state.isVisible);
+        }
 
-      // Обновляем цвета с сервера
-      if (state.colors) {
-        setColors(state.colors);
-      }
+        // Обновляем цвета с сервера
+        if (state.colors) {
+          setColors(state.colors);
+        }
 
-      // Обновляем время анимации
-      if (state.animationDuration) {
-        setAnimationDuration(state.animationDuration);
-      }
+        // Обновляем время анимации
+        if (typeof state.animationDuration === 'number') {
+          setAnimationDuration(state.animationDuration);
+        }
 
-      if (state as any && (state as any).layoutConfig) {
-        setLayoutConfig((state as any).layoutConfig as LayoutConfig);
+        if (state.layoutConfig) {
+          setLayoutConfig(state.layoutConfig);
+        }
+        if (typeof state.showBorders === 'boolean') {
+          setShowBorders(state.showBorders);
+        }
+      } catch (error) {
+        console.error('Ошибка парсинга состояния:', error);
       }
     };
 
@@ -116,6 +135,7 @@ const Scoreboard: React.FC = () => {
       signalRContext.connection?.off("ReceiveState", handleReceiveState);
     };
   }, []);
+
 
   // Если панель скрыта, не отображаем ничего
   if (!isVisible) {
@@ -215,9 +235,9 @@ const Scoreboard: React.FC = () => {
             className={styles.centerDiv}
             variants={centerVariants}
             style={{ 
-              backgroundColor: colors.backgroundColor,
-              border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
+              border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
+              boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
               top: layoutConfig.center?.top,
               left: layoutConfig.center?.left,
               right: layoutConfig.center?.right,
@@ -235,9 +255,9 @@ const Scoreboard: React.FC = () => {
             className={styles.leftDiv}
             variants={itemVariants}
             style={{ 
-              backgroundColor: colors.backgroundColor,
-              border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
+              border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
+              boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
               top: layoutConfig.left?.top,
               left: layoutConfig.left?.left,
               right: layoutConfig.left?.right,
@@ -292,9 +312,9 @@ const Scoreboard: React.FC = () => {
             className={styles.rightDiv}
             variants={itemVariants}
             style={{ 
-              backgroundColor: colors.backgroundColor,
-              border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-              boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+              backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
+              border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
+              boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
               top: layoutConfig.right?.top,
               left: layoutConfig.right?.left,
               right: layoutConfig.right?.right,
@@ -350,9 +370,9 @@ const Scoreboard: React.FC = () => {
               className={styles.fightModeDiv}
               variants={fightModeVariants}
               style={{ 
-                backgroundColor: colors.backgroundColor,
-                border: `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}`,
-                boxShadow: getNeonGlow(colors.mainColor || "#3F00FF"),
+                backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
+                border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
+                boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
                 top: layoutConfig.fightMode?.top,
                 left: layoutConfig.fightMode?.left,
                 right: layoutConfig.fightMode?.right,

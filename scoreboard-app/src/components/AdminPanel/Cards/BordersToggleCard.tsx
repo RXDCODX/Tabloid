@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Card, Form } from "react-bootstrap";
 import { BoundingBox } from "react-bootstrap-icons";
 
 type BordersToggleCardProps = {
-  initial?: boolean;
+  showBorders: boolean;
+  onShowBordersChange: (showBorders: boolean) => void;
 };
 
-const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ initial = false }) => {
-  const [enabled, setEnabled] = useState<boolean>(initial);
-
+const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ showBorders, onShowBordersChange }) => {
   useEffect(() => {
-    if (enabled) {
+    if (showBorders) {
       document.body.classList.add('scoreboard-show-borders');
     } else {
       document.body.classList.remove('scoreboard-show-borders');
     }
-  }, [enabled]);
+  }, [showBorders]);
 
   return (
     <Card className="bg-dark text-white border-danger border-2 w-100 p-3">
@@ -31,9 +30,9 @@ const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ initial = false }
           type="switch"
           id="toggle-scoreboard-borders"
           className="ms-3"
-          checked={enabled}
-          onChange={(e) => setEnabled(e.currentTarget.checked)}
-          label={enabled ? 'Включены' : 'Выключены'}
+          checked={showBorders}
+          onChange={(e) => onShowBordersChange(e.currentTarget.checked)}
+          label={showBorders ? 'Включены' : 'Выключены'}
         />
       </div>
     </Card>

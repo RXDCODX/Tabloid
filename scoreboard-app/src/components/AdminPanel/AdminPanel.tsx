@@ -18,10 +18,12 @@ const AdminPanel = () => {
     player1,
     player2,
     meta,
+    colors,
     isVisible,
     animationDuration,
     backgroundImages,
     layoutConfig,
+    showBorders,
     setPlayer1,
     setPlayer2,
     setMeta,
@@ -29,6 +31,7 @@ const AdminPanel = () => {
     setAnimationDuration,
     setBackgroundImages,
     setLayoutConfig,
+    setShowBorders,
     swapPlayers,
     reset,
     handleColorChange,
@@ -75,7 +78,10 @@ const AdminPanel = () => {
       {/* Borders Toggle */}
       <Row className="mb-4">
         <Col xs={12}>
-          <BordersToggleCard />
+          <BordersToggleCard 
+            showBorders={showBorders}
+            onShowBordersChange={setShowBorders}
+          />
         </Col>
       </Row>
 

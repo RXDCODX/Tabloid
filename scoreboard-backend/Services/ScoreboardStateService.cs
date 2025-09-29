@@ -1,12 +1,10 @@
 ﻿using System.Text.Json;
-using scoreboard_backend.Models;
-using scoreboard_backend.Serialization;
 
 namespace scoreboard_backend.Services;
 
 public class ScoreboardStateService
 {
-    private ScoreboardState _state = new();
+    private JsonDocument? _state;
     private readonly string _statePath;
     private readonly bool _persistenceDisabled;
 
@@ -21,48 +19,33 @@ public class ScoreboardStateService
         LoadState();
     }
 
-    public ScoreboardState GetState() => _state;
+    public JsonDocument GetState() => _state ?? throw new InvalidOperationException("State not initialized");
 
-    public void UpdatePlayer1(Player player)
+    public void SetState(JsonDocument state)
     {
-        _state.Player1 = player;
-        SaveState();
-    }
-
-    public void UpdatePlayer2(Player player)
-    {
-        _state.Player2 = player;
-        SaveState();
-    }
-
-    public void UpdateMeta(MetaInfo meta)
-    {
-        _state.Meta = meta;
-        SaveState();
-    }
-
-    public void UpdateColors(ColorPreset colors)
-    {
-        _state.Colors = colors;
-        SaveState();
-    }
-
-    public void UpdateVisibility(bool isVisible)
-    {
-        _state.IsVisible = isVisible;
-        SaveState();
-    }
-
-    public void UpdateAnimationDuration(int animationDuration)
-    {
-        _state.AnimationDuration = animationDuration;
-        SaveState();
-    }
-
-    public void SetState(ScoreboardState state)
-    {
+        _state?.Dispose();
         _state = state;
         SaveState();
+    }
+
+    public void SetStateFromJson(string jsonString)
+    {
+        if (string.IsNullOrWhiteSpace(jsonString))
+        {
+            ResetToDefault();
+            return;
+        }
+
+        try
+        {
+            var newState = JsonDocument.Parse(jsonString);
+            SetState(newState);
+        }
+        catch
+        {
+            // Если JSON некорректный, сбрасываем к дефолтному состоянию
+            ResetToDefault();
+        }
     }
 
     private void SaveState()
@@ -80,10 +63,7 @@ public class ScoreboardStateService
                 Directory.CreateDirectory(dir);
             }
 
-            var json = JsonSerializer.Serialize(
-                _state,
-                ScoreboardJsonContext.Default.ScoreboardState
-            );
+            var json = _state?.RootElement.GetRawText() ?? "{}";
             File.WriteAllText(_statePath, json);
         }
         catch
@@ -96,28 +76,83 @@ public class ScoreboardStateService
     {
         if (!File.Exists(_statePath))
         {
-            _state = new ScoreboardState();
+            ResetToDefault();
             return;
         }
 
         try
         {
             var json = File.ReadAllText(_statePath);
-            var loaded = JsonSerializer.Deserialize(
-                json,
-                ScoreboardJsonContext.Default.ScoreboardState
-            );
-            _state = loaded ?? new ScoreboardState();
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                ResetToDefault();
+                return;
+            }
+
+            _state = JsonDocument.Parse(json);
         }
         catch
         {
-            _state = new ScoreboardState();
+            ResetToDefault();
         }
     }
 
     public void ResetToDefault()
     {
-        _state = new ScoreboardState();
+        _state?.Dispose();
+        
+        var defaultJson = """
+        {
+            "player1": {
+                "name": "Player 1",
+                "sponsor": "",
+                "score": 0,
+                "tag": "",
+                "flag": "none",
+                "final": "none"
+            },
+            "player2": {
+                "name": "Player 2",
+                "sponsor": "",
+                "score": 0,
+                "tag": "",
+                "flag": "none",
+                "final": "none"
+            },
+            "meta": {
+                "title": "Tournament",
+                "fightRule": "Grand Finals"
+            },
+            "colors": {
+                "name": "",
+                "mainColor": "#3F00FF",
+                "playerNamesColor": "#ffffff",
+                "tournamentTitleColor": "#3F00FF",
+                "fightModeColor": "#3F00FF",
+                "scoreColor": "#ffffff",
+                "backgroundColor": "#23272f",
+                "borderColor": "#3F00FF"
+            },
+            "textConfig": {},
+            "backgroundImages": {},
+            "layoutConfig": {
+                "center": { "top": "15px", "left": "50%", "width": "540px", "height": "60px" },
+                "left": { "top": "15px", "left": "167px", "width": "540px", "height": "120px" },
+                "right": { "top": "15px", "right": "167px", "width": "540px", "height": "120px" },
+                "fightMode": { "top": "150px", "left": "50%", "width": "300px", "height": "50px" }
+            },
+            "isVisible": true,
+            "animationDuration": 800,
+            "showBorders": false
+        }
+        """;
+        
+        _state = JsonDocument.Parse(defaultJson);
         SaveState();
+    }
+
+    public void Dispose()
+    {
+        _state?.Dispose();
     }
 }

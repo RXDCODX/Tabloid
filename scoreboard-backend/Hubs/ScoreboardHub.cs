@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using scoreboard_backend.Models;
 using scoreboard_backend.Services;
 
 namespace scoreboard_backend.Hubs;
@@ -9,59 +8,31 @@ public class ScoreboardHub(ScoreboardStateService stateService) : Hub
 {
     public override Task OnConnectedAsync()
     {
-        return Clients.Caller.SendAsync("ReceiveState", stateService.GetState());
+        var state = stateService.GetState();
+        var stateJson = state.RootElement.GetRawText();
+        return Clients.Caller.SendAsync("ReceiveState", stateJson);
     }
 
     public async Task GetState()
     {
-        await Clients.Caller.SendAsync("ReceiveState", stateService.GetState());
+        var state = stateService.GetState();
+        var stateJson = state.RootElement.GetRawText();
+        await Clients.Caller.SendAsync("ReceiveState", stateJson);
     }
 
-    public async Task UpdatePlayer1(Player player)
+    public async Task SetState(string stateJson)
     {
-        stateService.UpdatePlayer1(player);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task UpdatePlayer2(Player player)
-    {
-        stateService.UpdatePlayer2(player);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task UpdateMeta(MetaInfo meta)
-    {
-        stateService.UpdateMeta(meta);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task UpdateColors(ColorPreset colors)
-    {
-        stateService.UpdateColors(colors);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task UpdateVisibility(bool isVisible)
-    {
-        stateService.UpdateVisibility(isVisible);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task UpdateAnimationDuration(int animationDuration)
-    {
-        stateService.UpdateAnimationDuration(animationDuration);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
-    }
-
-    public async Task SetState(ScoreboardState state)
-    {
-        stateService.SetState(state);
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+        stateService.SetStateFromJson(stateJson);
+        var currentState = stateService.GetState();
+        var currentStateJson = currentState.RootElement.GetRawText();
+        await Clients.All.SendAsync("ReceiveState", currentStateJson);
     }
 
     public async Task ResetToDefault()
     {
         stateService.ResetToDefault();
-        await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+        var state = stateService.GetState();
+        var stateJson = state.RootElement.GetRawText();
+        await Clients.All.SendAsync("ReceiveState", stateJson);
     }
 }

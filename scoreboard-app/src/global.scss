@@ -13,15 +13,17 @@ html {
 // Режим показа границ контейнеров скорборда (включается классом на body)
 body.scoreboard-show-borders {
 
-  .centerDiv,
-  .leftDiv,
-  .rightDiv,
-  .fightModeDiv {
-    outline: 2px dashed #dc3545;
+  // Используем :global() для доступа к CSS модулям
+  :global(.centerDiv),
+  :global(.leftDiv),
+  :global(.rightDiv),
+  :global(.fightModeDiv) {
+    outline: 2px dashed #dc3545 !important;
     outline-offset: -2px;
-    background-color: rgba(220, 53, 69, 0.05);
+    background-color: rgba(220, 53, 69, 0.05) !important;
   }
 }
+
 .hidden {
   opacity: 0;
 }
@@ -46,4 +48,4 @@ body.scoreboard-show-borders {
 // Центрирование плейсхолдеров для всех полей ввода
 input::placeholder {
   text-align: center;
-} 
+}

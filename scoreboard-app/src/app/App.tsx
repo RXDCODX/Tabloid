@@ -4,7 +4,7 @@ import { AdminPanel } from "../components/AdminPanel";
 import styles from "./App.module.scss";
 import "../global.scss";
 import Scoreboard from "../components/Scoreboard/Scoreboard";
-import { SignalRContext } from "../providers/SignalRProvider";
+import { SignalRProvider } from "../providers/SignalRProvider";
 
 
 function App() {
@@ -42,20 +42,13 @@ function App() {
           </button>
         </div>
       </div>
-      <SignalRContext.Provider
-        value={{
-          connection: null,
-          automaticReconnect: true,
-          withCredentials: false,
-          url: "http://localhost:5035/scoreboardHub"
-        }}
-      >
+      <SignalRProvider url={window.location.origin + "/scoreboardHub"}>
         <Routes>
           <Route path="/scoreboard" element={<Scoreboard />} />
           <Route path="/adminpanel" element={<AdminPanel />} />
           <Route path="*" element={<Scoreboard />} />
         </Routes>
-      </SignalRContext.Provider>
+      </SignalRProvider>
     </Router>
   );
 }
