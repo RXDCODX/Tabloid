@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using static System.GC;
 
 namespace scoreboard_backend.Services;
 
@@ -19,7 +20,8 @@ public class ScoreboardStateService
         LoadState();
     }
 
-    public JsonDocument GetState() => _state ?? throw new InvalidOperationException("State not initialized");
+    public JsonDocument GetState() =>
+        _state ?? throw new InvalidOperationException("State not initialized");
 
     public void SetState(JsonDocument state)
     {
@@ -100,53 +102,53 @@ public class ScoreboardStateService
     public void ResetToDefault()
     {
         _state?.Dispose();
-        
+
         var defaultJson = """
-        {
-            "player1": {
-                "name": "Player 1",
-                "sponsor": "",
-                "score": 0,
-                "tag": "",
-                "flag": "none",
-                "final": "none"
-            },
-            "player2": {
-                "name": "Player 2",
-                "sponsor": "",
-                "score": 0,
-                "tag": "",
-                "flag": "none",
-                "final": "none"
-            },
-            "meta": {
-                "title": "Tournament",
-                "fightRule": "Grand Finals"
-            },
-            "colors": {
-                "name": "",
-                "mainColor": "#3F00FF",
-                "playerNamesColor": "#ffffff",
-                "tournamentTitleColor": "#3F00FF",
-                "fightModeColor": "#3F00FF",
-                "scoreColor": "#ffffff",
-                "backgroundColor": "#23272f",
-                "borderColor": "#3F00FF"
-            },
-            "textConfig": {},
-            "backgroundImages": {},
-            "layoutConfig": {
-                "center": { "top": "15px", "left": "50%", "width": "540px", "height": "60px" },
-                "left": { "top": "15px", "left": "167px", "width": "540px", "height": "120px" },
-                "right": { "top": "15px", "right": "167px", "width": "540px", "height": "120px" },
-                "fightMode": { "top": "150px", "left": "50%", "width": "300px", "height": "50px" }
-            },
-            "isVisible": true,
-            "animationDuration": 800,
-            "showBorders": false
-        }
-        """;
-        
+            {
+                "player1": {
+                    "name": "Player 1",
+                    "sponsor": "",
+                    "score": 0,
+                    "tag": "",
+                    "flag": "none",
+                    "final": "none"
+                },
+                "player2": {
+                    "name": "Player 2",
+                    "sponsor": "",
+                    "score": 0,
+                    "tag": "",
+                    "flag": "none",
+                    "final": "none"
+                },
+                "meta": {
+                    "title": "Tournament",
+                    "fightRule": "Grand Finals"
+                },
+                "colors": {
+                    "name": "",
+                    "mainColor": "#3F00FF",
+                    "playerNamesColor": "#ffffff",
+                    "tournamentTitleColor": "#3F00FF",
+                    "fightModeColor": "#3F00FF",
+                    "scoreColor": "#ffffff",
+                    "backgroundColor": "#23272f",
+                    "borderColor": "#3F00FF"
+                },
+                "textConfig": {},
+                "backgroundImages": {},
+                "layoutConfig": {
+                    "center": { "top": "15px", "left": "50%", "width": "540px", "height": "60px" },
+                    "left": { "top": "15px", "left": "167px", "width": "540px", "height": "120px" },
+                    "right": { "top": "15px", "right": "167px", "width": "540px", "height": "120px" },
+                    "fightMode": { "top": "150px", "left": "50%", "width": "300px", "height": "50px" }
+                },
+                "isVisible": true,
+                "animationDuration": 800,
+                "showBorders": false
+            }
+            """;
+
         _state = JsonDocument.Parse(defaultJson);
         SaveState();
     }
@@ -154,5 +156,6 @@ public class ScoreboardStateService
     public void Dispose()
     {
         _state?.Dispose();
+        SuppressFinalize(this);
     }
 }

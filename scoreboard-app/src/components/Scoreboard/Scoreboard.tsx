@@ -29,11 +29,19 @@ type ColorPreset = {
   borderColor?: string;
 };
 
+type BackgroundImages = {
+  centerImage?: string;
+  leftImage?: string;
+  rightImage?: string;
+  fightModeImage?: string;
+};
+
 type ScoreboardState = {
   player1: Player;
   player2: Player;
   meta: MetaInfo;
   colors: ColorPreset;
+  backgroundImages?: BackgroundImages;
   isVisible: boolean; // Новое поле для управления видимостью
   animationDuration?: number; // Время анимации в миллисекундах
   layoutConfig?: LayoutConfig;
@@ -88,6 +96,23 @@ const Scoreboard: React.FC = () => {
     fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
   });
   const [showBorders, setShowBorders] = useState<boolean>(false);
+  const [backgroundImages, setBackgroundImages] = useState<BackgroundImages>({});
+
+  // Функция для получения URL изображения
+  const getImageUrl = (imagePath: string | undefined): string | undefined => {
+    if (!imagePath) return undefined;
+    
+    // Если путь уже полный URL, возвращаем как есть
+    if (imagePath.startsWith('http')) return imagePath;
+    
+    // Если путь начинается с /, добавляем базовый URL сервера
+    if (imagePath.startsWith('/')) {
+      return `http://localhost:5035${imagePath}`;
+    }
+    
+    // Иначе возвращаем как есть
+    return imagePath;
+  };
 
   const handleReceiveState = useCallback((stateJson: string) => {
     try {
@@ -121,6 +146,11 @@ const Scoreboard: React.FC = () => {
       }
       if (typeof state.showBorders === 'boolean') {
         setShowBorders(state.showBorders);
+      }
+      
+      // Обновляем фоновые изображения
+      if (state.backgroundImages) {
+        setBackgroundImages(state.backgroundImages);
       }
     } catch (error) {
       console.error('Ошибка парсинга состояния:', error);
@@ -243,6 +273,10 @@ const Scoreboard: React.FC = () => {
               backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
               border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
               boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
+              backgroundImage: backgroundImages.centerImage ? `url(${getImageUrl(backgroundImages.centerImage)})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               top: layoutConfig.center?.top,
               left: layoutConfig.center?.left,
               right: layoutConfig.center?.right,
@@ -263,6 +297,10 @@ const Scoreboard: React.FC = () => {
               backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
               border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
               boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
+              backgroundImage: backgroundImages.leftImage ? `url(${getImageUrl(backgroundImages.leftImage)})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               top: layoutConfig.left?.top,
               left: layoutConfig.left?.left,
               right: layoutConfig.left?.right,
@@ -320,6 +358,10 @@ const Scoreboard: React.FC = () => {
               backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
               border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
               boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
+              backgroundImage: backgroundImages.rightImage ? `url(${getImageUrl(backgroundImages.rightImage)})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               top: layoutConfig.right?.top,
               left: layoutConfig.right?.left,
               right: layoutConfig.right?.right,
@@ -378,6 +420,10 @@ const Scoreboard: React.FC = () => {
                 backgroundColor: showBorders ? colors.backgroundColor : 'transparent',
                 border: showBorders ? `2px solid ${colors.borderColor || colors.mainColor || "#3F00FF"}` : 'none',
                 boxShadow: showBorders ? getNeonGlow(colors.mainColor || "#3F00FF") : 'none',
+                backgroundImage: backgroundImages.fightModeImage ? `url(${getImageUrl(backgroundImages.fightModeImage)})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 top: layoutConfig.fightMode?.top,
                 left: layoutConfig.fightMode?.left,
                 right: layoutConfig.fightMode?.right,
