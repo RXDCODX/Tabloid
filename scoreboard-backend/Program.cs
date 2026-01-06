@@ -19,6 +19,8 @@ public static class Program
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
         builder.Services.AddSingleton<PlayerPresetService>();
+        builder.Services.AddSingleton<BackgroundImagesService>();
+
         builder.Services.AddControllers();
         builder
             .Services.AddSignalR()

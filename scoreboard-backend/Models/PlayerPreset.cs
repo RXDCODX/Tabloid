@@ -7,5 +7,3 @@ public class PlayerPreset
     public string Flag { get; set; } = string.Empty;
     public string Sponsor { get; set; } = string.Empty;
 }
-
-

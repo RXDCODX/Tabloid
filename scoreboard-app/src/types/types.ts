@@ -31,7 +31,7 @@ export interface TextConfiguration {
   player2ScoreText?: string;
 }
 
-export interface BackgroundImages {
+export interface Images {
   centerImage?: string;
   leftImage?: string;
   rightImage?: string;
@@ -59,9 +59,10 @@ export interface ScoreboardState {
   meta: MetaInfo;
   colors: ColorPreset;
   textConfig: TextConfiguration;
-  backgroundImages: BackgroundImages;
+  images: Images;
   isVisible: boolean;
-  animationDuration?: number;
+  animationDuration: number;
+  isShowBorders?: boolean;
   layoutConfig?: LayoutConfig;
 }
 

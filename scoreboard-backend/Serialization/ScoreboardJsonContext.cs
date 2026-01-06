@@ -9,4 +9,4 @@ namespace scoreboard_backend.Serialization;
 [JsonSerializable(typeof(MetaInfo))]
 [JsonSerializable(typeof(ColorPreset))]
 [JsonSerializable(typeof(ScoreboardState))]
-public partial class ScoreboardJsonContext : JsonSerializerContext { }
+public partial class ScoreboardJsonContext : JsonSerializerContext;
