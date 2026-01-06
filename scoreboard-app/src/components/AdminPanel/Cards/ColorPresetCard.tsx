@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { Palette } from "react-bootstrap-icons";
-import { ColorPreset, defaultPreset } from "../types";
+import { SignalRContext } from "../../../providers/SignalRProvider";
 import ColorPickerWithTransparency from "../Forms/ColorPickerWithTransparency";
+import { ColorPreset, defaultPreset } from "../types";
 import styles from "./ColorPresetCard.module.scss";
 
 type ColorPresetCardProps = {
   onColorChange: (colors: Partial<ColorPreset>) => void;
 };
 
+type ColorPresetModel = {
+  name: string;
+  playerNamesColor?: string;
+  tournamentTitleColor?: string;
+  fightModeColor?: string;
+  scoreColor?: string;
+};
+
 const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
+  const signalRContext = useContext(SignalRContext);
   const [customColors, setCustomColors] = useState({
     playerNamesColor: defaultPreset.playerNamesColor,
     tournamentTitleColor: defaultPreset.tournamentTitleColor,
     fightModeColor: defaultPreset.fightModeColor,
     scoreColor: defaultPreset.scoreColor,
   });
+  const [colorPresets, setColorPresets] = useState<ColorPresetModel[]>([]);
 
-  const colorPresets: Partial<ColorPreset & { name: string }>[] = [
-    { name: "Default", playerNamesColor: defaultPreset.playerNamesColor, tournamentTitleColor: defaultPreset.tournamentTitleColor, fightModeColor: defaultPreset.fightModeColor, scoreColor: defaultPreset.scoreColor },
-    { name: "Classic Blue", playerNamesColor: "#ffffff", tournamentTitleColor: "#0dcaf0", fightModeColor: "#0dcaf0", scoreColor: "#0dcaf0" },
-    { name: "Fire Red", playerNamesColor: "#ffffff", tournamentTitleColor: "#dc3545", fightModeColor: "#dc3545", scoreColor: "#dc3545" },
-    { name: "Forest Green", playerNamesColor: "#ffffff", tournamentTitleColor: "#198754", fightModeColor: "#198754", scoreColor: "#198754" },
-    { name: "Purple Night", playerNamesColor: "#ffffff", tournamentTitleColor: "#6f42c1", fightModeColor: "#6f42c1", scoreColor: "#6f42c1" },
-    { name: "Golden", playerNamesColor: "#ffffff", tournamentTitleColor: "#ffc107", fightModeColor: "#ffc107", scoreColor: "#ffc107" },
-    { name: "Neon", playerNamesColor: "#ffffff", tournamentTitleColor: "#0088ff", fightModeColor: "#00ff88", scoreColor: "#00ff88" },
-  ];
-
-  // Применяем дефолтный пресет при загрузке компонента
   useEffect(() => {
     onColorChange({
       playerNamesColor: defaultPreset.playerNamesColor,
@@ -37,15 +37,25 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
     });
   }, [onColorChange]);
 
-  const applyPreset = (preset: Partial<ColorPreset> & { name?: string }) => {
-    const next = {
-      playerNamesColor: preset.playerNamesColor ?? customColors.playerNamesColor,
-      tournamentTitleColor: preset.tournamentTitleColor ?? customColors.tournamentTitleColor,
-      fightModeColor: preset.fightModeColor ?? customColors.fightModeColor,
-      scoreColor: preset.scoreColor ?? customColors.scoreColor,
+  useEffect(() => {
+    const handleReceiveColorPresets = (presets: ColorPresetModel[]) => {
+      setColorPresets(presets);
     };
-    setCustomColors(next);
-    onColorChange(next);
+
+    signalRContext.connection?.on("ReceiveColorPresets", handleReceiveColorPresets);
+    signalRContext.connection?.invoke("GetColorPresets").catch((err) => {
+      console.error("Error fetching color presets:", err);
+    });
+
+    return () => {
+      signalRContext.connection?.off("ReceiveColorPresets", handleReceiveColorPresets);
+    };
+  }, [signalRContext.connection]);
+
+  const applyPreset = (preset: ColorPresetModel) => {
+    signalRContext.connection?.invoke("ApplyColorPreset", preset.name).catch((err) => {
+      console.error("Error applying color preset:", err);
+    });
   };
 
   const handleCustomColorChange = (
@@ -73,7 +83,7 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
           <div className={styles.presetsContainer}>
             {colorPresets.map((preset) => (
               <Button
-                key={preset.name as string}
+                key={preset.name}
                 variant="outline-primary"
                 size="sm"
                 onClick={() => applyPreset(preset)}
@@ -92,7 +102,6 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
         <div className={styles.customColorsSection}>
           <h6 className={styles.sectionTitle}>Custom Colors:</h6>
           <Row className="g-3 d-flex justify-content-center">
-            {/* Удалено: mainColor */}
             <Col xs={6} md={3} className={styles.colorField}>
               <Form.Group>
                 <Form.Label className={styles.fieldLabel}>
@@ -141,7 +150,6 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({ onColorChange }) => {
                 />
               </Form.Group>
             </Col>
-            {/* Удалено: backgroundColor, borderColor */}
           </Row>
         </div>
       </Card.Body>

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AdminPanel } from "../components/AdminPanel";
-import styles from "./App.module.scss";
-import "../global.scss";
 import Scoreboard from "../components/Scoreboard/Scoreboard";
-import { SignalRContext } from "../providers/SignalRProvider";
+import "../global.scss";
+import { SignalRProvider } from "../providers/SignalRProvider";
+import styles from "./App.module.scss";
 
 
 function App() {
@@ -42,20 +42,17 @@ function App() {
           </button>
         </div>
       </div>
-      <SignalRContext.Provider
-        value={{
-          connection: null,
-          automaticReconnect: true,
-          withCredentials: false,
-          url: "http://localhost:5035/scoreboardHub"
-        }}
+      <SignalRProvider
+        url="http://localhost:5035/scoreboardHub"
+        withCredentials={false}
+        automaticReconnect={true}
       >
         <Routes>
           <Route path="/scoreboard" element={<Scoreboard />} />
           <Route path="/adminpanel" element={<AdminPanel />} />
           <Route path="*" element={<Scoreboard />} />
         </Routes>
-      </SignalRContext.Provider>
+      </SignalRProvider>
     </Router>
   );
 }

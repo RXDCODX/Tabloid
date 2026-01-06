@@ -20,7 +20,8 @@ public static class Program
         builder.Services.AddSingleton<ScoreboardStateService>();
         builder.Services.AddSingleton<PlayerPresetService>();
         builder.Services.AddSingleton<BackgroundImagesService>();
-
+        builder.Services.AddSingleton<ColorPresetService>();
+        
         builder.Services.AddControllers();
         builder
             .Services.AddSignalR()
