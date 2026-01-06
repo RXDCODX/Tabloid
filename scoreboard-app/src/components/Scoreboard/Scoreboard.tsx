@@ -1,8 +1,8 @@
 // Компонент создан на основе Scoreboard.cshtml из Tabloid
-import React, { useEffect, useState, useContext } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { defaultPreset, LayoutConfig } from "../../types/types";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useContext, useEffect, useState } from "react";
 import { SignalRContext } from "../../providers/SignalRProvider";
+import { defaultPreset, LayoutConfig } from "../../types/types";
 import styles from "./Scoreboard.module.scss";
 
 type Player = {
@@ -89,6 +89,8 @@ const Scoreboard: React.FC = () => {
 
   // Подписка на SignalR события
   useEffect(() => {
+    if (!signalRContext.connection) return;
+
     const handleReceiveState = (state: ScoreboardState) => {
       setPlayer1(state.player1);
       setPlayer2(state.player2);
@@ -110,12 +112,12 @@ const Scoreboard: React.FC = () => {
       }
     };
 
-    signalRContext.connection?.on("ReceiveState", handleReceiveState);
+    signalRContext.connection.on("ReceiveState", handleReceiveState);
 
     return () => {
       signalRContext.connection?.off("ReceiveState", handleReceiveState);
     };
-  }, []);
+  }, [signalRContext.connection]);
 
   // Если панель скрыта, не отображаем ничего
   if (!isVisible) {

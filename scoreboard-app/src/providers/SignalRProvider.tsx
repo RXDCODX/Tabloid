@@ -1,5 +1,5 @@
-import React, { createContext } from 'react';
 import * as signalR from '@microsoft/signalr';
+import React, { createContext, useEffect, useState } from 'react';
 
 export interface SignalRContextType {
   connection: signalR.HubConnection | null;
@@ -15,18 +15,6 @@ export const SignalRContext = createContext<SignalRContextType>({
   url: '',
 });
 
-// Создаем соединение SignalR
-const createConnection = (url: string, withCredentials: boolean) => {
-  const connection = new signalR.HubConnectionBuilder()
-    .withUrl(url, {
-      withCredentials,
-    })
-    .withAutomaticReconnect()
-    .build();
-
-  return connection;
-};
-
 // Провайдер для SignalR
 export const SignalRProvider: React.FC<{
   children: React.ReactNode;
@@ -39,7 +27,27 @@ export const SignalRProvider: React.FC<{
   withCredentials = false,
   automaticReconnect = true,
 }) => {
-  const connection = createConnection(url, withCredentials);
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+
+  useEffect(() => {
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl(url, {
+        withCredentials,
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    newConnection.start()
+      .then(() => {
+        console.log('SignalR Connected');
+        setConnection(newConnection);
+      })
+      .catch((err) => console.error('SignalR Connection Error: ', err));
+
+    return () => {
+      newConnection.stop();
+    };
+  }, [url, withCredentials]);
 
   return (
     <SignalRContext.Provider

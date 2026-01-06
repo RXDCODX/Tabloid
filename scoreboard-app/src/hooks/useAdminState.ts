@@ -1,14 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import { SignalRContext } from '../providers/SignalRProvider';
 import {
-  Player,
-  MetaInfo,
-  ColorPreset,
-  TextConfiguration,
-  BackgroundImages,
-  LayoutConfig,
+    BackgroundImages,
+    ColorPreset,
+    LayoutConfig,
+    MetaInfo,
+    Player,
+    TextConfiguration,
 } from '../types/types';
 
 export const useAdminState = () => {
+  const signalRContext = useContext(SignalRContext);
   const [player1, setPlayer1] = useState<Player>({
     name: 'Player 1',
     sponsor: '',
@@ -84,9 +86,10 @@ export const useAdminState = () => {
   }, []);
 
   const handleColorChange = useCallback((colors: ColorPreset) => {
-    // Здесь можно добавить логику для изменения цветов
-    console.log('Colors changed:', colors);
-  }, []);
+    signalRContext.connection?.invoke('UpdateColors', colors).catch((err) => {
+      console.error('Error updating colors:', err);
+    });
+  }, [signalRContext.connection]);
 
   return {
     player1,

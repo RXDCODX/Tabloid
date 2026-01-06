@@ -5,7 +5,7 @@ using scoreboard_backend.Services;
 
 namespace scoreboard_backend.Hubs;
 
-public class ScoreboardHub(ScoreboardStateService stateService) : Hub
+public class ScoreboardHub(ScoreboardStateService stateService, ColorPresetService colorPresetService) : Hub
 {
     public override Task OnConnectedAsync()
     {
@@ -63,5 +63,33 @@ public class ScoreboardHub(ScoreboardStateService stateService) : Hub
     {
         stateService.ResetToDefault();
         await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+    }
+
+    public async Task GetColorPresets()
+    {
+        await Clients.Caller.SendAsync("ReceiveColorPresets", colorPresetService.GetAll());
+    }
+
+    public async Task ApplyColorPreset(string presetName)
+    {
+        var presets = colorPresetService.GetAll();
+        var preset = presets.FirstOrDefault(p => p.Name.Equals(presetName, StringComparison.OrdinalIgnoreCase));
+        
+        if (preset != null)
+        {
+            var currentColors = stateService.GetState().Colors;
+            
+            if (!string.IsNullOrEmpty(preset.PlayerNamesColor))
+                currentColors.PlayerNamesColor = preset.PlayerNamesColor;
+            if (!string.IsNullOrEmpty(preset.TournamentTitleColor))
+                currentColors.TournamentTitleColor = preset.TournamentTitleColor;
+            if (!string.IsNullOrEmpty(preset.FightModeColor))
+                currentColors.FightModeColor = preset.FightModeColor;
+            if (!string.IsNullOrEmpty(preset.ScoreColor))
+                currentColors.ScoreColor = preset.ScoreColor;
+            
+            stateService.UpdateColors(currentColors);
+            await Clients.All.SendAsync("ReceiveState", stateService.GetState());
+        }
     }
 }
