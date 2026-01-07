@@ -38,6 +38,8 @@ export interface Images {
   fightModeImage?: string;
 }
 
+export type BackgroundImages = Images;
+
 export interface LayoutBlockSizeAndPosition {
   top?: string; // e.g. "15px" | "10%"
   left?: string; // e.g. "167px" | "5%"
