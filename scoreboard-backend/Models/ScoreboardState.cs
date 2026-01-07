@@ -11,4 +11,5 @@ public class ScoreboardState
     public bool IsVisible { get; set; } = true; // Новое поле для управления видимостью
     public int AnimationDuration { get; set; } = 2000; // Время анимации в миллисекундах
     public bool IsShowBorders { get; set; } = false;
+    public LayoutConfig LayoutConfig { get; set; } = new();
 }

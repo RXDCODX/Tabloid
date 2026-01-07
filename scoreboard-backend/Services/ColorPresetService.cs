@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;
@@ -9,9 +10,11 @@ public class ColorPresetService
     private readonly List<ColorPresetModel> _presets;
     private readonly Lock _lock = new();
     private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
+    private readonly ILogger<ColorPresetService> _logger;
 
-    public ColorPresetService()
+    public ColorPresetService(ILogger<ColorPresetService> logger)
     {
+        _logger = logger;
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
         _presetsPath = Path.Combine(baseDir, "color_presets.json");
         _presets = LoadFromDisk();
@@ -20,9 +23,11 @@ public class ColorPresetService
         {
             InitializeDefaultPresets();
         }
+
+        _logger.LogInformation("ColorPresetService initialized. Presets path: {Path}, loaded {Count} presets", _presetsPath, _presets.Count);
     }
 
-    public IReadOnlyList<ColorPresetModel> GetAll()
+    public List<ColorPresetModel> GetAll()
     {
         lock (_lock)
         {
@@ -34,6 +39,7 @@ public class ColorPresetService
     {
         if (string.IsNullOrWhiteSpace(preset.Name))
         {
+            _logger.LogWarning("Upsert called with empty preset name");
             return;
         }
 
@@ -45,10 +51,12 @@ public class ColorPresetService
             if (idx >= 0)
             {
                 _presets[idx] = Normalize(preset);
+                _logger.LogInformation("Updated color preset: {Name}", preset.Name);
             }
             else
             {
                 _presets.Insert(0, Normalize(preset));
+                _logger.LogInformation("Inserted new color preset: {Name}", preset.Name);
             }
             SaveToDisk();
         }
@@ -58,12 +66,14 @@ public class ColorPresetService
     {
         if (string.IsNullOrWhiteSpace(name))
         {
+            _logger.LogWarning("RemoveByName called with empty name");
             return;
         }
 
         lock (_lock)
         {
-            _presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var removed = _presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            _logger.LogInformation("Removed {Count} color presets with name {Name}", removed, name);
             SaveToDisk();
         }
     }
@@ -74,6 +84,7 @@ public class ColorPresetService
         {
             _presets.Clear();
             _presets.AddRange(presets.Select(Normalize));
+            _logger.LogInformation("Replaced all color presets. New count: {Count}", _presets.Count);
             SaveToDisk();
         }
     }
@@ -84,15 +95,18 @@ public class ColorPresetService
         {
             if (!File.Exists(_presetsPath))
             {
+                _logger.LogInformation("Color presets file not found: {Path}", _presetsPath);
                 return [];
             }
 
             var json = File.ReadAllText(_presetsPath);
             var data = JsonSerializer.Deserialize<List<ColorPresetModel>>(json) ?? [];
+            _logger.LogInformation("Loaded {Count} color presets from disk", data.Count);
             return data;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to load color presets from disk: {Path}", _presetsPath);
             return [];
         }
     }
@@ -108,9 +122,11 @@ public class ColorPresetService
             }
             var json = JsonSerializer.Serialize(_presets, jsonSerializerOptions);
             File.WriteAllText(_presetsPath, json);
+            _logger.LogInformation("Saved {Count} color presets to disk", _presets.Count);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to save color presets to disk: {Path}", _presetsPath);
             // ignore
         }
     }

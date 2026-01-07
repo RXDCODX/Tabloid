@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
+import { Image } from 'react-bootstrap-icons';
 import { BackgroundImages } from '../../../types/types';
 import { BackgroundImageService } from '../services/BackgroundImagesService';
 import styles from './BackgroundImagesCard.module.scss';
@@ -15,7 +16,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
 }) => {
   const fileInputRefs: Record<
     keyof BackgroundImages,
-    React.RefObject<HTMLInputElement>
+    React.RefObject<HTMLInputElement | null>
   > = {
     centerImage: useRef<HTMLInputElement>(null),
     leftImage: useRef<HTMLInputElement>(null),
@@ -38,64 +39,70 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
     }
   };
 
-  const handleImageUpload = async (
-    field: keyof BackgroundImages,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = useCallback(
+    async (
+      field: keyof BackgroundImages,
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Пожалуйста, выберите файл изображения');
-      return;
-    }
+      if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите файл изображения');
+        return;
+      }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Размер файла не должен превышать 5MB');
-      return;
-    }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 5MB');
+        return;
+      }
 
-    // Показываем локальное превью сразу
-    const previewUrl = URL.createObjectURL(file);
-    onBackgroundImagesChange({
-      ...backgroundImages,
-      [field]: previewUrl,
-    });
+      // Показываем локальное превью сразу
+      const previewUrl = URL.createObjectURL(file);
+      onBackgroundImagesChange({
+        ...backgroundImages,
+        [field]: previewUrl,
+      });
 
-    const imageType = mapFieldToImageType(field);
-    try {
-      await BackgroundImageService.updateImage(imageType, file);
-    } catch (e: any) {
-      alert('Не удалось загрузить изображение: ' + (e.message || e));
+      const imageType = mapFieldToImageType(field);
+      try {
+        await BackgroundImageService.updateImage(imageType, file);
+      } catch (e: any) {
+        alert('Не удалось загрузить изображение: ' + (e.message || e));
+        onBackgroundImagesChange({
+          ...backgroundImages,
+          [field]: '',
+        });
+        const input = fileInputRefs[field].current;
+        if (input) input.value = '';
+      }
+    },
+    [backgroundImages, onBackgroundImagesChange, fileInputRefs]
+  );
+
+  const handleRemoveImage = useCallback(
+    async (field: keyof BackgroundImages) => {
+      const imageType = mapFieldToImageType(field);
+      try {
+        await BackgroundImageService.deleteImage(imageType);
+      } catch (e: any) {
+        alert('Не удалось удалить изображение: ' + (e.message || e));
+        return;
+      }
+
       onBackgroundImagesChange({
         ...backgroundImages,
         [field]: '',
       });
       const input = fileInputRefs[field].current;
-      if (input) input.value = '';
-    }
-  };
+      if (input) {
+        input.value = '';
+      }
+    },
+    [backgroundImages, onBackgroundImagesChange, fileInputRefs]
+  );
 
-  const handleRemoveImage = async (field: keyof BackgroundImages) => {
-    const imageType = mapFieldToImageType(field);
-    try {
-      await BackgroundImageService.deleteImage(imageType);
-    } catch (e: any) {
-      alert('Не удалось удалить изображение: ' + (e.message || e));
-      return;
-    }
-
-    onBackgroundImagesChange({
-      ...backgroundImages,
-      [field]: '',
-    });
-    const input = fileInputRefs[field].current;
-    if (input) {
-      input.value = '';
-    }
-  };
-
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     onBackgroundImagesChange({});
     // Очищаем все inputs
     Object.values(fileInputRefs).forEach(ref => {
@@ -103,7 +110,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         ref.current.value = '';
       }
     });
-  };
+  }, [onBackgroundImagesChange, fileInputRefs]);
 
   const ImageUploadField = ({
     field,
@@ -159,10 +166,11 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
 
   return (
     <Card className={`mb-4 ${styles.backgroundImagesCard}`}>
-      <Card.Header className='bg-success text-white'>
-        <h5 className='mb-0'>Фоновые изображения</h5>
-      </Card.Header>
       <Card.Body>
+        <div className={styles.cardHeader}>
+          <Image color='#28a745' size={22} />
+          <span className={styles.cardTitle}>Фоновые изображения</span>
+        </div>
         <Row>
           <ImageUploadField
             field='centerImage'

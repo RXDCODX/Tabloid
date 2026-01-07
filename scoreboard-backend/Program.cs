@@ -21,7 +21,7 @@ public static class Program
         builder.Services.AddSingleton<PlayerPresetService>();
         builder.Services.AddSingleton<BackgroundImagesService>();
         builder.Services.AddSingleton<ColorPresetService>();
-        
+
         builder.Services.AddControllers();
         builder
             .Services.AddSignalR()
@@ -35,9 +35,9 @@ public static class Program
         builder.Services.AddCors(options =>
             options.AddPolicy(
                 "CorsPolicy",
-                builderr =>
+                builder_ =>
                 {
-                    builderr
+                    builder_
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .SetIsOriginAllowed(host => true)

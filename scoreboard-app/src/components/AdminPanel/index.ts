@@ -21,4 +21,5 @@ export * from './Utils/flagUtils';
 export * from './types';
 
 // Сервисы
-export { playerPresetRepository } from './services/PlayerPresetService';
+// Репозиторий пресетов игроков располагается в src/services
+export { playerPresetRepository } from '../../services/PlayerPresetService';

@@ -1,18 +1,18 @@
-import React, { useMemo, useState } from "react";
-import { Button, Card, Form } from "react-bootstrap";
+import React, { useCallback, useMemo, useState } from 'react';
+import { Button, Card, Form } from 'react-bootstrap';
 import {
-    ArrowDown,
-    ArrowRepeat,
-    ArrowUp,
-    PersonFill,
-    TrophyFill,
-    XCircleFill,
-} from "react-bootstrap-icons";
-import { PlayerWithTimestamp } from "../types";
-import FlagSelector from "../Forms/FlagSelector";
-import { playerPresetRepository } from "../services/PlayerPresetService";
-import { getFlagPath } from "../Utils/flagUtils";
-import styles from "./PlayerCard.module.scss";
+  ArrowDown,
+  ArrowRepeat,
+  ArrowUp,
+  PersonFill,
+  TrophyFill,
+  XCircleFill,
+} from 'react-bootstrap-icons';
+import { playerPresetRepository } from '../../../services/PlayerPresetService';
+import FlagSelector from '../Forms/FlagSelector';
+import { PlayerWithTimestamp } from '../types';
+import { getFlagPath } from '../Utils/flagUtils';
+import styles from './PlayerCard.module.scss';
 
 type PlayerCardProps = {
   player: PlayerWithTimestamp;
@@ -44,33 +44,71 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   const [isNameOpen, setIsNameOpen] = useState(false);
   const [presetsVersion, setPresetsVersion] = useState(0);
 
-  const nameQuery = player.name || "";
+  const nameQuery = player.name || '';
 
   const filteredPresets = useMemo(() => {
-    const query = (nameQuery || "").trim().toLowerCase();
-    if (!query) return [] as { name: string; tag: string; flag: string; sponsor?: string }[];
+    const query = (nameQuery || '').trim().toLowerCase();
+    if (!query)
+      return [] as {
+        name: string;
+        tag: string;
+        flag: string;
+        sponsor?: string;
+      }[];
     return playerPresetRepository
-      .getAllPresets()
+      .getPresets()
+      .map((p: any) => ({
+        name: p.player1?.name || p.name || '',
+        tag: p.player1?.tag || '',
+        flag: p.player1?.flag || '',
+        sponsor: p.player1?.sponsor || '',
+      }))
       .filter((p: any) => p.name.toLowerCase().includes(query))
       .slice(0, 8);
   }, [nameQuery, presetsVersion]);
 
-  const handleSelectPreset = (p: { name: string; tag: string; flag: string }) => {
-    onName(p.name);
-    onTag(p.tag || "");
-    onFlag(p.flag || "");
-    setIsNameOpen(false);
-  };
+  const handleSelectPreset = useCallback(
+    (p: { name: string; tag: string; flag: string }) => {
+      onName(p.name);
+      onTag(p.tag || '');
+      onFlag(p.flag || '');
+      setIsNameOpen(false);
+    },
+    [onName, onTag, onFlag]
+  );
 
-  const handleSavePreset = () => {
+  const handleSavePreset = useCallback(() => {
     playerPresetRepository.save({
+      id: Date.now().toString(),
       name: player.name,
-      tag: player.tag,
-      flag: player.flag,
-      sponsor: player.sponsor,
+      player1: {
+        name: player.name,
+        sponsor: player.sponsor,
+        tag: player.tag,
+        flag: player.flag,
+      },
+      player2: {
+        name: '',
+        sponsor: '',
+        tag: '',
+        flag: 'none',
+      },
+      meta: {
+        title: '',
+        fightRule: '',
+      },
+      colors: {
+        mainColor: '#3F00FF',
+        playerNamesColor: '#FFFFFF',
+        tournamentTitleColor: '#FFFFFF',
+        fightModeColor: '#FFFFFF',
+        scoreColor: '#FFFFFF',
+        backgroundColor: '#1a1a1a',
+        borderColor: '#3F00FF',
+      },
     });
-    setPresetsVersion((v) => v + 1);
-  };
+    setPresetsVersion(v => v + 1);
+  }, [player]);
 
   return (
     <Card
@@ -82,41 +120,38 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <Card.Body>
         <div className={styles.cardHeader}>
           <PersonFill color={accent} size={22} />
-          <span
-            className={styles.cardTitle}
-            style={{ color: accent }}
-          >
+          <span className={styles.cardTitle} style={{ color: accent }}>
             {label}
           </span>
         </div>
-        
+
         <div className={styles.playerInfo}>
           <Form.Control
-            placeholder="Tag"
-            value={player.tag}
-            onChange={(e) => onTag(e.target.value)}
-            size="sm"
+            placeholder='Tag'
+            value={player.tag ?? ''}
+            onChange={e => onTag(e.target.value)}
+            size='sm'
             className={`${styles.tagInput} bg-dark text-info border-info border-2 fw-bold rounded-3`}
             style={{ maxWidth: 90 }}
           />
           <div className={styles.nameInputContainer}>
             <Form.Control
-              placeholder="Name"
+              placeholder='Name'
               value={
-                (player.final === "winner"
-                  ? "[W] "
-                  : player.final === "loser"
-                  ? "[L] "
-                  : "") + player.name
+                (player.final === 'winner'
+                  ? '[W] '
+                  : player.final === 'loser'
+                    ? '[L] '
+                    : '') + (player.name ?? '')
               }
-              onChange={(e) => {
-                let val = e.target.value.replace(/^\[W\] |^\[L\] /, "");
+              onChange={e => {
+                let val = e.target.value.replace(/^\[W\] |^\[L\] /, '');
                 onName(val);
                 setIsNameOpen(true);
               }}
               onFocus={() => setIsNameOpen(true)}
               onBlur={() => setTimeout(() => setIsNameOpen(false), 150)}
-              size="sm"
+              size='sm'
               className={`${styles.nameInput} fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100`}
             />
             {isNameOpen && filteredPresets.length > 0 && (
@@ -125,20 +160,23 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                   <div
                     key={`${p.name}-${p.tag}-${p.flag}`}
                     className={styles.presetItem}
-                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseDown={e => e.preventDefault()}
                     onClick={() => handleSelectPreset(p)}
                   >
                     <img
                       src={getFlagPath(p.flag)}
                       alt={p.flag}
                       className={styles.flagImage}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      onError={e => {
+                        (e.currentTarget as HTMLImageElement).style.display =
+                          'none';
                       }}
                     />
                     <div className={styles.presetInfo}>
                       <span className={styles.presetName}>{p.name}</span>
-                      {p.tag && <span className={styles.presetTag}>{p.tag}</span>}
+                      {p.tag && (
+                        <span className={styles.presetTag}>{p.tag}</span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -146,20 +184,20 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             )}
           </div>
         </div>
-        
+
         <div className={styles.flagSelector}>
           <FlagSelector
-            selectedFlag={player.flag}
+            selectedFlag={player.flag ?? 'none'}
             onFlagChange={onFlag}
-            placeholder="Флаг"
+            placeholder='Флаг'
           />
         </div>
-        
+
         <div className={styles.scoreSection}>
           <Button
-            variant="outline-info"
-            size="sm"
-            onClick={() => onScore(player.score + 1)}
+            variant='outline-info'
+            size='sm'
+            onClick={() => onScore((player.score ?? 0) + 1)}
             className={styles.scoreButton}
           >
             <ArrowUp />
@@ -170,61 +208,61 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               color: accent,
             }}
           >
-            {player.score}
+            {player.score ?? 0}
           </span>
           <Button
-            variant="outline-info"
-            size="sm"
-            onClick={() => onScore(player.score - 1)}
+            variant='outline-info'
+            size='sm'
+            onClick={() => onScore((player.score ?? 0) - 1)}
             className={styles.scoreButton}
           >
             <ArrowDown />
           </Button>
           <Button
-            variant="outline-secondary"
-            size="sm"
+            variant='outline-secondary'
+            size='sm'
             onClick={() => onScore(0)}
             className={styles.scoreButton}
           >
             <ArrowRepeat />
           </Button>
         </div>
-        
+
         <div className={styles.actionsSection}>
           <Button
-            variant="success"
-            size="sm"
+            variant='success'
+            size='sm'
             className={`${styles.actionButton} px-3`}
             onClick={onWin}
           >
             <TrophyFill /> W
           </Button>
           <Button
-            variant="danger"
-            size="sm"
+            variant='danger'
+            size='sm'
             className={`${styles.actionButton} px-3`}
             onClick={onLose}
           >
             <XCircleFill /> L
           </Button>
-          {player.final !== "none" && (
+          {player.final !== 'none' && (
             <Button
-              variant="outline-secondary"
-              size="sm"
+              variant='outline-secondary'
+              size='sm'
               className={`${styles.clearButton} px-2 py-0`}
               style={{ fontSize: 14 }}
               onClick={onClearFinal}
-              title="Убрать статус W/L"
+              title='Убрать статус W/L'
             >
               ✕
             </Button>
           )}
           <Button
-            variant="outline-success"
-            size="sm"
+            variant='outline-success'
+            size='sm'
             className={styles.saveButton}
             onClick={handleSavePreset}
-            title="Сохранить пресет игрока"
+            title='Сохранить пресет игрока'
           >
             Сохранить
           </Button>

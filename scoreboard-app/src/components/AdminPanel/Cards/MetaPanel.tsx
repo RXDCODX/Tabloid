@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Button, ButtonGroup, Card, Form } from "react-bootstrap";
-import { InfoCircle } from "react-bootstrap-icons";
-import { MetaInfoWithTimestamp } from "../types";
-import styles from "./MetaPanel.module.scss";
+import React, { useCallback, useState } from 'react';
+import { Button, ButtonGroup, Card, Form } from 'react-bootstrap';
+import { InfoCircle } from 'react-bootstrap-icons';
+import { MetaInfoWithTimestamp } from '../types';
+import styles from './MetaPanel.module.scss';
 
 type MetaPanelProps = {
   setMeta: (meta: any) => void;
@@ -10,113 +10,130 @@ type MetaPanelProps = {
 };
 
 const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
-  const [customFightRule, setCustomFightRule] = useState(meta.fightRule || "");
+  const [customFightRule, setCustomFightRule] = useState(meta.fightRule || '');
 
-  const fightRules = ["FT1", "FT2", "FT3", "FT4", "FT5"];
+  const fightRules = ['FT1', 'FT2', 'FT3', 'FT4', 'FT5'];
 
-  const handleFightRuleChange = (rule: string) => {
-    setMeta({ fightRule: rule });
-    if (fightRules.includes(rule) || rule === "None") {
-      setCustomFightRule(""); // сбрасываем customFightRule
-    } else {
-      setCustomFightRule(rule);
-    }
-  };
+  const handleFightRuleChange = useCallback(
+    (rule: string) => {
+      setMeta({ ...meta, fightRule: rule });
+      if (fightRules.includes(rule) || rule === 'None') {
+        setCustomFightRule(''); // сбрасываем customFightRule
+      } else {
+        setCustomFightRule(rule);
+      }
+    },
+    [fightRules, meta, setMeta]
+  );
 
-  const handleCustomFightRuleChange = (value: string) => {
-    setCustomFightRule(value);
-    setMeta({ fightRule: value });
-  };
+  const handleCustomFightRuleChange = useCallback(
+    (value: string) => {
+      setCustomFightRule(value);
+      setMeta({ ...meta, fightRule: value });
+    },
+    [meta, setMeta]
+  );
 
   return (
     <Card className={styles.metaPanel}>
       <Card.Body className={styles.cardBody}>
         <div className={styles.cardHeader}>
-          <InfoCircle color="#6f42c1" size={20} />
-          <span className={styles.cardTitle}>
-            Meta Panel
-          </span>
+          <InfoCircle color='#6f42c1' size={20} />
+          <span className={styles.cardTitle}>Meta Panel</span>
         </div>
-        
+
         <div className={styles.formSection}>
           <Form.Group>
             <Form.Label className={styles.fieldLabel}>
               Название турнира
             </Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Введите название турнира"
-              value={meta.title}
-              onChange={(e) => setMeta({ title: e.target.value })}
+              type='text'
+              placeholder='Введите название турнира'
+              value={meta.title ?? ''}
+              onChange={e => setMeta({ ...meta, title: e.target.value })}
               className={`${styles.textInput} bg-dark text-white border-primary border-2 fw-bold rounded-3`}
               style={{ fontSize: 14 }}
             />
           </Form.Group>
-          
+
           <Form.Group>
-            <Form.Label className={styles.fieldLabel}>
-              Режим драки
-            </Form.Label>
+            <Form.Label className={styles.fieldLabel}>Режим драки</Form.Label>
             <div className={styles.fightRulesContainer}>
-              <ButtonGroup size="sm" className="w-100">
-                {fightRules.map((rule) => (
+              <ButtonGroup size='sm' className='w-100'>
+                {fightRules.map(rule => (
                   <Button
                     key={rule}
                     variant={
-                      meta.fightRule === rule ? "primary" : "outline-primary"
+                      meta.fightRule === rule ? 'primary' : 'outline-primary'
                     }
                     onClick={() => handleFightRuleChange(rule)}
                     className={`${styles.fightRuleButton} fw-bold`}
-                    style={{
-                      '--button-bg': meta.fightRule === rule ? "#0d6efd" : "transparent",
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        '--button-bg':
+                          meta.fightRule === rule ? '#0d6efd' : 'transparent',
+                      } as React.CSSProperties
+                    }
                   >
                     {rule}
                   </Button>
                 ))}
               </ButtonGroup>
             </div>
-            
+
             {/* Отдельный ряд для None */}
-            <div className="d-flex gap-1 flex-wrap mb-2">
+            <div className='d-flex gap-1 flex-wrap mb-2'>
               <Button
                 variant={
-                  meta.fightRule === "None" ? "secondary" : "outline-secondary"
+                  meta.fightRule === 'None' ? 'secondary' : 'outline-secondary'
                 }
-                onClick={() => handleFightRuleChange("None")}
+                onClick={() => handleFightRuleChange('None')}
                 className={`${styles.noneButton} fw-bold`}
-                style={{
-                  '--button-bg': meta.fightRule === "None" ? "#6c757d" : "transparent",
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--button-bg':
+                      meta.fightRule === 'None' ? '#6c757d' : 'transparent',
+                  } as React.CSSProperties
+                }
               >
                 None
               </Button>
             </div>
-            
-            <div className="d-flex flex-column gap-2">
+
+            <div className='d-flex flex-column gap-2'>
               <Button
                 variant={
-                  meta.fightRule === "Custom" || (!fightRules.includes(meta.fightRule) && meta.fightRule !== "None")
-                    ? "primary"
-                    : "outline-primary"
+                  meta.fightRule === 'Custom' ||
+                  (!fightRules.includes(meta.fightRule) &&
+                    meta.fightRule !== 'None')
+                    ? 'primary'
+                    : 'outline-primary'
                 }
-                onClick={() => handleFightRuleChange("Custom")}
+                onClick={() => handleFightRuleChange('Custom')}
                 className={`${styles.customButton} fw-bold`}
-                style={{
-                  '--button-bg': meta.fightRule === "Custom" || (!fightRules.includes(meta.fightRule) && meta.fightRule !== "None")
-                    ? "#0d6efd"
-                    : "transparent",
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--button-bg':
+                      meta.fightRule === 'Custom' ||
+                      (!fightRules.includes(meta.fightRule) &&
+                        meta.fightRule !== 'None')
+                        ? '#0d6efd'
+                        : 'transparent',
+                  } as React.CSSProperties
+                }
               >
                 Custom
               </Button>
-              {(meta.fightRule === "Custom" ||
-                (customFightRule && !fightRules.includes(meta.fightRule) && meta.fightRule !== "None")) && (
+              {(meta.fightRule === 'Custom' ||
+                (customFightRule &&
+                  !fightRules.includes(meta.fightRule) &&
+                  meta.fightRule !== 'None')) && (
                 <Form.Control
-                  type="text"
-                  placeholder="Кастомный режим (например: FT10, BO3)"
-                  value={customFightRule || ""}
-                  onChange={(e) => handleCustomFightRuleChange(e.target.value)}
+                  type='text'
+                  placeholder='Кастомный режим (например: FT10, BO3)'
+                  value={customFightRule || ''}
+                  onChange={e => handleCustomFightRuleChange(e.target.value)}
                   className={`${styles.customInput} bg-dark text-warning border-warning border-2 fw-bold rounded-3`}
                   style={{ fontSize: 12 }}
                 />

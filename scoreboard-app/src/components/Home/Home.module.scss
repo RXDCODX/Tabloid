@@ -1,0 +1,124 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--background);
+}
+
+.content {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.navButton {
+  padding: 20px 40px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-background);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.adminButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+  
+  &:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
+}
+
+.scoreboardButton {
+  background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 114, 255, 0.28), inset 0 -3px 0 rgba(0,0,0,0.08);
+  transform: translateZ(0);
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: -10px;
+    height: 10px;
+    border-radius: 6px;
+    background: radial-gradient(closest-side, rgba(0,114,255,0.25), transparent 60%);
+    filter: blur(8px);
+    z-index: -1;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 14px 40px rgba(0, 114, 255, 0.32), inset 0 -4px 0 rgba(0,0,0,0.12);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 114, 255, 0.2);
+  }
+}
+
+.stateContainer {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.stateTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.stateJson {
+  background: var(--code-background, #1e1e1e);
+  color: var(--code-text, #d4d4d4);
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  max-height: 600px;
+  overflow-y: auto;
+}

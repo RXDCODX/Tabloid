@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Card, Form } from "react-bootstrap";
-import { BoundingBox } from "react-bootstrap-icons";
+import { useEffect, useState } from 'react';
+import { Card, Form } from 'react-bootstrap';
+import { BoundingBox } from 'react-bootstrap-icons';
+import styles from './BordersToggleCard.module.scss';
 
-type BordersToggleCardProps = {
+interface BordersToggleCardProps {
   initial?: boolean;
-};
+  onToggle?: (enabled: boolean) => void;
+}
 
-const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ initial = false }) => {
+const BordersToggleCard = ({
+  initial = false,
+  onToggle,
+}: BordersToggleCardProps) => {
   const [enabled, setEnabled] = useState<boolean>(initial);
+
+  // Keep local state in sync when parent updates `initial` (controlled usage)
+  useEffect(() => {
+    setEnabled(initial);
+  }, [initial]);
 
   useEffect(() => {
     if (enabled) {
@@ -17,23 +27,34 @@ const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ initial = false }
     }
   }, [enabled]);
 
+  useEffect(() => {
+    if(typeof initial === 'boolean') {
+      setEnabled(initial);
+    }
+  }, [initial]);
+
   return (
-    <Card className="bg-dark text-white border-danger border-2 w-100 p-3">
-      <div className="d-flex flex-column align-items-center gap-2 text-center mb-2">
-        <BoundingBox color="#dc3545" size={22} />
-        <span className="fw-bold text-uppercase" style={{ color: '#dc3545', letterSpacing: 1 }}>Container Borders</span>
+    <Card className={styles.bordersToggleCard}>
+      <div className={styles.cardHeader}>
+        <BoundingBox color='#dc3545' size={22} />
+        <span className={styles.cardTitle}>Container Borders</span>
       </div>
-      <div className="d-flex align-items-center justify-content-center">
-        <div className="d-flex flex-column">
-          <small className="text-secondary">Показать/скрыть вспомогательные границы</small>
+      <div className='d-flex align-items-center justify-content-center'>
+        <div className='d-flex flex-column'>
+          <small className='text-secondary'>
+            Показать/скрыть вспомогательные границы
+          </small>
         </div>
         <Form.Check
-          type="switch"
-          id="toggle-scoreboard-borders"
-          className="ms-3"
+          type='switch'
+          id='toggle-scoreboard-borders'
+          className='ms-3'
           checked={enabled}
-          onChange={(e) => setEnabled(e.currentTarget.checked)}
-          label={enabled ? 'Включены' : 'Выключены'}
+          onChange={e => {
+            const next = e.target.checked;
+            setEnabled(next);
+            if (onToggle) onToggle(next);
+          }}
         />
       </div>
     </Card>
@@ -41,5 +62,3 @@ const BordersToggleCard: React.FC<BordersToggleCardProps> = ({ initial = false }
 };
 
 export default BordersToggleCard;
-
-

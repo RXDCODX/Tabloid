@@ -27,25 +27,32 @@ export const SignalRProvider: React.FC<{
   withCredentials = false,
   automaticReconnect = true,
 }) => {
-  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(
+    null
+  );
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
+      .configureLogging(signalR.LogLevel.Debug)
       .withUrl(url, {
         withCredentials,
       })
       .withAutomaticReconnect()
       .build();
 
-    newConnection.start()
+    // Устанавливаем connection сразу, чтобы компоненты могли подписаться на обработчики
+    setConnection(newConnection);
+
+    newConnection
+      .start()
       .then(() => {
         console.log('SignalR Connected');
-        setConnection(newConnection);
       })
-      .catch((err) => console.error('SignalR Connection Error: ', err));
+      .catch(err => console.error('SignalR Connection Error: ', err));
 
     return () => {
       newConnection.stop();
+      setConnection(null);
     };
   }, [url, withCredentials]);
 

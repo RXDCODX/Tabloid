@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Button, Card, Form } from "react-bootstrap";
-import { Eye, EyeSlash, Clock, PlayCircle } from "react-bootstrap-icons";
-import styles from "./VisibilityCard.module.scss";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Card, Form } from 'react-bootstrap';
+import { Clock, Eye, EyeSlash, PlayCircle } from 'react-bootstrap-icons';
+import styles from './VisibilityCard.module.scss';
 
 type VisibilityCardProps = {
   isVisible: boolean;
@@ -36,12 +36,12 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
     setLastUpdateTime(Date.now());
   }, [isVisible]);
 
-  const handleVisibilityToggle = () => {
+  const handleVisibilityToggle = useCallback(() => {
     const newVisibility = !isVisible;
-    
+
     // Блокируем кнопку на время любой анимации
     if (isTransitioning) return;
-    
+
     if (newVisibility) {
       // Показываем панель - блокируем кнопку на время анимации
       setIsTransitioning(true);
@@ -60,28 +60,36 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
         setIsTransitioning(false);
       }, 100); // Короткая блокировка для скрытия
     }
-  };
+  }, [isVisible, isTransitioning, animationDuration, onVisibilityChange]);
 
-  const handleAnimationDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value >= 100 && value <= 99999 && onAnimationDurationChange) {
-      onAnimationDurationChange(value);
-    }
-  };
+  const handleAnimationDurationChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value);
+      if (
+        !isNaN(value) &&
+        value >= 100 &&
+        value <= 99999 &&
+        onAnimationDurationChange
+      ) {
+        onAnimationDurationChange(value);
+      }
+    },
+    [onAnimationDurationChange]
+  );
 
-  const handleDurationIncrease = () => {
+  const handleDurationIncrease = useCallback(() => {
     if (onAnimationDurationChange) {
       const newValue = Math.min(animationDuration + 500, 10000);
       onAnimationDurationChange(newValue);
     }
-  };
+  }, [animationDuration, onAnimationDurationChange]);
 
-  const handleDurationDecrease = () => {
+  const handleDurationDecrease = useCallback(() => {
     if (onAnimationDurationChange) {
       const newValue = Math.max(animationDuration - 500, 100);
       onAnimationDurationChange(newValue);
     }
-  };
+  }, [animationDuration, onAnimationDurationChange]);
 
   // Функция для форматирования времени
   const formatTime = (timestamp: number) => {
@@ -89,7 +97,7 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
     return date.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     });
   };
 
@@ -118,40 +126,43 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
         <div>
           <div className={styles.cardHeader}>
             {isVisible ? (
-              <Eye color="#dc3545" size={20} />
+              <Eye color='#dc3545' size={20} />
             ) : (
-              <EyeSlash color="#dc3545" size={20} />
+              <EyeSlash color='#dc3545' size={20} />
             )}
-            <span className={styles.cardTitle}>
-              Видимость
-            </span>
+            <span className={styles.cardTitle}>Видимость</span>
           </div>
 
           {/* Кнопка и input для времени анимации в одном ряду */}
           <div className={styles.controlsSection}>
             <Button
-              variant={isVisible ? "danger" : "success"}
+              variant={isVisible ? 'danger' : 'success'}
               className={`${styles.visibilityButton} fw-bold py-2 px-3 text-white`}
-              style={{
-                '--animation-duration': `${animationDuration}ms`,
-              } as React.CSSProperties}
+              style={
+                {
+                  '--animation-duration': `${animationDuration}ms`,
+                } as React.CSSProperties
+              }
               onClick={handleVisibilityToggle}
               disabled={shouldDisableButton}
             >
               {shouldDisableButton ? (
                 <div className={styles.loadingSpinner}>
-                  <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="visually-hidden">Загрузка...</span>
+                  <div
+                    className='spinner-border spinner-border-sm'
+                    role='status'
+                  >
+                    <span className='visually-hidden'>Загрузка...</span>
                   </div>
                   <span className={styles.spinnerText}>
-                    {isShowing ? "Показываем..." : "Скрываем..."}
+                    {isShowing ? 'Показываем...' : 'Скрываем...'}
                   </span>
                 </div>
               ) : (
-                <div className="d-flex align-items-center gap-1">
+                <div className='d-flex align-items-center gap-1'>
                   {isVisible ? <EyeSlash size={14} /> : <Eye size={14} />}
                   <span style={{ fontSize: 12 }}>
-                    {isVisible ? "Скрыть" : "Показать"}
+                    {isVisible ? 'Скрыть' : 'Показать'}
                   </span>
                 </div>
               )}
@@ -164,8 +175,8 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
               </Form.Label>
               <div className={styles.animationInputGroup}>
                 <Button
-                  variant="outline-danger"
-                  size="sm"
+                  variant='outline-danger'
+                  size='sm'
                   onClick={handleDurationDecrease}
                   disabled={animationDuration <= 100}
                   className={`${styles.animationButton} fw-bold`}
@@ -173,19 +184,19 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
                   -
                 </Button>
                 <Form.Control
-                  type="number"
+                  type='number'
                   value={animationDuration}
                   onChange={handleAnimationDurationChange}
                   min={100}
                   max={10000}
                   step={100}
-                  size="sm"
+                  size='sm'
                   className={`${styles.animationInput} bg-dark text-white border-danger border-2 fw-bold rounded-3 text-center`}
-                  placeholder="800"
+                  placeholder='800'
                 />
                 <Button
-                  variant="outline-danger"
-                  size="sm"
+                  variant='outline-danger'
+                  size='sm'
                   onClick={handleDurationIncrease}
                   disabled={animationDuration >= 10000}
                   className={`${styles.animationButton} fw-bold`}
@@ -201,14 +212,18 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
         <div className={styles.infoSection}>
           {/* Время последнего обновления */}
           <div className={styles.infoItem}>
-            <Clock size={14} color="#dc3545" />
-            <span className={styles.infoText}>Обновлено: {formatTime(lastUpdateTime)}</span>
+            <Clock size={14} color='#dc3545' />
+            <span className={styles.infoText}>
+              Обновлено: {formatTime(lastUpdateTime)}
+            </span>
           </div>
 
           {/* Время открытия страницы */}
           <div className={styles.infoItem}>
-            <PlayCircle size={14} color="#dc3545" />
-            <span className={styles.infoText}>Открыто: {formatPageOpenTime()}</span>
+            <PlayCircle size={14} color='#dc3545' />
+            <span className={styles.infoText}>
+              Открыто: {formatPageOpenTime()}
+            </span>
           </div>
 
           {/* Статус панели */}
@@ -216,7 +231,7 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
             <small
               className={isVisible ? styles.statusVisible : styles.statusHidden}
             >
-              {isVisible ? "Панель видна" : "Панель скрыта"}
+              {isVisible ? 'Панель видна' : 'Панель скрыта'}
             </small>
           </div>
         </div>

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Serialization;
@@ -9,5 +10,8 @@ namespace scoreboard_backend.Serialization;
 [JsonSerializable(typeof(MetaInfo))]
 [JsonSerializable(typeof(ColorPreset))]
 [JsonSerializable(typeof(ColorPresetModel))]
+[JsonSerializable(typeof(List<ColorPresetModel>))]
+[JsonSerializable(typeof(ColorPresetModel[]))]
+[JsonSerializable(typeof(IReadOnlyList<ColorPresetModel>))]
 [JsonSerializable(typeof(ScoreboardState))]
 public partial class ScoreboardJsonContext : JsonSerializerContext;
