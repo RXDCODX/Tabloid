@@ -24,7 +24,7 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
   context,
 }) => {
   const signalRContext = context;
-  const [customColors, setCustomColors] = useState({
+  const [customColors, setCustomColors] = useState<Partial<ColorPreset>>({
     playerNamesColor: defaultPreset.playerNamesColor,
     tournamentTitleColor: defaultPreset.tournamentTitleColor,
     fightModeColor: defaultPreset.fightModeColor,
@@ -79,10 +79,10 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
           preset.tournamentTitleColor || defaultPreset.tournamentTitleColor,
         fightModeColor: preset.fightModeColor || defaultPreset.fightModeColor,
         scoreColor: preset.scoreColor || defaultPreset.scoreColor,
-      } as Partial<ColorPreset>;
+      };
 
       // Обновим локально UI сразу
-      setCustomColors(newColors as any);
+      setCustomColors(newColors);
       onColorChange(newColors);
 
       // Посылаем на сервер

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 using scoreboard_backend.Models;
 using scoreboard_backend.Services;
 
@@ -87,7 +86,11 @@ public class ScoreboardHub(
 
     public async Task UpdateVisibility(bool isVisible)
     {
-        logger.LogInformation("UpdateVisibility called by {ConnectionId}: {IsVisible}", Context.ConnectionId, isVisible);
+        logger.LogInformation(
+            "UpdateVisibility called by {ConnectionId}: {IsVisible}",
+            Context.ConnectionId,
+            isVisible
+        );
         try
         {
             stateService.UpdateVisibility(isVisible);
@@ -102,7 +105,11 @@ public class ScoreboardHub(
 
     public async Task UpdateAnimationDuration(int animationDuration)
     {
-        logger.LogInformation("UpdateAnimationDuration called by {ConnectionId}: {Duration}", Context.ConnectionId, animationDuration);
+        logger.LogInformation(
+            "UpdateAnimationDuration called by {ConnectionId}: {Duration}",
+            Context.ConnectionId,
+            animationDuration
+        );
         try
         {
             stateService.UpdateAnimationDuration(animationDuration);
@@ -130,39 +137,13 @@ public class ScoreboardHub(
         }
     }
 
-    public async Task UpdateLayoutBlock(string blockKey, LayoutBlockSizeAndPosition block)
-    {
-        logger.LogInformation("UpdateLayoutBlock called by {ConnectionId}: {Block}", Context.ConnectionId, blockKey);
-        try
-        {
-            stateService.UpdateLayoutBlock(blockKey, block);
-            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error in UpdateLayoutBlock");
-            throw;
-        }
-    }
-
-    public async Task UpdateLayoutField(string blockKey, string field, string? value)
-    {
-        logger.LogInformation("UpdateLayoutField called by {ConnectionId}: {Block}.{Field} = {Value}", Context.ConnectionId, blockKey, field, value);
-        try
-        {
-            stateService.UpdateLayoutField(blockKey, field, value);
-            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error in UpdateLayoutField");
-            throw;
-        }
-    }
-
     public async Task UpdateBordersShowingState(bool isShowBorders)
     {
-        logger.LogInformation("UpdateBordersShowingState called by {ConnectionId}: {IsShow}", Context.ConnectionId, isShowBorders);
+        logger.LogInformation(
+            "UpdateBordersShowingState called by {ConnectionId}: {IsShow}",
+            Context.ConnectionId,
+            isShowBorders
+        );
         try
         {
             stateService.UpdateShowBorders(isShowBorders);
@@ -222,7 +203,11 @@ public class ScoreboardHub(
 
     public async Task ApplyColorPreset(string presetName)
     {
-        logger.LogInformation("ApplyColorPreset called by {ConnectionId}: {Preset}", Context.ConnectionId, presetName);
+        logger.LogInformation(
+            "ApplyColorPreset called by {ConnectionId}: {Preset}",
+            Context.ConnectionId,
+            presetName
+        );
         try
         {
             var presets = colorPresetService.GetAll();

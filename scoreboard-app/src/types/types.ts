@@ -1,10 +1,13 @@
+export type TimeStamp = {
+  _lastEdit?: number;
+};
+
 export interface Player {
   name: string;
-  sponsor: string;
   score: number;
   tag: string;
   flag: string;
-  final: 'winner' | 'loser' | 'none';
+  final: 'winner' | 'loser' | 'none' | string;
 }
 
 export interface MetaInfo {
@@ -12,7 +15,18 @@ export interface MetaInfo {
   fightRule: string;
 }
 
+export type PlayerWithTimestamp = Player & TimeStamp;
+export type MetaInfoWithTimestamp = MetaInfo & TimeStamp;
+
+export type ScoreboardStateWithTimestamp = {
+  player1: PlayerWithTimestamp;
+  player2: PlayerWithTimestamp;
+  meta: MetaInfoWithTimestamp;
+  _receivedAt?: number;
+};
+
 export interface ColorPreset {
+  name?: string;
   mainColor?: string;
   playerNamesColor?: string;
   tournamentTitleColor?: string;
@@ -32,27 +46,39 @@ export interface TextConfiguration {
 }
 
 export interface Images {
-  centerImage?: string;
-  leftImage?: string;
-  rightImage?: string;
-  fightModeImage?: string;
+  centerImage?: BackgroundImage;
+  leftImage?: BackgroundImage;
+  rightImage?: BackgroundImage;
+  fightModeImage?: BackgroundImage;
 }
 
-export type BackgroundImages = Images;
+export interface BackgroundImage {
+  imageName: string;
+  imageType: ImageType;
+  isShouldExists: boolean;
+}
+
+export enum ImageType {
+  None = 'None',
+  LeftImage = 'LeftImage',
+  RightImage = 'RightImage',
+  TopImage = 'TopImage',
+  FightModeImage = 'FightModeImage',
+}
 
 export interface LayoutBlockSizeAndPosition {
-  top?: string; // e.g. "15px" | "10%"
-  left?: string; // e.g. "167px" | "5%"
-  right?: string; // e.g. "167px" | "5%"
-  width?: string; // e.g. "540px" | "50%"
-  height?: string; // e.g. "120px" | "10%"
+  top?: string;
+  left?: string;
+  right?: string;
+  width?: string;
+  height?: string;
 }
 
 export interface LayoutConfig {
-  center?: LayoutBlockSizeAndPosition; // Заголовок турнира
-  left?: LayoutBlockSizeAndPosition; // Контейнер игрока 1
-  right?: LayoutBlockSizeAndPosition; // Контейнер игрока 2
-  fightMode?: LayoutBlockSizeAndPosition; // Контейнер режима боя
+  center?: LayoutBlockSizeAndPosition;
+  left?: LayoutBlockSizeAndPosition;
+  right?: LayoutBlockSizeAndPosition;
+  fightMode?: LayoutBlockSizeAndPosition;
 }
 
 export interface ScoreboardState {
@@ -60,15 +86,16 @@ export interface ScoreboardState {
   player2: Player;
   meta: MetaInfo;
   colors: ColorPreset;
-  textConfig: TextConfiguration;
-  images: Images;
-  isVisible: boolean;
-  animationDuration: number;
+  textConfig?: TextConfiguration;
+  images?: Images;
+  isVisible?: boolean;
+  animationDuration?: number;
   isShowBorders?: boolean;
   layoutConfig?: LayoutConfig;
 }
 
 export const defaultPreset: ColorPreset = {
+  name: 'Default',
   mainColor: '#3F00FF',
   playerNamesColor: '#FFFFFF',
   tournamentTitleColor: '#FFFFFF',

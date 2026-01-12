@@ -1,3 +1,4 @@
+import { debug } from 'console';
 import { useCallback, useEffect, useRef } from 'react';
 
 // Возвращает дебаунс-обёртку для переданной функции.
@@ -28,6 +29,7 @@ export default function useDebouncedCallback<
       }
       // window.setTimeout returns number in browser
       timerRef.current = window.setTimeout(() => {
+        debugger;
         callbackRef.current(...args);
         timerRef.current = null;
       }, delay) as unknown as number;

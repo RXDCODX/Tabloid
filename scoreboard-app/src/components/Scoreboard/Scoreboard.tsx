@@ -72,6 +72,18 @@ const Scoreboard: React.FC = () => {
     ? getNeonGlow(borderColor || c.mainColor || '#3F00FF')
     : 'none';
 
+  // background images (stretch to cover corresponding containers)
+  const imgs = scoreboardState.images;
+  const bgStyleFor = (img?: { imageName?: string } | null) =>
+    img && img.imageName
+      ? {
+          backgroundImage: `url(${'Images/' + img.imageName})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }
+      : {};
+
   // Функция для проверки, нужно ли отображать див режима драки
   const shouldShowFightMode = () => {
     return (
@@ -169,6 +181,7 @@ const Scoreboard: React.FC = () => {
             right: layout?.center?.right,
             width: layout?.center?.width,
             height: layout?.center?.height,
+            ...bgStyleFor(imgs?.centerImage as any),
           }}
         >
           <h5 id='metaTitle' style={{ color: c.tournamentTitleColor }}>
@@ -189,6 +202,7 @@ const Scoreboard: React.FC = () => {
             right: layout?.left?.right,
             width: layout?.left?.width,
             height: layout?.left?.height,
+            ...bgStyleFor(imgs?.leftImage as any),
           }}
         >
           <div className={styles.playerInfo}>
@@ -210,7 +224,7 @@ const Scoreboard: React.FC = () => {
               </span>
             </h4>
           </div>
-          {p1.flag && p1.flag !== 'none' && (
+          {p1.country && p1.country !== 'none' && (
             <div
               className={styles.flag}
               style={{
@@ -223,7 +237,7 @@ const Scoreboard: React.FC = () => {
               }}
             >
               <img
-                src={getFlagPath(p1.flag)}
+                src={getFlagPath(p1.country)}
                 alt='Player 1 flag'
                 style={{
                   width: '100%',
@@ -259,6 +273,7 @@ const Scoreboard: React.FC = () => {
             right: layout?.right?.right,
             width: layout?.right?.width,
             height: layout?.right?.height,
+            ...bgStyleFor(imgs?.rightImage as any),
           }}
         >
           <div className={styles.score}>
@@ -266,7 +281,7 @@ const Scoreboard: React.FC = () => {
               {p2.score}
             </h2>
           </div>
-          {p2.flag && p2.flag !== 'none' && (
+          {p2.country && p2.country !== 'none' && (
             <div
               className={styles.flag}
               style={{
@@ -279,7 +294,7 @@ const Scoreboard: React.FC = () => {
               }}
             >
               <img
-                src={getFlagPath(p2.flag)}
+                src={getFlagPath(p2.country)}
                 alt='Player 2 flag'
                 style={{
                   width: '100%',
@@ -330,6 +345,7 @@ const Scoreboard: React.FC = () => {
               right: layout?.fightMode?.right,
               width: layout?.fightMode?.width,
               height: layout?.fightMode?.height,
+              ...bgStyleFor(imgs?.fightModeImage as any),
             }}
           >
             <h4 style={{ color: c.fightModeColor }}>{m.fightRule}</h4>

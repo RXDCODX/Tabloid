@@ -1,13 +1,13 @@
 import React, { useCallback, useRef } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { Image } from 'react-bootstrap-icons';
-import { BackgroundImages } from '../../../types/types';
+import { BackgroundImage, ImageType, Images } from '../../../types/types';
 import { BackgroundImageService } from '../services/BackgroundImagesService';
 import styles from './BackgroundImagesCard.module.scss';
 
 interface BackgroundImagesCardProps {
-  backgroundImages: BackgroundImages;
-  onBackgroundImagesChange: (backgroundImages: BackgroundImages) => void;
+  backgroundImages: Images;
+  onBackgroundImagesChange: (backgroundImages: Images) => void;
 }
 
 const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
@@ -15,33 +15,27 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
   onBackgroundImagesChange,
 }) => {
   const fileInputRefs: Record<
-    keyof BackgroundImages,
+    ImageType,
     React.RefObject<HTMLInputElement | null>
   > = {
-    centerImage: useRef<HTMLInputElement>(null),
-    leftImage: useRef<HTMLInputElement>(null),
-    rightImage: useRef<HTMLInputElement>(null),
-    fightModeImage: useRef<HTMLInputElement>(null),
+    [ImageType.TopImage]: useRef<HTMLInputElement>(null),
+    [ImageType.LeftImage]: useRef<HTMLInputElement>(null),
+    [ImageType.RightImage]: useRef<HTMLInputElement>(null),
+    [ImageType.FightModeImage]: useRef<HTMLInputElement>(null),
+    [ImageType.None]: useRef<HTMLInputElement>(null),
   };
 
-  const mapFieldToImageType = (field: keyof BackgroundImages) => {
-    switch (field) {
-      case 'centerImage':
-        return 'CenterImage';
-      case 'leftImage':
-        return 'LeftImage';
-      case 'rightImage':
-        return 'RightImage';
-      case 'fightModeImage':
-        return 'FightModeImage';
-      default:
-        return '';
-    }
+  const IMAGE_TYPE_TO_FIELD: Record<ImageType, keyof Images | undefined> = {
+    [ImageType.TopImage]: 'centerImage',
+    [ImageType.LeftImage]: 'leftImage',
+    [ImageType.RightImage]: 'rightImage',
+    [ImageType.FightModeImage]: 'fightModeImage',
+    [ImageType.None]: undefined,
   };
 
   const handleImageUpload = useCallback(
     async (
-      field: keyof BackgroundImages,
+      imageType: ImageType,
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
       const file = event.target.files?.[0];
@@ -52,28 +46,20 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Размер файла не должен превышать 5MB');
+      const field = IMAGE_TYPE_TO_FIELD[imageType];
+      if (!field) {
         return;
       }
 
-      // Показываем локальное превью сразу
-      const previewUrl = URL.createObjectURL(file);
-      onBackgroundImagesChange({
-        ...backgroundImages,
-        [field]: previewUrl,
-      });
-
-      const imageType = mapFieldToImageType(field);
       try {
         await BackgroundImageService.updateImage(imageType, file);
       } catch (e: any) {
         alert('Не удалось загрузить изображение: ' + (e.message || e));
         onBackgroundImagesChange({
           ...backgroundImages,
-          [field]: '',
+          [field]: undefined,
         });
-        const input = fileInputRefs[field].current;
+        const input = fileInputRefs[imageType].current;
         if (input) input.value = '';
       }
     },
@@ -81,8 +67,10 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
   );
 
   const handleRemoveImage = useCallback(
-    async (field: keyof BackgroundImages) => {
-      const imageType = mapFieldToImageType(field);
+    async (imageType: ImageType) => {
+      const field = IMAGE_TYPE_TO_FIELD[imageType];
+      if (!field) return;
+
       try {
         await BackgroundImageService.deleteImage(imageType);
       } catch (e: any) {
@@ -92,9 +80,9 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
 
       onBackgroundImagesChange({
         ...backgroundImages,
-        [field]: '',
+        [field]: undefined,
       });
-      const input = fileInputRefs[field].current;
+      const input = fileInputRefs[imageType].current;
       if (input) {
         input.value = '';
       }
@@ -103,66 +91,89 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
   );
 
   const handleClearAll = useCallback(() => {
-    onBackgroundImagesChange({});
     // Очищаем все inputs
-    Object.values(fileInputRefs).forEach(ref => {
-      if (ref.current) {
-        ref.current.value = '';
-      }
+    [
+      ImageType.TopImage,
+      ImageType.LeftImage,
+      ImageType.RightImage,
+      ImageType.FightModeImage,
+    ].forEach(t => {
+      const ref = fileInputRefs[t];
+      if (ref?.current) ref.current.value = '';
     });
+    BackgroundImageService.deleteAllImages();
   }, [onBackgroundImagesChange, fileInputRefs]);
 
-  const ImageUploadField = ({
-    field,
-    label,
-    description,
-  }: {
-    field: keyof BackgroundImages;
-    label: string;
-    description: string;
-  }) => {
-    const hasImage = backgroundImages[field];
+  const handleContainerClick = useCallback(
+    (imageType: ImageType) => {
+      const ref = fileInputRefs[imageType];
+      if (ref?.current) {
+        ref.current.click();
+      }
+    },
+    [fileInputRefs]
+  );
 
-    return (
-      <Col md={6} className='mb-3'>
-        <Form.Group>
-          <Form.Label>{label}</Form.Label>
-          <div className={styles.imageUploadContainer}>
-            {hasImage ? (
-              <div className={styles.imagePreview}>
-                <img
-                  src={hasImage}
-                  alt={`Preview for ${label}`}
-                  className={styles.previewImage}
-                />
-                <Button
-                  variant='danger'
-                  size='sm'
-                  className={styles.removeButton}
-                  onClick={() => handleRemoveImage(field)}
-                >
-                  ×
-                </Button>
-              </div>
-            ) : (
-              <div className={styles.uploadPlaceholder}>
-                <div className={styles.uploadIcon}>📷</div>
-                <div className={styles.uploadText}>Нажмите для загрузки</div>
-              </div>
-            )}
-            <input
-              ref={fileInputRefs[field]}
-              type='file'
-              accept='image/*'
-              onChange={e => handleImageUpload(field, e)}
-              className={styles.hiddenInput}
-            />
-          </div>
-          <Form.Text className='text-muted'>{description}</Form.Text>
-        </Form.Group>
-      </Col>
-    );
-  };
+  const ImageUploadField = useCallback(
+    ({ field, label }: { field: ImageType; label: string }) => {
+      const f = IMAGE_TYPE_TO_FIELD[field];
+      const backgroundImage = f
+        ? (backgroundImages[f] as BackgroundImage | undefined)
+        : undefined;
+      const hasImage = f ? backgroundImage?.isShouldExists : undefined;
+
+      return (
+        <Col md={6} className='mb-3'>
+          <Form.Group>
+            <Form.Label className={styles.brightLabel}>{label}</Form.Label>
+            <div
+              className={styles.imageUploadContainer}
+              onClick={() => handleContainerClick(field)}
+            >
+              {hasImage ? (
+                <div className={styles.imagePreview}>
+                  <img
+                    src={
+                      '/Images/' +
+                      (hasImage ? backgroundImage?.imageName || '' : '')
+                    }
+                    alt={`Preview for ${label}`}
+                    className={styles.previewImage}
+                  />
+                  <Button
+                    variant='danger'
+                    size='sm'
+                    className={styles.removeButton}
+                    onClick={e => {
+                      e.stopPropagation();
+                      debugger;
+                      handleRemoveImage(field);
+                    }}
+                  >
+                    ×
+                  </Button>
+                </div>
+              ) : (
+                <div className={styles.uploadPlaceholder}>
+                  <div className={styles.uploadIcon}>📷</div>
+                  <div className={styles.uploadText}>Нажмите для загрузки</div>
+                </div>
+              )}
+              <input
+                ref={fileInputRefs[field] as React.RefObject<HTMLInputElement>}
+                type='file'
+                accept='image/*'
+                onChange={e => handleImageUpload(field, e)}
+                className={styles.hiddenInput}
+              />
+            </div>
+            {/* Описание перемещено в общий блок снизу карточки */}
+          </Form.Group>
+        </Col>
+      );
+    },
+    [backgroundImages, handleRemoveImage, handleImageUpload, fileInputRefs]
+  );
 
   return (
     <Card className={`mb-4 ${styles.backgroundImagesCard}`}>
@@ -173,28 +184,28 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         </div>
         <Row>
           <ImageUploadField
-            field='centerImage'
+            field={ImageType.TopImage}
             label='Центральный блок (название турнира)'
-            description='Изображение будет отображаться по центру блока'
           />
           <ImageUploadField
-            field='leftImage'
+            field={ImageType.LeftImage}
             label='Левый блок (игрок 1)'
-            description='Изображение будет отображаться по центру блока'
           />
         </Row>
         <Row>
           <ImageUploadField
-            field='rightImage'
+            field={ImageType.RightImage}
             label='Правый блок (игрок 2)'
-            description='Изображение будет отображаться по центру блока'
           />
           <ImageUploadField
-            field='fightModeImage'
+            field={ImageType.FightModeImage}
             label='Блок режима драки'
-            description='Изображение будет отображаться по центру блока'
           />
         </Row>
+
+        <Form.Text className={styles.commonDescription}>
+          Изображение будет отображаться растянутыми на весь блок
+        </Form.Text>
 
         <div className='mt-3'>
           <Button variant='outline-danger' size='sm' onClick={handleClearAll}>

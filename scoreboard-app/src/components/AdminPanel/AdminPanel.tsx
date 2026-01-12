@@ -3,7 +3,6 @@ import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAdminState } from '../../hooks/useAdminState';
 import { SignalRContext } from '../../providers/SignalRProvider';
-import { playerPresetRepository } from '../../services/PlayerPresetService';
 import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
@@ -12,7 +11,9 @@ import LayoutConfigCard from './Cards/LayoutConfigCard';
 import MetaPanel from './Cards/MetaPanel';
 import PlayerCard from './Cards/PlayerCard';
 import VisibilityCard from './Cards/VisibilityCard';
+
 import ActionButtons from './UI/ActionButtons';
+import { PlayerPresetService } from './services/PlayerPresetService';
 
 const AdminPanel = () => {
   const signalRContext = useContext(SignalRContext);
@@ -46,7 +47,7 @@ const AdminPanel = () => {
     }
   }, [navigate]);
   useEffect(() => {
-    playerPresetRepository.load?.();
+    PlayerPresetService.load?.();
   }, []);
 
   const handleSwapNames = useCallback(async () => {
@@ -79,7 +80,10 @@ const AdminPanel = () => {
         </Row>
 
         {/* Color Preset Panel */}
-        <ColorPresetCard onColorChange={handleColorChange} context={signalRContext} />
+        <ColorPresetCard
+          onColorChange={handleColorChange}
+          context={signalRContext}
+        />
 
         {/* Borders Toggle */}
         <Row className='mb-4'>

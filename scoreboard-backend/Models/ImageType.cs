@@ -1,10 +1,12 @@
-﻿namespace scoreboard_backend.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace scoreboard_backend.Models;
 
 public enum ImageType
 {
     None,
     LeftImage,
     RightImage,
-    TopImageg,
+    TopImage,
     FightModeImage,
 }

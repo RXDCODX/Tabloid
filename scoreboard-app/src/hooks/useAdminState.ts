@@ -1,9 +1,9 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { SignalRContext } from '../providers/SignalRProvider';
 import {
-  BackgroundImages,
   ColorPreset,
   defaultPreset,
+  Images,
   LayoutConfig,
   MetaInfo,
   Player,
@@ -16,19 +16,17 @@ export const useAdminState = () => {
   const signalRContext = useContext(SignalRContext);
   const [player1, localSetPlayer1] = useState<Player>({
     name: 'Player 1',
-    sponsor: '',
     score: 0,
     tag: '',
-    flag: 'none',
+    flag: 'ru',
     final: 'none',
   });
 
   const [player2, localSetPlayer2] = useState<Player>({
     name: 'Player 2',
-    sponsor: '',
     score: 0,
     tag: '',
-    flag: 'none',
+    flag: 'us',
     final: 'none',
   });
 
@@ -42,9 +40,7 @@ export const useAdminState = () => {
   const [animationDuration, localSetAnimationDuration] = useState<number>(800);
   const [colors, setColors] = useState<ColorPreset>(defaultPreset);
   const [textConfig, setTextConfig] = useState<TextConfiguration>({});
-  const [backgroundImages, setBackgroundImages] = useState<BackgroundImages>(
-    {}
-  );
+  const [backgroundImages, setBackgroundImages] = useState<Images>({});
 
   const [layoutConfig, localSetLayoutConfig] = useState<LayoutConfig>({
     center: { top: '15px', left: '50%', width: '540px', height: '60px' },
@@ -93,6 +89,7 @@ export const useAdminState = () => {
   /* Remote wrappers: update local state and notify server */
   const setPlayer1 = useCallback(
     (p: Player) => {
+      console.debug('setPlayer1 called', { new: p, old: player1 });
       localSetPlayer1(p);
       debouncedInvoke('UpdatePlayer1', p);
     },
@@ -101,6 +98,7 @@ export const useAdminState = () => {
 
   const setPlayer2 = useCallback(
     (p: Player) => {
+      console.debug('setPlayer2 called', { new: p, old: player2 });
       localSetPlayer2(p);
       debouncedInvoke('UpdatePlayer2', p);
     },
@@ -159,28 +157,100 @@ export const useAdminState = () => {
 
   const handleReceiveState = useCallback(
     (state: ScoreboardState) => {
-      console.log('SignalR ReceiveState (useAdminState):', state);
       if (!state) return;
-      if (state.player1) localSetPlayer1(state.player1);
-      if (state.player2) localSetPlayer2(state.player2);
-      if (state.meta) localSetMeta(state.meta);
-      if (typeof state.isVisible === 'boolean')
+
+      debugger;
+      console.debug('ReceiveState incoming', state);
+
+      const diff: Partial<ScoreboardState> = {};
+
+      if (state.player1) {
+        if (JSON.stringify(state.player1) !== JSON.stringify(player1)) {
+          diff.player1 = state.player1;
+        }
+        console.debug('handleReceiveState: updating player1', {
+          from: player1,
+          to: state.player1,
+        });
+        localSetPlayer1(state.player1);
+      }
+
+      if (state.player2) {
+        if (JSON.stringify(state.player2) !== JSON.stringify(player2)) {
+          diff.player2 = state.player2;
+        }
+        console.debug('handleReceiveState: updating player2', {
+          from: player2,
+          to: state.player2,
+        });
+        localSetPlayer2(state.player2);
+      }
+
+      if (state.meta) {
+        if (JSON.stringify(state.meta) !== JSON.stringify(meta)) {
+          diff.meta = state.meta;
+        }
+        localSetMeta(state.meta);
+      }
+
+      if (typeof state.isVisible === 'boolean') {
+        if (state.isVisible !== isVisible) diff.isVisible = state.isVisible;
         localSetIsVisible(state.isVisible);
-      if (typeof state.isShowBorders === 'boolean')
+      }
+
+      if (typeof state.isShowBorders === 'boolean') {
+        if (state.isShowBorders !== isShowBorders)
+          diff.isShowBorders = state.isShowBorders as boolean;
         localSetIsShowBorders(state.isShowBorders as boolean);
-      if (state.animationDuration)
+      }
+
+      if (state.animationDuration !== undefined) {
+        if (state.animationDuration !== animationDuration)
+          diff.animationDuration = state.animationDuration;
         localSetAnimationDuration(state.animationDuration);
-      if (state.colors) setColors(state.colors);
-      if ((state as any).textConfig)
-        setTextConfig((state as any).textConfig as TextConfiguration);
-      if ((state as any).backgroundImages)
-        setBackgroundImages(
-          (state as any).backgroundImages as BackgroundImages
-        );
-      if ((state as any).layoutConfig)
-        setLayoutConfig((state as any).layoutConfig as LayoutConfig);
+      }
+
+      if (state.colors) {
+        if (JSON.stringify(state.colors) !== JSON.stringify(colors))
+          diff.colors = state.colors;
+        setColors(state.colors);
+      }
+
+      if (state.textConfig) {
+        if (JSON.stringify(state.textConfig) !== JSON.stringify(textConfig))
+          diff.textConfig = state.textConfig;
+        setTextConfig(state.textConfig);
+      }
+
+      if (state.images) {
+        if (JSON.stringify(state.images) !== JSON.stringify(backgroundImages))
+          diff.images = state.images;
+        setBackgroundImages(state.images);
+      }
+
+      if (state.layoutConfig) {
+        if (JSON.stringify(state.layoutConfig) !== JSON.stringify(layoutConfig))
+          diff.layoutConfig = state.layoutConfig;
+        // avoid calling the remote-updating wrapper here to prevent an
+        // update echo loop back to the server; use local setter instead
+        localSetLayoutConfig(state.layoutConfig);
+      }
+
+      if (Object.keys(diff).length > 0) {
+        console.log('SignalR ReceiveState changes (useAdminState):', diff);
+      }
     },
     [
+      player1,
+      player2,
+      meta,
+      isVisible,
+      isShowBorders,
+      animationDuration,
+      colors,
+      textConfig,
+      backgroundImages,
+      layoutConfig,
       localSetPlayer1,
       localSetPlayer2,
       localSetMeta,
@@ -206,7 +276,14 @@ export const useAdminState = () => {
     return () => {
       signalRContext.connection?.off?.('ReceiveState', handleReceiveState);
     };
-  }, [signalRContext.connection]);
+  }, [signalRContext.connection, handleReceiveState]);
+
+  useEffect(() => {
+    console.debug('player flags changed', {
+      player1: player1?.flag,
+      player2: player2?.flag,
+    });
+  }, [player2.flag, player1.flag]);
 
   return {
     player1,

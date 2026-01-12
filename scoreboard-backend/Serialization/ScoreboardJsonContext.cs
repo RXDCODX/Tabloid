@@ -5,7 +5,7 @@ using scoreboard_backend.Models;
 namespace scoreboard_backend.Serialization;
 
 /// <inheritdoc />
-[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSourceGenerationOptions(WriteIndented = true, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(Player))]
 [JsonSerializable(typeof(MetaInfo))]
 [JsonSerializable(typeof(ColorPreset))]
@@ -14,4 +14,5 @@ namespace scoreboard_backend.Serialization;
 [JsonSerializable(typeof(ColorPresetModel[]))]
 [JsonSerializable(typeof(IReadOnlyList<ColorPresetModel>))]
 [JsonSerializable(typeof(ScoreboardState))]
+[JsonSerializable(typeof(ImageType))]
 public partial class ScoreboardJsonContext : JsonSerializerContext;

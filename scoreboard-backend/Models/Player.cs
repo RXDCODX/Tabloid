@@ -6,5 +6,5 @@ public class Player
     public int Score { get; set; } = 0;
     public string Tag { get; set; } = string.Empty;
     public string Final { get; set; } = "none"; // "winner", "loser", "none"
-    public string Country { get; set; } = string.Empty;
+    public string Flag { get; set; } = string.Empty;
 }

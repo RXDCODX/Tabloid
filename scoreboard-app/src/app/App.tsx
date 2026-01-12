@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Link,
+  Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
@@ -83,7 +84,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/scoreboard' element={<Scoreboard />} />
           <Route path='/adminpanel' element={<AdminPanel />} />
-          <Route path='*' element={<Home />} />
+          <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </SignalRProvider>
     </Router>

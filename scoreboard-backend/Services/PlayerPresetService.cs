@@ -1,32 +1,63 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using Dapper;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;
 
 public class PlayerPresetService
 {
-    private readonly string _presetsPath;
-    private readonly List<PlayerPreset> _presets;
     private readonly Lock _lock = new();
-    private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
     private readonly ILogger<PlayerPresetService> _logger;
+    private readonly DatabaseService _databaseService;
 
-    public PlayerPresetService(ILogger<PlayerPresetService> logger)
+    public PlayerPresetService(ILogger<PlayerPresetService> logger, DatabaseService databaseService)
     {
         _logger = logger;
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        _presetsPath = Path.Combine(baseDir, "player_presets.json");
-        _presets = LoadFromDisk();
+        _databaseService = databaseService;
 
-        _logger.LogInformation("PlayerPresetService initialized. Presets path: {Path}, loaded {Count} presets", _presetsPath, _presets.Count);
+        var count = GetCount();
+
+        _logger.LogInformation(
+            "PlayerPresetService initialized. DB path: {Path}, stored {Count} presets",
+            _databaseService.GetConnectionString(),
+            count
+        );
     }
 
-    public IReadOnlyList<PlayerPreset> GetAll()
+    public IReadOnlyList<PlayerPreset> GetAll(int count = -1, string? startsWith = null)
     {
         lock (_lock)
         {
-            return [.. _presets];
+            using var conn = _databaseService.GetConnection();
+
+            var builder = new SqlBuilder();
+            var template = builder.AddTemplate(
+                """
+                SELECT Name, Score, Tag, Final, Flag FROM player_presets /**where**/ /**orderby**/
+                """
+            );
+
+            if (!string.IsNullOrWhiteSpace(startsWith))
+            {
+                startsWith = startsWith.Trim();
+                builder.Where(
+                    "Name LIKE @pattern ESCAPE '\\' COLLATE NOCASE",
+                    new { pattern = startsWith + "%" }
+                );
+            }
+
+            builder.OrderBy("rowid DESC");
+
+            var sql = template.RawSql;
+            var parameters = new DynamicParameters(template.Parameters);
+
+            if (count >= 0)
+            {
+                sql += " LIMIT @limit";
+                parameters.Add("limit", count);
+            }
+
+            var result = conn.Query<PlayerPreset>(sql, parameters).ToList();
+            return result;
         }
     }
 
@@ -40,20 +71,22 @@ public class PlayerPresetService
 
         lock (_lock)
         {
-            var idx = _presets.FindIndex(p =>
-                p.Name.Equals(preset.Name, StringComparison.OrdinalIgnoreCase)
-            );
-            if (idx >= 0)
-            {
-                _presets[idx] = Normalize(preset);
-                _logger.LogInformation("Updated player preset: {Name}", preset.Name);
-            }
-            else
-            {
-                _presets.Insert(0, Normalize(preset));
-                _logger.LogInformation("Inserted new player preset: {Name}", preset.Name);
-            }
-            SaveToDisk();
+            var normalized = Normalize(preset);
+            using var conn = _databaseService.GetConnection();
+
+            var sql = """
+                INSERT INTO player_presets(Name, Score, Tag, Final, Flag)
+                VALUES(@Name, @Score, @Tag, @Final, @Flag)
+                ON CONFLICT(Name) DO UPDATE SET
+                  Score = excluded.Score,
+                  Tag = excluded.Tag,
+                  Final = excluded.Final,
+                  Flag = excluded.Flag;
+                """;
+
+            conn.Execute(sql, normalized);
+
+            _logger.LogInformation("Upserted player preset: {Name}", normalized.Name);
         }
     }
 
@@ -67,71 +100,41 @@ public class PlayerPresetService
 
         lock (_lock)
         {
-            var removed = _presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            using var conn = _databaseService.GetConnection();
+
+            var sql = """DELETE FROM player_presets WHERE Name = @Name""";
+            var removed = conn.Execute(sql, new { Name = name });
+
             _logger.LogInformation("Removed {Count} presets with name {Name}", removed, name);
-            SaveToDisk();
         }
     }
 
-    public void ReplaceAll(IEnumerable<PlayerPreset> presets)
-    {
-        lock (_lock)
-        {
-            _presets.Clear();
-            _presets.AddRange(presets.Select(Normalize));
-            _logger.LogInformation("Replaced all player presets. New count: {Count}", _presets.Count);
-            SaveToDisk();
-        }
-    }
-
-    private List<PlayerPreset> LoadFromDisk()
+    private int GetCount()
     {
         try
         {
-            if (!File.Exists(_presetsPath))
-            {
-                _logger.LogInformation("Presets file not found: {Path}", _presetsPath);
-                return [];
-            }
-
-            var json = File.ReadAllText(_presetsPath);
-            var data = JsonSerializer.Deserialize<List<PlayerPreset>>(json) ?? [];
-            _logger.LogInformation("Loaded {Count} player presets from disk", data.Count);
-            return data;
+            using var conn = _databaseService.GetConnection();
+            var sql = """SELECT COUNT(1) FROM player_presets""";
+            return conn.ExecuteScalar<int>(sql);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load player presets from disk: {Path}", _presetsPath);
-            return [];
-        }
-    }
-
-    private void SaveToDisk()
-    {
-        try
-        {
-            var dir = Path.GetDirectoryName(_presetsPath);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            var json = JsonSerializer.Serialize(_presets, jsonSerializerOptions);
-            File.WriteAllText(_presetsPath, json);
-            _logger.LogInformation("Saved {Count} player presets to disk", _presets.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save player presets to disk: {Path}", _presetsPath);
-            // ignore
+            _logger.LogError(
+                ex,
+                "Failed to get presets count from database: {Path}",
+                _databaseService.GetConnectionString()
+            );
+            return 0;
         }
     }
 
     private static PlayerPreset Normalize(PlayerPreset p) =>
         new()
         {
-            Name = (p.Name ?? string.Empty).Trim(),
-            Tag = p.Tag ?? string.Empty,
-            Flag = p.Flag ?? string.Empty,
-            Sponsor = p.Sponsor ?? string.Empty,
+            Name = (p.Name).Trim(),
+            Tag = p.Tag,
+            Flag = p.Flag,
+            Final = p.Final,
+            Score = p.Score,
         };
 }

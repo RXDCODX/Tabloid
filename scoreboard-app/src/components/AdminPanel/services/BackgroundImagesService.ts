@@ -1,7 +1,9 @@
+import { ImageType } from '../types';
+
 export class BackgroundImageService {
   private static baseUrl = '/api/BackgroundImages';
 
-  static async updateImage(imageType: string, file: File): Promise<void> {
+  static async updateImage(imageType: ImageType, file: File): Promise<void> {
     const form = new FormData();
     form.append('imageType', imageType);
     form.append('file', file, file.name);
@@ -29,6 +31,16 @@ export class BackgroundImageService {
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || 'Failed to delete background image');
+    }
+  }
+
+  static async deleteAllImages(): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/all`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to delete all background images');
     }
   }
 }

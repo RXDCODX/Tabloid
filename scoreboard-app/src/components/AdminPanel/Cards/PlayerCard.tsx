@@ -1,16 +1,19 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import {
   ArrowDown,
   ArrowRepeat,
   ArrowUp,
   PersonFill,
+  Save,
+  Trash,
   TrophyFill,
   XCircleFill,
 } from 'react-bootstrap-icons';
-import { playerPresetRepository } from '../../../services/PlayerPresetService';
+import useDebouncedCallback from '../../../hooks/useDebouncedCallback';
 import FlagSelector from '../Forms/FlagSelector';
-import { PlayerWithTimestamp } from '../types';
+import { PlayerPresetService } from '../services/PlayerPresetService';
+import { Player, PlayerWithTimestamp } from '../types';
 import { getFlagPath } from '../Utils/flagUtils';
 import styles from './PlayerCard.module.scss';
 
@@ -31,7 +34,6 @@ type PlayerCardProps = {
 const PlayerCard: React.FC<PlayerCardProps> = ({
   player,
   onName,
-  onSponsor,
   onScore,
   onWin,
   onLose,
@@ -43,29 +45,47 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 }) => {
   const [isNameOpen, setIsNameOpen] = useState(false);
   const [presetsVersion, setPresetsVersion] = useState(0);
+  const [presets, setPresets] = useState<Player[]>([]);
 
-  const nameQuery = player.name || '';
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const debounced = useDebouncedCallback(
+    (q: string) => setDebouncedQuery(q),
+    300
+  );
 
-  const filteredPresets = useMemo(() => {
-    const query = (nameQuery || '').trim().toLowerCase();
-    if (!query)
-      return [] as {
-        name: string;
-        tag: string;
-        flag: string;
-        sponsor?: string;
-      }[];
-    return playerPresetRepository
-      .getPresets()
-      .map((p: any) => ({
-        name: p.player1?.name || p.name || '',
-        tag: p.player1?.tag || '',
-        flag: p.player1?.flag || '',
-        sponsor: p.player1?.sponsor || '',
-      }))
-      .filter((p: any) => p.name.toLowerCase().includes(query))
-      .slice(0, 8);
-  }, [nameQuery, presetsVersion]);
+  useEffect(() => {
+    let cancelled = false;
+    const q = (debouncedQuery || '').trim();
+    if (!q) {
+      setPresets([]);
+      return;
+    }
+
+    (async () => {
+      try {
+        // ask backend for presets starting with the query (limit to 20)
+        const data = await PlayerPresetService.load(20, q);
+        if (cancelled) return;
+        const normalized = (Array.isArray(data) ? data : []).map(
+          (p: any) =>
+            ({
+              name: p.player1?.name || p.name || '',
+              tag: p.player1?.tag || '',
+              flag: p.player1?.flag || '',
+            }) as Player
+        );
+        setPresets(normalized);
+      } catch (e) {
+        // ignore, service logs errors
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, presetsVersion]);
+
+  const filteredPresets = useMemo(() => presets.slice(0, 8), [presets]);
 
   const handleSelectPreset = useCallback(
     (p: { name: string; tag: string; flag: string }) => {
@@ -77,36 +97,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     [onName, onTag, onFlag]
   );
 
-  const handleSavePreset = useCallback(() => {
-    playerPresetRepository.save({
-      id: Date.now().toString(),
-      name: player.name,
-      player1: {
-        name: player.name,
-        sponsor: player.sponsor,
-        tag: player.tag,
-        flag: player.flag,
-      },
-      player2: {
-        name: '',
-        sponsor: '',
-        tag: '',
-        flag: 'none',
-      },
-      meta: {
-        title: '',
-        fightRule: '',
-      },
-      colors: {
-        mainColor: '#3F00FF',
-        playerNamesColor: '#FFFFFF',
-        tournamentTitleColor: '#FFFFFF',
-        fightModeColor: '#FFFFFF',
-        scoreColor: '#FFFFFF',
-        backgroundColor: '#1a1a1a',
-        borderColor: '#3F00FF',
-      },
-    });
+  const handleSavePreset = useCallback(async () => {
+    await PlayerPresetService.save(player as any);
+    setPresetsVersion(v => v + 1);
+  }, [player]);
+
+  const handleDeletePreset = useCallback(async () => {
+    const name = player.name ?? '';
+    if (!name) return;
+    await PlayerPresetService.delete(name);
     setPresetsVersion(v => v + 1);
   }, [player]);
 
@@ -148,6 +147,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                 let val = e.target.value.replace(/^\[W\] |^\[L\] /, '');
                 onName(val);
                 setIsNameOpen(true);
+                debounced(val);
               }}
               onFocus={() => setIsNameOpen(true)}
               onBlur={() => setTimeout(() => setIsNameOpen(false), 150)}
@@ -156,7 +156,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             />
             {isNameOpen && filteredPresets.length > 0 && (
               <div className={styles.presetsDropdown}>
-                {filteredPresets.map((p: any) => (
+                {filteredPresets.map((p: Player) => (
                   <div
                     key={`${p.name}-${p.tag}-${p.flag}`}
                     className={styles.presetItem}
@@ -185,12 +185,34 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           </div>
         </div>
 
-        <div className={styles.flagSelector}>
+        <div
+          className={styles.flagSelector}
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        >
           <FlagSelector
             selectedFlag={player.flag ?? 'none'}
             onFlagChange={onFlag}
             placeholder='Флаг'
           />
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            <Button
+              variant='outline-success'
+              size='sm'
+              className={styles.saveButton}
+              onClick={handleSavePreset}
+              title='Сохранить пресет игрока'
+            >
+              <Save />
+            </Button>
+            <Button
+              variant='outline-danger'
+              size='sm'
+              onClick={handleDeletePreset}
+              title='Удалить пресет'
+            >
+              <Trash />
+            </Button>
+          </div>
         </div>
 
         <div className={styles.scoreSection}>
@@ -257,15 +279,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               ✕
             </Button>
           )}
-          <Button
-            variant='outline-success'
-            size='sm'
-            className={styles.saveButton}
-            onClick={handleSavePreset}
-            title='Сохранить пресет игрока'
-          >
-            Сохранить
-          </Button>
         </div>
       </Card.Body>
     </Card>

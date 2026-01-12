@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using scoreboard_backend.Models;
 using scoreboard_backend.Services;
 
@@ -9,9 +11,14 @@ namespace scoreboard_backend.Controllers;
 public class PlayerPresetsController(PlayerPresetService service) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<PlayerPreset>> GetAll()
+    public ActionResult<IEnumerable<PlayerPreset>> Get(
+        [FromQuery] int count = -1,
+        [FromQuery] string? startsWith = null
+    )
     {
-        return Ok(service.GetAll());
+        var presets = service.GetAll(count, startsWith);
+
+        return Ok(presets);
     }
 
     [HttpPost]

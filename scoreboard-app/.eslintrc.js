@@ -34,14 +34,17 @@ module.exports = {
   rules: {
     // Prettier правила
     'prettier/prettier': 'error',
-    
+
     // TypeScript правила
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-non-null-assertion': 'warn',
-    
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-non-null-assertion': 'error',
+    '@typescript-eslint/no-unsafe-assignment': 'error',
+    '@typescript-eslint/no-unsafe-member-access': 'error',
+    '@typescript-eslint/no-unsafe-call': 'error',
+
     // React правила
     'react/react-in-jsx-scope': 'off', // Не нужен с React 17+
     'react/prop-types': 'off', // Используем TypeScript
@@ -61,11 +64,11 @@ module.exports = {
     'react/no-unescaped-entities': 'error',
     'react/no-unknown-property': 'error',
     'react/require-render-return': 'error',
-    
+
     // React Hooks правила
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // Import правила
     'import/order': [
       'error',
@@ -96,7 +99,7 @@ module.exports = {
         jsx: 'never',
       },
     ],
-    
+
     // Общие правила
     'no-console': 'warn',
     'no-debugger': 'error',
@@ -118,10 +121,5 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: [
-    'dist',
-    'node_modules',
-    '*.config.js',
-    '*.config.ts',
-  ],
+  ignorePatterns: ['dist', 'node_modules', '*.config.js', '*.config.ts'],
 };

@@ -6,7 +6,10 @@ namespace scoreboard_backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BackgroundImagesController(ScoreboardStateService service) : Controller
+public class BackgroundImagesController(
+    ScoreboardStateService service,
+    BackgroundImagesService backgroundImagesService
+) : Controller
 {
     [HttpPost]
     public ActionResult UpdateBackgroundImage(
@@ -39,14 +42,33 @@ public class BackgroundImagesController(ScoreboardStateService service) : Contro
     {
         try
         {
+            // Request deletion: this updates files on disk and clears corresponding in-memory image
             service.UpdateBackgroundImage(
-                new BackgroundImage()
+                new BackgroundImage
                 {
                     IsShouldExists = false,
                     ImageType = imageType,
                     ImageName = string.Empty,
                 }
             );
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e);
+        }
+    }
+
+    [HttpDelete("all")]
+    public async Task<ActionResult> DeleteAllImages()
+    {
+        try
+        {
+            await backgroundImagesService.ClearAllImages();
+            var state = service.GetState();
+            state.Images = new Images();
+            service.SetState(state);
         }
         catch (Exception e)
         {

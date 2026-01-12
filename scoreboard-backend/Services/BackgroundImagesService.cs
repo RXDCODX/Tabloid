@@ -10,55 +10,35 @@ public class BackgroundImagesService
     private readonly string _imagesFolder;
     private readonly ILogger<BackgroundImagesService> _logger;
 
-    public BackgroundImagesService(IWebHostEnvironment environment, ILogger<BackgroundImagesService> logger)
+    public BackgroundImagesService(
+        IWebHostEnvironment environment,
+        ILogger<BackgroundImagesService> logger
+    )
     {
         _logger = logger;
         _imagesFolder = Path.Combine(environment.WebRootPath, "Images");
 
-        _logger.LogInformation("BackgroundImagesService initialized. Images folder: {ImagesFolder}", _imagesFolder);
+        _logger.LogInformation(
+            "BackgroundImagesService initialized. Images folder: {ImagesFolder}",
+            _imagesFolder
+        );
 
         EnsureImagesFolderExists();
     }
 
     public async Task UpdateBackgroundImage(BackgroundImage image)
     {
-        _logger.LogInformation("UpdateBackgroundImage called for ImageType={ImageType}, ShouldExists={ShouldExists}", image.ImageType, image.IsShouldExists);
+        _logger.LogInformation(
+            "UpdateBackgroundImage called for ImageType={ImageType}, ShouldExists={ShouldExists}",
+            image.ImageType,
+            image.IsShouldExists
+        );
 
         ArgumentNullException.ThrowIfNull(image);
 
         if (!image.IsShouldExists)
         {
-            await _semaphore.WaitAsync();
-            try
-            {
-                var files = Directory.GetFiles(_imagesFolder);
-                var targetName = image.ImageType.ToString();
-
-                foreach (var filePath in files)
-                {
-                    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-                    if (
-                        fileNameWithoutExtension.Equals(
-                            targetName,
-                            StringComparison.OrdinalIgnoreCase
-                        )
-                    )
-                    {
-                        File.Delete(filePath);
-                        _logger.LogInformation("Deleted background image file {FilePath}", filePath);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while deleting background images");
-                throw;
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-
+            await DeleteImage(image.ImageType);
             return;
         }
 
@@ -79,7 +59,11 @@ public class BackgroundImagesService
             var folderFullPath = Path.GetFullPath(_imagesFolder);
             if (!fullPath.StartsWith(folderFullPath, StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogError("Invalid file path detected. FilePath={FilePath}, ImagesFolder={ImagesFolder}", fullPath, folderFullPath);
+                _logger.LogError(
+                    "Invalid file path detected. FilePath={FilePath}, ImagesFolder={ImagesFolder}",
+                    fullPath,
+                    folderFullPath
+                );
                 throw new InvalidOperationException("Invalid file path");
             }
 
@@ -106,6 +90,39 @@ public class BackgroundImagesService
         }
     }
 
+    public async Task DeleteImage(ImageType imageType)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var files = Directory.GetFiles(_imagesFolder);
+            var targetName = imageType.ToString();
+
+            foreach (var filePath in files)
+            {
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                if (fileNameWithoutExtension.Equals(targetName, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Delete(filePath);
+                    _logger.LogInformation("Deleted background image file {FilePath}", filePath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error while deleting background images for type {ImageType}",
+                imageType
+            );
+            throw;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     public async Task<List<BackgroundImage>> GetAllImages()
     {
         _logger.LogInformation("GetAllImages called");
@@ -121,7 +138,10 @@ public class BackgroundImagesService
                 if (!Enum.TryParse<ImageType>(fileNameWithoutExtension, true, out var imageType))
                 {
                     // skip files that don't match the ImageType enum
-                    _logger.LogDebug("Skipping file that doesn't match ImageType enum: {FilePath}", filePath);
+                    _logger.LogDebug(
+                        "Skipping file that doesn't match ImageType enum: {FilePath}",
+                        filePath
+                    );
                     continue;
                 }
 
@@ -159,7 +179,11 @@ public class BackgroundImagesService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while reading background images from folder {ImagesFolder}", _imagesFolder);
+            _logger.LogError(
+                ex,
+                "Error while reading background images from folder {ImagesFolder}",
+                _imagesFolder
+            );
             throw;
         }
         finally
@@ -200,7 +224,11 @@ public class BackgroundImagesService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to ensure images folder exists: {ImagesFolder}", _imagesFolder);
+            _logger.LogError(
+                ex,
+                "Failed to ensure images folder exists: {ImagesFolder}",
+                _imagesFolder
+            );
             throw;
         }
     }

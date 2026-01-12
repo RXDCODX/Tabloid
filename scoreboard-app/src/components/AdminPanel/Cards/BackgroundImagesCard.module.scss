@@ -29,7 +29,7 @@
 
   .form-label {
     font-weight: 600;
-    color: #495057;
+    color: #f1f3f5; /* яркий цвет для контраста на тёмном фоне */
   }
 
   .form-text {
@@ -46,6 +46,9 @@
     cursor: pointer;
     transition: border-color 0.15s ease-in-out;
 
+    /* лёгкая полупрозрачная подложка для улучшения читабельности текста */
+    background: rgba(255, 255, 255, 0.02);
+
     &:hover {
       border-color: #80bdff;
     }
@@ -60,9 +63,13 @@
   }
 
   .previewImage {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
+    display: block;
   }
 
   .removeButton {
@@ -86,7 +93,8 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #6c757d;
+    color: #f8f9fa; /* светлый текст для лучшей читаемости */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   }
 
   .uploadIcon {
@@ -96,7 +104,30 @@
 
   .uploadText {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    color: #e9f7ff;
+  }
+
+  .descriptionText {
+    font-size: 0.875rem;
+    color: #adb5bd; /* мягкий серый цвет для описания */
+    margin-top: 0.5rem;
+  }
+
+  .commonDescription {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #adb5bd;
+    margin-top: 1rem;
+  }
+
+  .brightLabel {
+    color: #fff9; /* очень яркий текст */
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
 
   .hiddenInput {
@@ -106,7 +137,9 @@
     width: 100%;
     height: 100%;
     opacity: 0;
-    cursor: pointer;
+    cursor: default;
+    /* Делать input неперехватывающим клики — контейнер сам вызывает .click() */
+    pointer-events: none;
   }
 
   .btn-outline-danger {
@@ -120,7 +153,3 @@
     }
   }
 }
-
-
-
-

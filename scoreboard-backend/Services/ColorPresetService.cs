@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using scoreboard_backend.Models;
 
@@ -6,25 +5,27 @@ namespace scoreboard_backend.Services;
 
 public class ColorPresetService
 {
-    private readonly string _presetsPath;
     private readonly List<ColorPresetModel> _presets;
     private readonly Lock _lock = new();
-    private readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
     private readonly ILogger<ColorPresetService> _logger;
+    private readonly DatabaseService _databaseService;
 
-    public ColorPresetService(ILogger<ColorPresetService> logger)
+    public ColorPresetService(ILogger<ColorPresetService> logger, DatabaseService databaseService)
     {
         _logger = logger;
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        _presetsPath = Path.Combine(baseDir, "color_presets.json");
-        _presets = LoadFromDisk();
-        
+        _databaseService = databaseService;
+
+        _presets = _databaseService.LoadColorPresets();
+
         if (_presets.Count == 0)
         {
             InitializeDefaultPresets();
         }
 
-        _logger.LogInformation("ColorPresetService initialized. Presets path: {Path}, loaded {Count} presets", _presetsPath, _presets.Count);
+        _logger.LogInformation(
+            "ColorPresetService initialized. Loaded {Count} presets",
+            _presets.Count
+        );
     }
 
     public List<ColorPresetModel> GetAll()
@@ -45,20 +46,24 @@ public class ColorPresetService
 
         lock (_lock)
         {
+            var normalized = Normalize(preset);
+
             var idx = _presets.FindIndex(p =>
-                p.Name.Equals(preset.Name, StringComparison.OrdinalIgnoreCase)
+                p.Name.Equals(normalized.Name, StringComparison.OrdinalIgnoreCase)
             );
             if (idx >= 0)
             {
-                _presets[idx] = Normalize(preset);
-                _logger.LogInformation("Updated color preset: {Name}", preset.Name);
+                _presets[idx] = normalized;
+                _logger.LogInformation("Updated color preset: {Name}", normalized.Name);
             }
             else
             {
-                _presets.Insert(0, Normalize(preset));
-                _logger.LogInformation("Inserted new color preset: {Name}", preset.Name);
+                _presets.Insert(0, normalized);
+                _logger.LogInformation("Inserted new color preset: {Name}", normalized.Name);
             }
-            SaveToDisk();
+
+            // Persist single preset to DB
+            _databaseService.UpsertColorPreset(normalized);
         }
     }
 
@@ -72,9 +77,13 @@ public class ColorPresetService
 
         lock (_lock)
         {
-            var removed = _presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var removed = _presets.RemoveAll(p =>
+                p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
+            );
             _logger.LogInformation("Removed {Count} color presets with name {Name}", removed, name);
-            SaveToDisk();
+
+            // Persist removal
+            _databaseService.RemoveColorPresetByName(name);
         }
     }
 
@@ -84,50 +93,13 @@ public class ColorPresetService
         {
             _presets.Clear();
             _presets.AddRange(presets.Select(Normalize));
-            _logger.LogInformation("Replaced all color presets. New count: {Count}", _presets.Count);
-            SaveToDisk();
-        }
-    }
+            _logger.LogInformation(
+                "Replaced all color presets. New count: {Count}",
+                _presets.Count
+            );
 
-    private List<ColorPresetModel> LoadFromDisk()
-    {
-        try
-        {
-            if (!File.Exists(_presetsPath))
-            {
-                _logger.LogInformation("Color presets file not found: {Path}", _presetsPath);
-                return [];
-            }
-
-            var json = File.ReadAllText(_presetsPath);
-            var data = JsonSerializer.Deserialize<List<ColorPresetModel>>(json) ?? [];
-            _logger.LogInformation("Loaded {Count} color presets from disk", data.Count);
-            return data;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load color presets from disk: {Path}", _presetsPath);
-            return [];
-        }
-    }
-
-    private void SaveToDisk()
-    {
-        try
-        {
-            var dir = Path.GetDirectoryName(_presetsPath);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            var json = JsonSerializer.Serialize(_presets, jsonSerializerOptions);
-            File.WriteAllText(_presetsPath, json);
-            _logger.LogInformation("Saved {Count} color presets to disk", _presets.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save color presets to disk: {Path}", _presetsPath);
-            // ignore
+            // Persist all
+            _databaseService.ReplaceAllColorPresets(_presets);
         }
     }
 
@@ -135,19 +107,69 @@ public class ColorPresetService
     {
         var defaultPresets = new List<ColorPresetModel>
         {
-            new() { Name = "Default", PlayerNamesColor = "#FFFFFF", TournamentTitleColor = "#FFFFFF", FightModeColor = "#FFFFFF", ScoreColor = "#FFFFFF" },
-            new() { Name = "Classic Blue", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#0dcaf0", FightModeColor = "#0dcaf0", ScoreColor = "#0dcaf0" },
-            new() { Name = "Fire Red", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#dc3545", FightModeColor = "#dc3545", ScoreColor = "#dc3545" },
-            new() { Name = "Forest Green", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#198754", FightModeColor = "#198754", ScoreColor = "#198754" },
-            new() { Name = "Purple Night", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#6f42c1", FightModeColor = "#6f42c1", ScoreColor = "#6f42c1" },
-            new() { Name = "Golden", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#ffc107", FightModeColor = "#ffc107", ScoreColor = "#ffc107" },
-            new() { Name = "Neon", PlayerNamesColor = "#ffffff", TournamentTitleColor = "#0088ff", FightModeColor = "#00ff88", ScoreColor = "#00ff88" }
+            new()
+            {
+                Name = "Default",
+                PlayerNamesColor = "#FFFFFF",
+                TournamentTitleColor = "#FFFFFF",
+                FightModeColor = "#FFFFFF",
+                ScoreColor = "#FFFFFF",
+            },
+            new()
+            {
+                Name = "Classic Blue",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#0dcaf0",
+                FightModeColor = "#0dcaf0",
+                ScoreColor = "#0dcaf0",
+            },
+            new()
+            {
+                Name = "Fire Red",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#dc3545",
+                FightModeColor = "#dc3545",
+                ScoreColor = "#dc3545",
+            },
+            new()
+            {
+                Name = "Forest Green",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#198754",
+                FightModeColor = "#198754",
+                ScoreColor = "#198754",
+            },
+            new()
+            {
+                Name = "Purple Night",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#6f42c1",
+                FightModeColor = "#6f42c1",
+                ScoreColor = "#6f42c1",
+            },
+            new()
+            {
+                Name = "Golden",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#ffc107",
+                FightModeColor = "#ffc107",
+                ScoreColor = "#ffc107",
+            },
+            new()
+            {
+                Name = "Neon",
+                PlayerNamesColor = "#ffffff",
+                TournamentTitleColor = "#0088ff",
+                FightModeColor = "#00ff88",
+                ScoreColor = "#00ff88",
+            },
         };
-        
+
         lock (_lock)
         {
-            _presets.AddRange(defaultPresets);
-            SaveToDisk();
+            _presets.AddRange(defaultPresets.Select(Normalize));
+            // Persist defaults to DB
+            _databaseService.ReplaceAllColorPresets(_presets);
         }
     }
 
@@ -155,9 +177,12 @@ public class ColorPresetService
         new()
         {
             Name = (p.Name ?? string.Empty).Trim(),
+            MainColor = p.MainColor,
             PlayerNamesColor = p.PlayerNamesColor,
             TournamentTitleColor = p.TournamentTitleColor,
             FightModeColor = p.FightModeColor,
-            ScoreColor = p.ScoreColor
+            ScoreColor = p.ScoreColor,
+            BackgroundColor = p.BackgroundColor,
+            BorderColor = p.BorderColor,
         };
 }

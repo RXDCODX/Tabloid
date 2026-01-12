@@ -10,7 +10,7 @@ const Players: React.FC = () => {
     sponsor: '',
     score: 0,
     tag: '',
-    flag: 'none',
+    country: 'none',
     final: 'none',
   });
   const [player2, setPlayer2] = useState<Player>({
@@ -18,7 +18,7 @@ const Players: React.FC = () => {
     sponsor: '',
     score: 0,
     tag: '',
-    flag: 'none',
+    country: 'none',
     final: 'none',
   });
 

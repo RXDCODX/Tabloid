@@ -40,17 +40,20 @@ export const SignalRProvider: React.FC<{
       .withAutomaticReconnect()
       .build();
 
-    // Устанавливаем connection сразу, чтобы компоненты могли подписаться на обработчики
-    setConnection(newConnection);
-
+    // Не выставляем connection до успешного старта — компоненты не будут
+    // пытаться вызвать методы hub до того, как соединение действительно
+    // установлено. Это предотвращает ошибки "Cannot send data if the
+    // connection is not in the 'Connected' State.".
     newConnection
       .start()
       .then(() => {
         console.log('SignalR Connected');
+        setConnection(newConnection);
       })
       .catch(err => console.error('SignalR Connection Error: ', err));
 
     return () => {
+      // stop актуального экземпляра (даже если не установлен в state)
       newConnection.stop();
       setConnection(null);
     };
