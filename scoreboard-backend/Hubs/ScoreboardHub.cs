@@ -7,6 +7,7 @@ namespace scoreboard_backend.Hubs;
 public class ScoreboardHub(
     ScoreboardStateService stateService,
     ColorPresetService colorPresetService,
+    PlayerPresetService playerPresetService,
     ILogger<ScoreboardHub> logger
 ) : Hub
 {
@@ -250,6 +251,105 @@ public class ScoreboardHub(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error in ApplyColorPreset");
+            throw;
+        }
+    }
+
+    public async Task GetPlayerPresets(int count = -1, string? startsWith = null)
+    {
+        logger.LogInformation("GetPlayerPresets called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            var presets = playerPresetService.GetAll(count, startsWith);
+            await Clients.Caller.SendAsync("ReceivePlayerPresets", presets);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in GetPlayerPresets");
+        }
+    }
+
+    // Upsert preset for player 1 or 2 by taking player data from current state
+    public async Task UpsertPlayerPreset(int playerNumber)
+    {
+        logger.LogInformation(
+            "UpsertPlayerPreset called by {ConnectionId}: Player{Player}",
+            Context.ConnectionId,
+            playerNumber
+        );
+        try
+        {
+            var state = stateService.GetState();
+            var source = playerNumber switch
+            {
+                1 => state.Player1,
+                2 => state.Player2,
+                _ => null,
+            };
+
+            if (source is null)
+            {
+                logger.LogWarning(
+                    "UpsertPlayerPreset: invalid player number {Player}",
+                    playerNumber
+                );
+                return;
+            }
+
+            var preset = new PlayerPreset
+            {
+                Name = source.Name,
+                Score = source.Score,
+                Tag = source.Tag,
+                Final = source.Final,
+                Flag = source.Flag,
+            };
+
+            playerPresetService.Upsert(preset);
+
+            // Notify all clients about updated presets list
+            var presets = playerPresetService.GetAll();
+            await Clients.All.SendAsync("ReceivePlayerPresets", presets);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpsertPlayerPreset");
+            throw;
+        }
+    }
+
+    // Delete preset for player 1 or 2 by removing preset with the player's current name from state
+    public async Task DeletePlayerPreset(int playerNumber)
+    {
+        logger.LogInformation(
+            "DeletePlayerPreset called by {ConnectionId}: Player{Player}",
+            Context.ConnectionId,
+            playerNumber
+        );
+        try
+        {
+            var state = stateService.GetState();
+            var name =
+                playerNumber == 1 ? state.Player1?.Name
+                : playerNumber == 2 ? state.Player2?.Name
+                : null;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                logger.LogWarning(
+                    "DeletePlayerPreset: no name found for player {Player}",
+                    playerNumber
+                );
+                return;
+            }
+
+            playerPresetService.RemoveByName(name);
+            var presets = playerPresetService.GetAll();
+            await Clients.All.SendAsync("ReceivePlayerPresets", presets);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in DeletePlayerPreset");
             throw;
         }
     }

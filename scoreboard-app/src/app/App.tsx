@@ -8,10 +8,11 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { AdminPanel } from '../components/AdminPanel';
+import AdminStateSignalRSync from '../components/AdminStateSignalRSync/AdminStateSignalRSync';
 import { Home } from '../components/Home/Home';
 import Scoreboard from '../components/Scoreboard/Scoreboard';
 import '../global.scss';
-import { SignalRProvider } from '../providers/SignalRProvider';
+import { ScoreboardSignalRHubWrapper } from '../providers/SignalRProvider';
 import styles from './App.module.scss';
 
 function App() {
@@ -75,18 +76,15 @@ function App() {
         </div>
       </div>
 
-      <SignalRProvider
-        url='http://localhost:5035/scoreboardHub'
-        withCredentials={false}
-        automaticReconnect={true}
-      >
+      <ScoreboardSignalRHubWrapper>
+        <AdminStateSignalRSync />
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/scoreboard' element={<Scoreboard />} />
           <Route path='/adminpanel' element={<AdminPanel />} />
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
-      </SignalRProvider>
+      </ScoreboardSignalRHubWrapper>
     </Router>
   );
 }

@@ -13,6 +13,10 @@ namespace scoreboard_backend.Serialization;
 [JsonSerializable(typeof(List<ColorPresetModel>))]
 [JsonSerializable(typeof(ColorPresetModel[]))]
 [JsonSerializable(typeof(IReadOnlyList<ColorPresetModel>))]
+[JsonSerializable(typeof(PlayerPreset))]
+[JsonSerializable(typeof(List<PlayerPreset>))]
+[JsonSerializable(typeof(PlayerPreset[]))]
+[JsonSerializable(typeof(IReadOnlyList<PlayerPreset>))]
 [JsonSerializable(typeof(ScoreboardState))]
 [JsonSerializable(typeof(ImageType))]
 public partial class ScoreboardJsonContext : JsonSerializerContext;

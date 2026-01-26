@@ -1,13 +1,12 @@
-import React, { useCallback } from 'react';
-import { Card, Col, Form, Row } from 'react-bootstrap';
+import React, { memo, useCallback } from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
 import { Columns } from 'react-bootstrap-icons';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../../store/adminStateStore';
 import { LayoutConfig } from '../../../types/types';
 import styles from './LayoutConfigCard.module.scss';
 
-type Props = {
-  layoutConfig: LayoutConfig;
-  onChange: (next: LayoutConfig) => void;
-};
+type Props = {};
 
 const blocks: Array<{ key: keyof LayoutConfig; title: string }> = [
   { key: 'center', title: 'Заголовок турнира' },
@@ -28,23 +27,26 @@ const fields: Array<{
   { key: 'height', label: 'Height', placeholder: 'например: 120px или 10%' },
 ];
 
-const LayoutConfigCard: React.FC<Props> = ({ layoutConfig, onChange }) => {
+const LayoutConfigCard: React.FC<Props> = () => {
+  const layoutConfig = useAdminStore(useShallow(s => s.layoutConfig));
+
   const handleChange = useCallback(
     (
       block: keyof LayoutConfig,
       field: 'top' | 'left' | 'right' | 'width' | 'height',
       value: string
     ) => {
+      const currentLayout = useAdminStore.getState().layoutConfig;
       const next: LayoutConfig = {
-        ...layoutConfig,
+        ...currentLayout,
         [block]: {
-          ...layoutConfig[block],
+          ...currentLayout[block],
           [field]: value,
         },
       };
-      onChange(next);
+      useAdminStore.getState().setLayoutConfig(next);
     },
-    [layoutConfig, onChange]
+    []
   );
 
   return (
@@ -71,21 +73,24 @@ const LayoutConfigCard: React.FC<Props> = ({ layoutConfig, onChange }) => {
                     key={fkey}
                     className='d-flex justify-content-center'
                   >
-                    <Form.Group
-                      controlId={`${String(key)}-${fkey}`}
+                    <div
                       className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
                     >
-                      <Form.Label className='mb-1 text-white text-center'>
+                      <label
+                        htmlFor={`${String(key)}-${fkey}`}
+                        className='mb-1 text-white text-center'
+                      >
                         {label}
-                      </Form.Label>
-                      <Form.Control
+                      </label>
+                      <input
+                        id={`${String(key)}-${fkey}`}
                         type='text'
-                        className='bg-dark text-white border-secondary text-center'
+                        className='form-control form-control-sm bg-dark text-white border-secondary text-center'
                         value={layoutConfig[key]?.[fkey] ?? ''}
                         onChange={e => handleChange(key, fkey, e.target.value)}
                         placeholder={placeholder}
                       />
-                    </Form.Group>
+                    </div>
                   </Col>
                 ))}
             </Row>
@@ -101,21 +106,24 @@ const LayoutConfigCard: React.FC<Props> = ({ layoutConfig, onChange }) => {
                     key={fkey}
                     className='d-flex justify-content-center'
                   >
-                    <Form.Group
-                      controlId={`${String(key)}-${fkey}`}
+                    <div
                       className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
                     >
-                      <Form.Label className='mb-1 text-white text-center'>
+                      <label
+                        htmlFor={`${String(key)}-${fkey}`}
+                        className='mb-1 text-white text-center'
+                      >
                         {label}
-                      </Form.Label>
-                      <Form.Control
+                      </label>
+                      <input
+                        id={`${String(key)}-${fkey}`}
                         type='text'
-                        className='bg-dark text-white border-secondary text-center'
+                        className='form-control form-control-sm bg-dark text-white border-secondary text-center'
                         value={layoutConfig[key]?.[fkey] ?? ''}
                         onChange={e => handleChange(key, fkey, e.target.value)}
                         placeholder={placeholder}
                       />
-                    </Form.Group>
+                    </div>
                   </Col>
                 ))}
             </Row>
@@ -129,4 +137,4 @@ const LayoutConfigCard: React.FC<Props> = ({ layoutConfig, onChange }) => {
   );
 };
 
-export default LayoutConfigCard;
+export default memo(LayoutConfigCard);

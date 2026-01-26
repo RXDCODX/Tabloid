@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Card } from 'react-bootstrap';
 import {
   ArrowDown,
   ArrowRepeat,
@@ -10,39 +10,28 @@ import {
   TrophyFill,
   XCircleFill,
 } from 'react-bootstrap-icons';
+import { useShallow } from 'zustand/react/shallow';
 import useDebouncedCallback from '../../../hooks/useDebouncedCallback';
+import { Scoreboard, useConnection } from '../../../providers/SignalRProvider';
+import { useAdminStore } from '../../../store/adminStateStore';
 import FlagSelector from '../Forms/FlagSelector';
-import { PlayerPresetService } from '../services/PlayerPresetService';
-import { Player, PlayerWithTimestamp } from '../types';
-import { getFlagPath } from '../Utils/flagUtils';
+import { Player } from '../types';
+import { getCountryCodeFromValue, getFlagPath } from '../Utils/flagUtils';
 import styles from './PlayerCard.module.scss';
 
 type PlayerCardProps = {
-  player: PlayerWithTimestamp;
-  onName: (name: string) => void;
-  onSponsor: (sponsor: string) => void;
-  onScore: (score: number) => void;
-  onWin: () => void;
-  onLose: () => void;
-  label: string;
-  accent: string;
-  onTag: (tag: string) => void;
-  onFlag: (flag: string) => void;
-  onClearFinal: () => void;
+  playerNumber: 1 | 2;
+  label?: string;
+  accent?: string;
 };
 
 const PlayerCard: React.FC<PlayerCardProps> = ({
-  player,
-  onName,
-  onScore,
-  onWin,
-  onLose,
+  playerNumber,
   label,
-  accent,
-  onTag,
-  onFlag,
-  onClearFinal,
+  accent = '#0dcaf0',
 }) => {
+  console.log(`[PlayerCard ${playerNumber}] Render`);
+
   const [isNameOpen, setIsNameOpen] = useState(false);
   const [presetsVersion, setPresetsVersion] = useState(0);
   const [presets, setPresets] = useState<Player[]>([]);
@@ -53,7 +42,59 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     300
   );
 
+  const connection = useConnection();
+  console.log(`[PlayerCard ${playerNumber}] Connection:`, connection?.state);
+
+  const player = useAdminStore(
+    useShallow(s => (playerNumber === 1 ? s.player1 : s.player2))
+  );
+
+  const setPlayer = useAdminStore(
+    useShallow(s => (playerNumber === 1 ? s.setPlayer1 : s.setPlayer2))
+  );
+
+  const normalizePresets = useCallback(
+    (data: Player[]) => {
+      const normalized: Player[] = (Array.isArray(data) ? data : []).map(
+        (p: any) => {
+          const rawFlag =
+            p.player1?.flag || p.player1?.country || p.flag || p.country || '';
+          const flagCode = getCountryCodeFromValue(rawFlag);
+          return {
+            name: p.player1?.name || p.name || '',
+            tag: p.player1?.tag || '',
+            flag: flagCode || '',
+            final: 'none',
+            score: 0,
+          };
+        }
+      );
+      setPresets(normalized);
+    },
+    [setPresets]
+  );
+
+  const handler = useCallback(
+    (data: Player[]) => {
+      console.log(
+        `[PlayerCard ${playerNumber}] SignalR ReceivePlayerPresets`,
+        data
+      );
+      normalizePresets(data);
+    },
+    [normalizePresets, playerNumber]
+  );
+
+  // Подписка на SignalR события
+  Scoreboard.useSignalREffect('ReceivePlayerPresets', handler, [handler]);
+
   useEffect(() => {
+    console.log(`[PlayerCard ${playerNumber}] useEffect (GetPlayerPresets)`, {
+      debouncedQuery,
+      presetsVersion,
+      connectionState: connection?.state,
+    });
+
     let cancelled = false;
     const q = (debouncedQuery || '').trim();
     if (!q) {
@@ -61,53 +102,53 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       return;
     }
 
-    (async () => {
-      try {
-        // ask backend for presets starting with the query (limit to 20)
-        const data = await PlayerPresetService.load(20, q);
-        if (cancelled) return;
-        const normalized = (Array.isArray(data) ? data : []).map(
-          (p: any) =>
-            ({
-              name: p.player1?.name || p.name || '',
-              tag: p.player1?.tag || '',
-              flag: p.player1?.flag || '',
-            }) as Player
-        );
-        setPresets(normalized);
-      } catch (e) {
-        // ignore, service logs errors
-      }
-    })();
+    if (!connection || connection.state !== 'Connected') return;
+
+    connection.invoke('GetPlayerPresets', 100, q).catch(() => {
+      /* ignore */
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, presetsVersion]);
+  }, [debouncedQuery, presetsVersion, connection]);
 
   const filteredPresets = useMemo(() => presets.slice(0, 8), [presets]);
 
   const handleSelectPreset = useCallback(
-    (p: { name: string; tag: string; flag: string }) => {
-      onName(p.name);
-      onTag(p.tag || '');
-      onFlag(p.flag || '');
+    (p: Player) => {
+      setPlayer({
+        ...player,
+        name: p.name,
+        tag: p.tag || '',
+        flag: p.flag || '',
+      });
       setIsNameOpen(false);
     },
-    [onName, onTag, onFlag]
+    [player, setPlayer]
   );
 
   const handleSavePreset = useCallback(async () => {
-    await PlayerPresetService.save(player as any);
-    setPresetsVersion(v => v + 1);
-  }, [player]);
+    if (!connection || connection.state !== 'Connected' || !playerNumber)
+      return;
+    try {
+      await connection.invoke('UpsertPlayerPreset', playerNumber);
+      setPresetsVersion(v => v + 1);
+    } catch (e) {
+      // ignore
+    }
+  }, [connection, playerNumber]);
 
   const handleDeletePreset = useCallback(async () => {
-    const name = player.name ?? '';
-    if (!name) return;
-    await PlayerPresetService.delete(name);
-    setPresetsVersion(v => v + 1);
-  }, [player]);
+    if (!connection || connection.state !== 'Connected' || !playerNumber)
+      return;
+    try {
+      await connection.invoke('DeletePlayerPreset', playerNumber);
+      setPresetsVersion(v => v + 1);
+    } catch (e) {
+      // ignore
+    }
+  }, [connection, playerNumber]);
 
   return (
     <Card
@@ -125,16 +166,17 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         </div>
 
         <div className={styles.playerInfo}>
-          <Form.Control
+          <input
+            type='text'
             placeholder='Tag'
             value={player.tag ?? ''}
-            onChange={e => onTag(e.target.value)}
-            size='sm'
-            className={`${styles.tagInput} bg-dark text-info border-info border-2 fw-bold rounded-3`}
+            onChange={e => setPlayer({ ...player, tag: e.target.value })}
+            className={`form-control form-control-sm ${styles.tagInput} bg-dark text-info border-info border-2 fw-bold rounded-3`}
             style={{ maxWidth: 90 }}
           />
           <div className={styles.nameInputContainer}>
-            <Form.Control
+            <input
+              type='text'
               placeholder='Name'
               value={
                 (player.final === 'winner'
@@ -144,15 +186,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                     : '') + (player.name ?? '')
               }
               onChange={e => {
-                let val = e.target.value.replace(/^\[W\] |^\[L\] /, '');
-                onName(val);
+                const val = e.target.value.replace(/^\[W\]\s|^\[L\]\s/, '');
+                setPlayer({ ...player, name: val });
                 setIsNameOpen(true);
                 debounced(val);
               }}
               onFocus={() => setIsNameOpen(true)}
               onBlur={() => setTimeout(() => setIsNameOpen(false), 150)}
-              size='sm'
-              className={`${styles.nameInput} fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100`}
+              className={`form-control form-control-sm ${styles.nameInput} fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100`}
             />
             {isNameOpen && filteredPresets.length > 0 && (
               <div className={styles.presetsDropdown}>
@@ -160,8 +201,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                   <div
                     key={`${p.name}-${p.tag}-${p.flag}`}
                     className={styles.presetItem}
-                    onMouseDown={e => e.preventDefault()}
-                    onClick={() => handleSelectPreset(p)}
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      handleSelectPreset(p);
+                    }}
                   >
                     <img
                       src={getFlagPath(p.flag)}
@@ -191,7 +234,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         >
           <FlagSelector
             selectedFlag={player.flag ?? 'none'}
-            onFlagChange={onFlag}
+            onFlagChange={flag => setPlayer({ ...player, flag })}
             placeholder='Флаг'
           />
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
@@ -219,7 +262,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           <Button
             variant='outline-info'
             size='sm'
-            onClick={() => onScore((player.score ?? 0) + 1)}
+            onClick={() =>
+              setPlayer({ ...player, score: (player.score ?? 0) + 1 })
+            }
             className={styles.scoreButton}
           >
             <ArrowUp />
@@ -235,7 +280,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           <Button
             variant='outline-info'
             size='sm'
-            onClick={() => onScore((player.score ?? 0) - 1)}
+            onClick={() =>
+              setPlayer({ ...player, score: (player.score ?? 0) - 1 })
+            }
             className={styles.scoreButton}
           >
             <ArrowDown />
@@ -243,7 +290,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           <Button
             variant='outline-secondary'
             size='sm'
-            onClick={() => onScore(0)}
+            onClick={() => setPlayer({ ...player, score: 0 })}
             className={styles.scoreButton}
           >
             <ArrowRepeat />
@@ -255,7 +302,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             variant='success'
             size='sm'
             className={`${styles.actionButton} px-3`}
-            onClick={onWin}
+            onClick={() => setPlayer({ ...player, final: 'winner' })}
           >
             <TrophyFill /> W
           </Button>
@@ -263,7 +310,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             variant='danger'
             size='sm'
             className={`${styles.actionButton} px-3`}
-            onClick={onLose}
+            onClick={() => setPlayer({ ...player, final: 'loser' })}
           >
             <XCircleFill /> L
           </Button>
@@ -273,7 +320,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               size='sm'
               className={`${styles.clearButton} px-2 py-0`}
               style={{ fontSize: 14 }}
-              onClick={onClearFinal}
+              onClick={() => setPlayer({ ...player, final: 'none' })}
               title='Убрать статус W/L'
             >
               ✕
@@ -285,4 +332,4 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   );
 };
 
-export default PlayerCard;
+export default memo(PlayerCard);

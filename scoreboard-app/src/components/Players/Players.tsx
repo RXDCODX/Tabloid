@@ -1,51 +1,28 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Button, Col, Container, Form, InputGroup, Row } from 'react-bootstrap';
-import { SignalRContext } from '../../providers/SignalRProvider';
-import { Player, ScoreboardState } from '../../types/types';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../store/adminStateStore';
+import { Player } from '../../types/types';
 
 const Players: React.FC = () => {
-  const { connection } = useContext(SignalRContext);
-  const [player1, setPlayer1] = useState<Player>({
-    name: 'Player 1',
-    sponsor: '',
-    score: 0,
-    tag: '',
-    country: 'none',
-    final: 'none',
-  });
-  const [player2, setPlayer2] = useState<Player>({
-    name: 'Player 2',
-    sponsor: '',
-    score: 0,
-    tag: '',
-    country: 'none',
-    final: 'none',
-  });
-
-  useEffect(() => {
-    if (!connection) return;
-    const handler = (state: ScoreboardState) => {
-      console.log('SignalR ReceiveState (Players):', state);
-      setPlayer1(state.player1);
-      setPlayer2(state.player2);
-    };
-    connection.on('ReceiveState', handler);
-    return () => {
-      connection.off('ReceiveState', handler);
-    };
-  }, [connection]);
+  const { player1, player2, setPlayer1, setPlayer2, swapPlayers, reset } =
+    useAdminStore(
+      useShallow(s => ({
+        player1: s.player1,
+        player2: s.player2,
+        setPlayer1: s.setPlayer1,
+        setPlayer2: s.setPlayer2,
+        swapPlayers: s.swapPlayers,
+        reset: s.reset,
+      }))
+    );
 
   const updatePlayer = useCallback(
-    async (side: 'left' | 'right', updated: Player) => {
-      if (!connection) return;
-      const method = side === 'left' ? 'UpdatePlayer1' : 'UpdatePlayer2';
-      try {
-        await connection.invoke(method, updated);
-      } catch (e) {
-        console.error('Update player failed:', e);
-      }
+    (side: 'left' | 'right', updated: Player) => {
+      if (side === 'left') setPlayer1(updated);
+      else setPlayer2(updated);
     },
-    [connection]
+    [setPlayer1, setPlayer2]
   );
 
   const increment = useCallback(
@@ -98,20 +75,6 @@ const Players: React.FC = () => {
     updatePlayer('right', { ...player2, name: player1.name });
   }, [player1, player2, updatePlayer]);
 
-  const swapPlayers = useCallback(() => {
-    updatePlayer('left', { ...player2 });
-    updatePlayer('right', { ...player1 });
-  }, [player1, player2, updatePlayer]);
-
-  const reset = useCallback(async () => {
-    if (!connection) return;
-    try {
-      await connection.invoke('ResetToDefault');
-    } catch (e) {
-      console.error('Reset failed:', e);
-    }
-  }, [connection]);
-
   return (
     <Container
       fluid
@@ -123,10 +86,10 @@ const Players: React.FC = () => {
         <Col xs={5} className='d-flex align-items-center gap-2'>
           <span style={{ fontSize: 20, color: '#a78bfa' }}>👤</span>
           <Form.Control
-            placeholder='Sponsor'
-            value={player1.sponsor}
+            placeholder='Tag'
+            value={player1.tag ?? ''}
             onChange={e =>
-              updatePlayer('left', { ...player1, sponsor: e.target.value })
+              updatePlayer('left', { ...player1, tag: e.target.value })
             }
             size='sm'
             className='bg-secondary text-white fw-normal'
@@ -150,10 +113,10 @@ const Players: React.FC = () => {
         >
           <span style={{ fontSize: 20, color: '#a78bfa' }}>👤</span>
           <Form.Control
-            placeholder='Sponsor'
-            value={player2.sponsor}
+            placeholder='Tag'
+            value={player2.tag ?? ''}
             onChange={e =>
-              updatePlayer('right', { ...player2, sponsor: e.target.value })
+              updatePlayer('right', { ...player2, tag: e.target.value })
             }
             size='sm'
             className='bg-secondary text-white fw-normal'

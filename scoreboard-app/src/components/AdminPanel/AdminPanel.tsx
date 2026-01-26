@@ -1,8 +1,6 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAdminState } from '../../hooks/useAdminState';
-import { SignalRContext } from '../../providers/SignalRProvider';
 import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
@@ -13,31 +11,9 @@ import PlayerCard from './Cards/PlayerCard';
 import VisibilityCard from './Cards/VisibilityCard';
 
 import ActionButtons from './UI/ActionButtons';
-import { PlayerPresetService } from './services/PlayerPresetService';
 
 const AdminPanel = () => {
-  const signalRContext = useContext(SignalRContext);
-  const {
-    player1,
-    player2,
-    meta,
-    isVisible,
-    isShowBorders,
-    animationDuration,
-    backgroundImages,
-    layoutConfig,
-    setPlayer1,
-    setPlayer2,
-    setMeta,
-    setVisibility,
-    setAnimationDuration,
-    setBackgroundImages,
-    setLayoutConfig,
-    setShowBorders,
-    swapPlayers,
-    reset,
-    handleColorChange,
-  } = useAdminState();
+  console.log('[AdminPanel] Render');
 
   // Редирект на админку при открытии с телефона
   const navigate = useNavigate();
@@ -46,20 +22,9 @@ const AdminPanel = () => {
       navigate('/admin');
     }
   }, [navigate]);
-  useEffect(() => {
-    PlayerPresetService.load?.();
-  }, []);
+  // presets are requested via SignalR when needed by individual controls
 
-  const handleSwapNames = useCallback(async () => {
-    const conn = signalRContext.connection;
-    if (!conn) return;
-    try {
-      await conn.invoke('UpdatePlayer1', { ...player1, name: player2.name });
-      await conn.invoke('UpdatePlayer2', { ...player2, name: player1.name });
-    } catch (e) {
-      console.error('Swap names failed:', e);
-    }
-  }, [player1, player2, signalRContext.connection]);
+  // swap names handled inside ActionButtons now
 
   return (
     <>
@@ -67,45 +32,28 @@ const AdminPanel = () => {
         {/* Visibility Panel и Meta Panel в один ряд с одинаковой шириной */}
         <Row className='mb-4'>
           <Col xs={12} md={6} lg={6}>
-            <VisibilityCard
-              isVisible={isVisible}
-              onVisibilityChange={setVisibility}
-              animationDuration={animationDuration} // Настраиваемое время анимации (800мс)
-              onAnimationDurationChange={setAnimationDuration} // Callback для изменения времени анимации
-            />
+            <VisibilityCard />
           </Col>
           <Col xs={12} md={6} lg={6}>
-            <MetaPanel setMeta={setMeta} meta={meta} />
+            <MetaPanel />
           </Col>
         </Row>
 
         {/* Color Preset Panel */}
-        <ColorPresetCard
-          onColorChange={handleColorChange}
-          context={signalRContext}
-        />
+        <ColorPresetCard />
 
         {/* Borders Toggle */}
         <Row className='mb-4'>
           <Col xs={12}>
-            <BordersToggleCard
-              initial={isShowBorders}
-              onToggle={setShowBorders}
-            />
+            <BordersToggleCard />
           </Col>
         </Row>
 
         {/* Background Images Panel */}
-        <BackgroundImagesCard
-          backgroundImages={backgroundImages}
-          onBackgroundImagesChange={setBackgroundImages}
-        />
+        <BackgroundImagesCard />
 
         {/* Layout Config Panel */}
-        <LayoutConfigCard
-          layoutConfig={layoutConfig}
-          onChange={setLayoutConfig}
-        />
+        <LayoutConfigCard />
 
         {/* Players Cards */}
         <Row className='justify-content-center align-items-center g-4'>
@@ -115,24 +63,7 @@ const AdminPanel = () => {
             lg={4}
             className='d-flex justify-content-center mb-3 mb-md-0'
           >
-            <PlayerCard
-              player={player1}
-              onName={name => setPlayer1({ ...player1, name })}
-              onSponsor={sponsor => setPlayer1({ ...player1, sponsor })}
-              onScore={score =>
-                setPlayer1({
-                  ...player1,
-                  score: Math.max(0, Math.min(99, score)),
-                })
-              }
-              onWin={() => setPlayer1({ ...player1, final: 'winner' })}
-              onLose={() => setPlayer1({ ...player1, final: 'loser' })}
-              onTag={tag => setPlayer1({ ...player1, tag })}
-              onFlag={flag => setPlayer1({ ...player1, flag })}
-              onClearFinal={() => setPlayer1({ ...player1, final: 'none' })}
-              label='Player 1'
-              accent='#0dcaf0'
-            />
+            <PlayerCard label='Player 1' playerNumber={1} accent='#0dcaf0' />
           </Col>
           <Col
             xs={12}
@@ -140,11 +71,7 @@ const AdminPanel = () => {
             lg={2}
             className='d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2'
           >
-            <ActionButtons
-              onSwapNames={handleSwapNames}
-              onSwapPlayers={swapPlayers}
-              onReset={reset}
-            />
+            <ActionButtons />
           </Col>
           <Col
             xs={12}
@@ -152,24 +79,7 @@ const AdminPanel = () => {
             lg={4}
             className='d-flex justify-content-center mb-3 mb-md-0'
           >
-            <PlayerCard
-              player={player2}
-              onName={name => setPlayer2({ ...player2, name })}
-              onSponsor={sponsor => setPlayer2({ ...player2, sponsor })}
-              onScore={score =>
-                setPlayer2({
-                  ...player2,
-                  score: Math.max(0, Math.min(99, score)),
-                })
-              }
-              onWin={() => setPlayer2({ ...player2, final: 'winner' })}
-              onLose={() => setPlayer2({ ...player2, final: 'loser' })}
-              onTag={tag => setPlayer2({ ...player2, tag })}
-              onFlag={flag => setPlayer2({ ...player2, flag })}
-              onClearFinal={() => setPlayer2({ ...player2, final: 'none' })}
-              label='Player 2'
-              accent='#6610f2'
-            />
+            <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
           </Col>
         </Row>
       </Container>
@@ -184,4 +94,4 @@ const AdminPanel = () => {
   );
 };
 
-export default AdminPanel;
+export default memo(AdminPanel);

@@ -111,7 +111,9 @@ public class DatabaseService
 
                 if (hasCountry)
                 {
-                    _logger.LogInformation("Legacy column 'Country' detected in player_presets - migrating to 'Flag'");
+                    _logger.LogInformation(
+                        "Legacy column 'Country' detected in player_presets - migrating to 'Flag'"
+                    );
                     using var trans = conn.BeginTransaction();
 
                     // Create new table with desired schema
@@ -132,7 +134,8 @@ public class DatabaseService
                     // Copy data mapping Country -> Flag
                     using (var copyCmd = conn.CreateCommand())
                     {
-                        copyCmd.CommandText = "INSERT OR REPLACE INTO player_presets_new(Name, Score, Tag, Final, Flag) SELECT Name, Score, Tag, Final, Country FROM player_presets;";
+                        copyCmd.CommandText =
+                            "INSERT OR REPLACE INTO player_presets_new(Name, Score, Tag, Final, Flag) SELECT Name, Score, Tag, Final, Country FROM player_presets;";
                         copyCmd.ExecuteNonQuery();
                     }
 
@@ -145,7 +148,8 @@ public class DatabaseService
 
                     using (var renameCmd = conn.CreateCommand())
                     {
-                        renameCmd.CommandText = "ALTER TABLE player_presets_new RENAME TO player_presets;";
+                        renameCmd.CommandText =
+                            "ALTER TABLE player_presets_new RENAME TO player_presets;";
                         renameCmd.ExecuteNonQuery();
                     }
 
@@ -155,7 +159,10 @@ public class DatabaseService
             }
             catch (Exception mex)
             {
-                _logger.LogError(mex, "Error while checking/migrating legacy player_presets schema");
+                _logger.LogError(
+                    mex,
+                    "Error while checking/migrating legacy player_presets schema"
+                );
                 // proceed without failing startup
             }
         }
@@ -222,7 +229,8 @@ public class DatabaseService
         {
             using var conn = GetConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor FROM color_presets ORDER BY rowid DESC";
+            cmd.CommandText =
+                "SELECT Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor FROM color_presets ORDER BY rowid DESC";
 
             using var reader = cmd.ExecuteReader();
             var list = new List<ColorPresetModel>();
@@ -247,7 +255,7 @@ public class DatabaseService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load color presets from DB");
-            return new List<ColorPresetModel>();
+            return [];
         }
     }
 

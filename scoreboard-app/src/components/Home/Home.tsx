@@ -1,10 +1,19 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminState } from '../../hooks/useAdminState';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../store/adminStateStore';
 import styles from './Home.module.scss';
 
 export const Home = () => {
   const navigate = useNavigate();
-  const state = useAdminState();
+  const { player1, player2, meta } = useAdminStore(
+    useShallow(s => ({ player1: s.player1, player2: s.player2, meta: s.meta }))
+  );
+
+  const displayed = useMemo(
+    () => JSON.stringify({ player1, player2, meta }, null, 2),
+    [player1, player2, meta]
+  );
 
   return (
     <div className={styles.container}>
@@ -28,9 +37,7 @@ export const Home = () => {
 
         <div className={styles.stateContainer}>
           <h2 className={styles.stateTitle}>Current State (SignalR)</h2>
-          <pre className={styles.stateJson}>
-            {JSON.stringify(state, null, 2)}
-          </pre>
+          <pre className={styles.stateJson}>{displayed}</pre>
         </div>
       </div>
     </div>

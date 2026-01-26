@@ -23,4 +23,3 @@ export * from './types';
 // Сервисы
 // Репозиторий пресетов игроков располагается в src/services
 export { BackgroundImageService } from './services/BackgroundImagesService';
-export { PlayerPresetService } from './services/PlayerPresetService';

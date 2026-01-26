@@ -1,4 +1,3 @@
-import { debug } from 'console';
 import { useCallback, useEffect, useRef } from 'react';
 
 // Возвращает дебаунс-обёртку для переданной функции.
@@ -7,7 +6,9 @@ export default function useDebouncedCallback<
   T extends (...args: any[]) => void,
 >(callback: T, delay = 300) {
   const callbackRef = useRef(callback);
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof globalThis.setTimeout> | null>(
+    null
+  );
 
   useEffect(() => {
     callbackRef.current = callback;
@@ -17,7 +18,7 @@ export default function useDebouncedCallback<
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current);
+        globalThis.clearTimeout(timerRef.current);
       }
     };
   }, []);
@@ -25,14 +26,12 @@ export default function useDebouncedCallback<
   const debounced = useCallback(
     (...args: Parameters<T>) => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current);
+        globalThis.clearTimeout(timerRef.current);
       }
-      // window.setTimeout returns number in browser
-      timerRef.current = window.setTimeout(() => {
-        debugger;
+      timerRef.current = globalThis.setTimeout(() => {
         callbackRef.current(...args);
         timerRef.current = null;
-      }, delay) as unknown as number;
+      }, delay);
     },
     [delay]
   );

@@ -1,23 +1,18 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { BoundingBox } from 'react-bootstrap-icons';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../../store/adminStateStore';
 import styles from './BordersToggleCard.module.scss';
 
-interface BordersToggleCardProps {
-  initial?: boolean;
-  onToggle?: (enabled: boolean) => void;
-}
+const BordersToggleCard = () => {
+  const isShowBorders = useAdminStore(useShallow(s => s.isShowBorders));
+  const [enabled, setEnabled] = useState<boolean>(!!isShowBorders);
 
-const BordersToggleCard = ({
-  initial = false,
-  onToggle,
-}: BordersToggleCardProps) => {
-  const [enabled, setEnabled] = useState<boolean>(initial);
-
-  // Keep local state in sync when parent updates `initial` (controlled usage)
+  // Keep local state in sync when external state changes
   useEffect(() => {
-    setEnabled(initial);
-  }, [initial]);
+    setEnabled(!!isShowBorders);
+  }, [isShowBorders]);
 
   useEffect(() => {
     if (enabled) {
@@ -28,10 +23,8 @@ const BordersToggleCard = ({
   }, [enabled]);
 
   useEffect(() => {
-    if(typeof initial === 'boolean') {
-      setEnabled(initial);
-    }
-  }, [initial]);
+    // no-op: handled above
+  }, []);
 
   return (
     <Card className={styles.bordersToggleCard}>
@@ -53,7 +46,7 @@ const BordersToggleCard = ({
           onChange={e => {
             const next = e.target.checked;
             setEnabled(next);
-            if (onToggle) onToggle(next);
+            useAdminStore.getState().setShowBorders(next);
           }}
         />
       </div>
@@ -61,4 +54,4 @@ const BordersToggleCard = ({
   );
 };
 
-export default BordersToggleCard;
+export default memo(BordersToggleCard);

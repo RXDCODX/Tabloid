@@ -190,3 +190,21 @@ export const getCountryByCode = (code: string): Country | undefined => {
   if (!code) return undefined;
   return countries.find(c => c.code.toLowerCase() === code.toLowerCase());
 };
+
+export const getCountryCodeFromValue = (value?: string): string => {
+  if (!value) return '';
+  const v = value.trim().toLowerCase();
+  // If it's already a 2-letter code present in countries, return it
+  const byCode = countries.find(c => c.code.toLowerCase() === v);
+  if (byCode) return byCode.code;
+
+  // Try exact name match
+  const byName = countries.find(c => c.name.toLowerCase() === v);
+  if (byName) return byName.code;
+
+  // Try includes match (partial name)
+  const byIncludes = countries.find(c => c.name.toLowerCase().includes(v));
+  if (byIncludes) return byIncludes.code;
+
+  return '';
+};

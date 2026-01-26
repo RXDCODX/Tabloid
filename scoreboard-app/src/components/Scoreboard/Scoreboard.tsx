@@ -1,12 +1,34 @@
 // Компонент создан на основе Scoreboard.cshtml из Tabloid
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { SignalRContext } from '../../providers/SignalRProvider';
-import { ScoreboardState } from '../../types/types';
+import React, { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../store/adminStateStore';
 import styles from './Scoreboard.module.scss';
 
 const Scoreboard: React.FC = () => {
-  const signalRContext = useContext(SignalRContext);
+  const {
+    player1,
+    player2,
+    meta,
+    colors,
+    layoutConfig,
+    animationDuration,
+    isVisible,
+    isShowBorders,
+    backgroundImages,
+  } = useAdminStore(
+    useShallow(s => ({
+      player1: s.player1,
+      player2: s.player2,
+      meta: s.meta,
+      colors: s.colors,
+      layoutConfig: s.layoutConfig,
+      animationDuration: s.animationDuration,
+      isVisible: s.isVisible,
+      isShowBorders: s.isShowBorders,
+      backgroundImages: s.backgroundImages,
+    }))
+  );
 
   // Функция для проверки валидности тега
   const isValidTag = useCallback((tag: string): boolean => {
@@ -23,41 +45,17 @@ const Scoreboard: React.FC = () => {
     return `/assets/flags/${countryCode.toLowerCase()}.svg`;
   }, []);
 
-  const [scoreboardState, setScoreboardState] =
-    useState<ScoreboardState | null>(null);
-  const handleReceiveState = useCallback((state: ScoreboardState) => {
-    console.log('SignalR ReceiveState (Scoreboard):', state);
-    setScoreboardState(state);
-  }, []);
-
-  // Подписка на SignalR события
-  useEffect(() => {
-    if (!signalRContext.connection) return;
-
-    signalRContext.connection.on('ReceiveState', handleReceiveState);
-
-    // Резервно запросим состояние у сервера (в случае, если начальное сообщение было пропущено)
-    signalRContext.connection.invoke('GetState').catch(() => {
-      /* ignore */
-    });
-
-    return () => {
-      signalRContext.connection?.off('ReceiveState', handleReceiveState);
-    };
-  }, [signalRContext.connection]);
-
   // Ждём первичного состояния и видимости панели
-  if (!scoreboardState || !scoreboardState.isVisible) {
+  if (!isVisible) {
     return null;
   }
 
-  const p1 = scoreboardState.player1;
-  const p2 = scoreboardState.player2;
-  const m = scoreboardState.meta;
-  const c = scoreboardState.colors!;
-  const layout = scoreboardState.layoutConfig;
-  const animDur = scoreboardState.animationDuration ?? 800;
-  const isShowBorders = scoreboardState.isShowBorders ?? false;
+  const p1 = player1;
+  const p2 = player2;
+  const m = meta;
+  const c = colors;
+  const layout = layoutConfig;
+  const animDur = animationDuration ?? 800;
   // Функция для создания неонового свечения с уменьшенной силой (15-20% от текущей)
   const getNeonGlow = (color: string) => {
     return `0 0 1px ${color}, 0 0 2px ${color}, 0 0 3px ${color}, 0 0 4px ${color}, 0 0 5px ${color}, 0 0 6px ${color}`;
@@ -73,7 +71,7 @@ const Scoreboard: React.FC = () => {
     : 'none';
 
   // background images (stretch to cover corresponding containers)
-  const imgs = scoreboardState.images;
+  const imgs = backgroundImages;
   const bgStyleFor = (img?: { imageName?: string } | null) =>
     img && img.imageName
       ? {
@@ -224,7 +222,7 @@ const Scoreboard: React.FC = () => {
               </span>
             </h4>
           </div>
-          {p1.country && p1.country !== 'none' && (
+          {p1.flag && p1.flag !== 'none' && (
             <div
               className={styles.flag}
               style={{
@@ -237,7 +235,7 @@ const Scoreboard: React.FC = () => {
               }}
             >
               <img
-                src={getFlagPath(p1.country)}
+                src={getFlagPath(p1.flag)}
                 alt='Player 1 flag'
                 style={{
                   width: '100%',
@@ -281,7 +279,7 @@ const Scoreboard: React.FC = () => {
               {p2.score}
             </h2>
           </div>
-          {p2.country && p2.country !== 'none' && (
+          {p2.flag && p2.flag !== 'none' && (
             <div
               className={styles.flag}
               style={{
@@ -294,7 +292,7 @@ const Scoreboard: React.FC = () => {
               }}
             >
               <img
-                src={getFlagPath(p2.country)}
+                src={getFlagPath(p2.flag)}
                 alt='Player 2 flag'
                 style={{
                   width: '100%',

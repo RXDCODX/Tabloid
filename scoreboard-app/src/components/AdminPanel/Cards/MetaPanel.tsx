@@ -1,21 +1,19 @@
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { Button, ButtonGroup, Card, Form } from 'react-bootstrap';
 import { InfoCircle } from 'react-bootstrap-icons';
-import { MetaInfoWithTimestamp } from '../types';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../../store/adminStateStore';
 import styles from './MetaPanel.module.scss';
 
-type MetaPanelProps = {
-  setMeta: (meta: any) => void;
-  meta: MetaInfoWithTimestamp;
-};
-
-const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
+const MetaPanel: React.FC = () => {
+  const meta = useAdminStore(useShallow(s => s.meta));
   const [customFightRule, setCustomFightRule] = useState(meta.fightRule || '');
 
   const fightRules = ['FT1', 'FT2', 'FT3', 'FT4', 'FT5'];
 
   const handleFightRuleChange = useCallback(
     (rule: string) => {
+      const setMeta = useAdminStore.getState().setMeta;
       setMeta({ ...meta, fightRule: rule });
       if (fightRules.includes(rule) || rule === 'None') {
         setCustomFightRule(''); // сбрасываем customFightRule
@@ -23,15 +21,16 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
         setCustomFightRule(rule);
       }
     },
-    [fightRules, meta, setMeta]
+    [fightRules, meta]
   );
 
   const handleCustomFightRuleChange = useCallback(
     (value: string) => {
       setCustomFightRule(value);
+      const setMeta = useAdminStore.getState().setMeta;
       setMeta({ ...meta, fightRule: value });
     },
-    [meta, setMeta]
+    [meta]
   );
 
   return (
@@ -51,7 +50,11 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
               type='text'
               placeholder='Введите название турнира'
               value={meta.title ?? ''}
-              onChange={e => setMeta({ ...meta, title: e.target.value })}
+              onChange={e =>
+                useAdminStore
+                  .getState()
+                  .setMeta({ ...meta, title: e.target.value })
+              }
               className={`${styles.textInput} bg-dark text-white border-primary border-2 fw-bold rounded-3`}
               style={{ fontSize: 14 }}
             />
@@ -146,4 +149,4 @@ const MetaPanel: React.FC<MetaPanelProps> = ({ setMeta, meta }) => {
   );
 };
 
-export default MetaPanel;
+export default memo(MetaPanel);

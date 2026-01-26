@@ -1,19 +1,13 @@
-import React, { useCallback, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { Image } from 'react-bootstrap-icons';
+import { useAdminStore } from '../../../store/adminStateStore';
 import { BackgroundImage, ImageType, Images } from '../../../types/types';
 import { BackgroundImageService } from '../services/BackgroundImagesService';
 import styles from './BackgroundImagesCard.module.scss';
 
-interface BackgroundImagesCardProps {
-  backgroundImages: Images;
-  onBackgroundImagesChange: (backgroundImages: Images) => void;
-}
-
-const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
-  backgroundImages,
-  onBackgroundImagesChange,
-}) => {
+const BackgroundImagesCard: React.FC = () => {
+  const backgroundImages = useAdminStore(s => s.backgroundImages);
   const fileInputRefs: Record<
     ImageType,
     React.RefObject<HTMLInputElement | null>
@@ -55,7 +49,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         await BackgroundImageService.updateImage(imageType, file);
       } catch (e: any) {
         alert('Не удалось загрузить изображение: ' + (e.message || e));
-        onBackgroundImagesChange({
+        useAdminStore.getState().setBackgroundImages({
           ...backgroundImages,
           [field]: undefined,
         });
@@ -63,7 +57,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         if (input) input.value = '';
       }
     },
-    [backgroundImages, onBackgroundImagesChange, fileInputRefs]
+    [backgroundImages, fileInputRefs]
   );
 
   const handleRemoveImage = useCallback(
@@ -78,7 +72,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         return;
       }
 
-      onBackgroundImagesChange({
+      useAdminStore.getState().setBackgroundImages({
         ...backgroundImages,
         [field]: undefined,
       });
@@ -87,7 +81,7 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
         input.value = '';
       }
     },
-    [backgroundImages, onBackgroundImagesChange, fileInputRefs]
+    [backgroundImages, fileInputRefs]
   );
 
   const handleClearAll = useCallback(() => {
@@ -102,7 +96,8 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
       if (ref?.current) ref.current.value = '';
     });
     BackgroundImageService.deleteAllImages();
-  }, [onBackgroundImagesChange, fileInputRefs]);
+    useAdminStore.getState().setBackgroundImages({});
+  }, [fileInputRefs]);
 
   const handleContainerClick = useCallback(
     (imageType: ImageType) => {
@@ -146,7 +141,6 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
                     className={styles.removeButton}
                     onClick={e => {
                       e.stopPropagation();
-                      debugger;
                       handleRemoveImage(field);
                     }}
                   >
@@ -217,4 +211,4 @@ const BackgroundImagesCard: React.FC<BackgroundImagesCardProps> = ({
   );
 };
 
-export default BackgroundImagesCard;
+export default memo(BackgroundImagesCard);

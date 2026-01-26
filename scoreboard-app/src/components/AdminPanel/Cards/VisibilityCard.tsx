@@ -1,35 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import { Clock, Eye, EyeSlash, PlayCircle } from 'react-bootstrap-icons';
+import { useShallow } from 'zustand/react/shallow';
+import { useAdminStore } from '../../../store/adminStateStore';
 import styles from './VisibilityCard.module.scss';
 
-type VisibilityCardProps = {
-  isVisible: boolean;
-  onVisibilityChange: (isVisible: boolean) => void;
-  animationDuration?: number; // Время анимации в миллисекундах
-  onAnimationDurationChange?: (duration: number) => void; // Новый callback для изменения времени анимации
-};
+const VisibilityCard: React.FC = () => {
+  const { isVisible, animationDuration } = useAdminStore(
+    useShallow(s => ({
+      isVisible: s.isVisible,
+      animationDuration: s.animationDuration,
+    }))
+  );
 
-const VisibilityCard: React.FC<VisibilityCardProps> = ({
-  isVisible,
-  onVisibilityChange,
-  animationDuration = 500, // По умолчанию 500мс
-  onAnimationDurationChange,
-}) => {
+  // fallback value
+  const duration = animationDuration ?? 500;
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isShowing, setIsShowing] = useState(false); // Новое состояние для отслеживания действия показа
-  const [pageOpenTime, setPageOpenTime] = useState<number>(Date.now());
+  const [pageOpenTime] = useState<number>(Date.now());
   const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now());
-  const [currentTime, setCurrentTime] = useState<number>(Date.now()); // New state for current time
-
-  // Обновляем текущее время каждую секунду для корректного расчета времени открытия страницы
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Обновляем время последнего обновления при изменении видимости
   useEffect(() => {
@@ -46,75 +35,78 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
       // Показываем панель - блокируем кнопку на время анимации
       setIsTransitioning(true);
       setIsShowing(true); // Устанавливаем флаг показа
-      onVisibilityChange(newVisibility);
+      useAdminStore.getState().setVisibility(newVisibility);
       setTimeout(() => {
         setIsTransitioning(false);
         setIsShowing(false); // Сбрасываем флаг показа
-      }, animationDuration);
+      }, duration);
     } else {
       // Скрываем панель - также блокируем кнопку на короткое время для предотвращения множественных кликов
       setIsTransitioning(true);
       setIsShowing(false); // Устанавливаем флаг скрытия
-      onVisibilityChange(newVisibility);
+      useAdminStore.getState().setVisibility(newVisibility);
       setTimeout(() => {
         setIsTransitioning(false);
       }, 100); // Короткая блокировка для скрытия
     }
-  }, [isVisible, isTransitioning, animationDuration, onVisibilityChange]);
+  }, [isVisible, isTransitioning, duration]);
 
   const handleAnimationDurationChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = parseInt(e.target.value);
-      if (
-        !isNaN(value) &&
-        value >= 100 &&
-        value <= 99999 &&
-        onAnimationDurationChange
-      ) {
-        onAnimationDurationChange(value);
+      if (!isNaN(value) && value >= 100 && value <= 99999) {
+        useAdminStore.getState().setAnimationDuration(value);
       }
     },
-    [onAnimationDurationChange]
+    []
   );
 
   const handleDurationIncrease = useCallback(() => {
-    if (onAnimationDurationChange) {
-      const newValue = Math.min(animationDuration + 500, 10000);
-      onAnimationDurationChange(newValue);
-    }
-  }, [animationDuration, onAnimationDurationChange]);
+    const newValue = Math.min((duration ?? 500) + 500, 10000);
+    useAdminStore.getState().setAnimationDuration(newValue);
+  }, [duration]);
 
   const handleDurationDecrease = useCallback(() => {
-    if (onAnimationDurationChange) {
-      const newValue = Math.max(animationDuration - 500, 100);
-      onAnimationDurationChange(newValue);
-    }
-  }, [animationDuration, onAnimationDurationChange]);
+    const newValue = Math.max((duration ?? 500) - 500, 100);
+    useAdminStore.getState().setAnimationDuration(newValue);
+  }, [duration]);
 
   // Функция для форматирования времени
-  const formatTime = (timestamp: number) => {
+  const formatTime = useCallback((timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
     });
-  };
+  }, []);
 
-  // Функция для форматирования времени открытия страницы
-  const formatPageOpenTime = () => {
-    const diff = currentTime - pageOpenTime; // Use currentTime
+  // Компонент, отвечающий только за отображение времени с момента открытия
+  const OpenDuration: React.FC<{ start: number }> = ({ start }) => {
+    const [now, setNow] = useState<number>(Date.now());
+    useEffect(() => {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
+    }, []);
+
+    const diff = Math.max(0, now - start);
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
 
-    if (hours > 0) {
-      return `${hours}ч ${minutes % 60}м ${seconds % 60}с`;
-    } else if (minutes > 0) {
-      return `${minutes}м ${seconds % 60}с`;
-    } else {
-      return `${seconds}с`;
-    }
+    if (hours > 0)
+      return (
+        <>
+          {hours}ч {minutes % 60}м {seconds % 60}с
+        </>
+      );
+    if (minutes > 0)
+      return (
+        <>
+          {minutes}м {seconds % 60}с
+        </>
+      );
+    return <>{seconds}с</>;
   };
 
   // Определяем, должна ли кнопка быть заблокирована
@@ -185,7 +177,7 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
                 </Button>
                 <Form.Control
                   type='number'
-                  value={animationDuration}
+                  value={duration}
                   onChange={handleAnimationDurationChange}
                   min={100}
                   max={10000}
@@ -222,7 +214,7 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
           <div className={styles.infoItem}>
             <PlayCircle size={14} color='#dc3545' />
             <span className={styles.infoText}>
-              Открыто: {formatPageOpenTime()}
+              Открыто: <OpenDuration start={pageOpenTime} />
             </span>
           </div>
 
@@ -240,4 +232,4 @@ const VisibilityCard: React.FC<VisibilityCardProps> = ({
   );
 };
 
-export default VisibilityCard;
+export default memo(VisibilityCard);

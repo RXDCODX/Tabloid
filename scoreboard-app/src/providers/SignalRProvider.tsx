@@ -1,74 +1,72 @@
-import * as signalR from '@microsoft/signalr';
-import React, { createContext, useEffect, useState } from 'react';
+import { HubConnection } from '@microsoft/signalr';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import * as signalR from 'react-signalr';
 
-export interface SignalRContextType {
-  connection: signalR.HubConnection | null;
-  automaticReconnect: boolean;
-  withCredentials: boolean;
-  url: string;
+export const Scoreboard = signalR.createSignalRContext({});
+
+// Создаем React Context для connection
+const ConnectionContext = createContext<HubConnection | null>(null);
+
+// Хук для получения connection
+export const useConnection = () => {
+  return useContext(ConnectionContext);
+};
+
+// Экспортируем как SignalRContext для совместимости
+export const SignalRContext = Scoreboard;
+
+interface SignalRProviderProps {
+  children: React.ReactNode;
 }
 
-export const SignalRContext = createContext<SignalRContextType>({
-  connection: null,
-  automaticReconnect: false,
-  withCredentials: false,
-  url: '',
-});
-
-// Провайдер для SignalR
-export const SignalRProvider: React.FC<{
-  children: React.ReactNode;
-  url: string;
-  withCredentials?: boolean;
-  automaticReconnect?: boolean;
-}> = ({
-  children,
-  url,
-  withCredentials = false,
-  automaticReconnect = true,
-}) => {
-  const [connection, setConnection] = useState<signalR.HubConnection | null>(
-    null
+function ConnectionProvider({ children }: { children: React.ReactNode }) {
+  const [connection, setConnection] = useState<HubConnection | null>(
+    Scoreboard.connection
   );
+
+  console.log('[ConnectionProvider] Render', {
+    currentConnection: connection,
+    scoreboardConnection: Scoreboard.connection,
+    state: connection?.state,
+  });
 
   useEffect(() => {
-    const newConnection = new signalR.HubConnectionBuilder()
-      .configureLogging(signalR.LogLevel.Debug)
-      .withUrl(url, {
-        withCredentials,
-      })
-      .withAutomaticReconnect()
-      .build();
-
-    // Не выставляем connection до успешного старта — компоненты не будут
-    // пытаться вызвать методы hub до того, как соединение действительно
-    // установлено. Это предотвращает ошибки "Cannot send data if the
-    // connection is not in the 'Connected' State.".
-    newConnection
-      .start()
-      .then(() => {
-        console.log('SignalR Connected');
-        setConnection(newConnection);
-      })
-      .catch(err => console.error('SignalR Connection Error: ', err));
-
-    return () => {
-      // stop актуального экземпляра (даже если не установлен в state)
-      newConnection.stop();
-      setConnection(null);
-    };
-  }, [url, withCredentials]);
+    console.log('[ConnectionProvider] useEffect triggered', {
+      scoreboardConnection: Scoreboard.connection,
+      currentConnection: connection,
+      areEqual: Scoreboard.connection === connection,
+    });
+    // Обновляем connection только когда он действительно изменился
+    if (Scoreboard.connection !== connection) {
+      console.log('[ConnectionProvider] Updating connection');
+      setConnection(Scoreboard.connection);
+    }
+  }, [Scoreboard.connection, connection]);
 
   return (
-    <SignalRContext.Provider
-      value={{
-        connection,
-        automaticReconnect,
-        withCredentials,
-        url,
-      }}
-    >
+    <ConnectionContext.Provider value={connection}>
       {children}
-    </SignalRContext.Provider>
+    </ConnectionContext.Provider>
   );
-};
+}
+
+export function ScoreboardSignalRHubWrapper({
+  children,
+}: SignalRProviderProps) {
+  return (
+    <Scoreboard.Provider
+      automaticReconnect={true}
+      onError={error => new Promise(resolve => resolve(console.log(error)))}
+      onClosed={event => console.log(event)}
+      onOpen={event => console.log(event)}
+      withCredentials={false}
+      url={import.meta.env.VITE_BASE_PATH + 'scoreboardHub'}
+      logMessageContent
+    >
+      <ConnectionProvider>{children}</ConnectionProvider>
+    </Scoreboard.Provider>
+  );
+}
+
+// Для удобства можно экспортировать Provider отдельно
+export const SignalRProvider = ScoreboardSignalRHubWrapper;

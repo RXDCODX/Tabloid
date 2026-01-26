@@ -219,26 +219,8 @@ public class ScoreboardStateService
             return;
         }
 
-        // Отправляем состояние клиентам сразу (как было ранее после записи)
-        try
-        {
-            var hubContext = _serviceCollection.GetRequiredService<IHubContext<ScoreboardHub>>();
-            hubContext.Clients.All.SendCoreAsync(
-                ScoreboardHub.MainReceiveStateMethodName,
-                [_state]
-            );
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Broadcasted state to clients");
-            }
-        }
-        catch (Exception ex)
-        {
-            if (_logger.IsEnabled(LogLevel.Error))
-            {
-                _logger.LogError(ex, "Failed to broadcast state to hub");
-            }
-        }
+        // ВАЖНО: НЕ отправляем состояние здесь, это делают методы Hub'а
+        // Двойная отправка через IHubContext и Hub может вызывать проблемы
 
         // Планируем отложенную запись с дебаунсом
         lock (_persistLock)

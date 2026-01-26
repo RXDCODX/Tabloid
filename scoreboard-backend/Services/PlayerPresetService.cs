@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dapper;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;
@@ -8,6 +10,11 @@ public class PlayerPresetService
     private readonly Lock _lock = new();
     private readonly ILogger<PlayerPresetService> _logger;
     private readonly DatabaseService _databaseService;
+
+    // In-memory cache keyed by preset name (case-insensitive)
+    private readonly Dictionary<string, PlayerPreset> _cache = new(
+        StringComparer.OrdinalIgnoreCase
+    );
 
     public PlayerPresetService(ILogger<PlayerPresetService> logger, DatabaseService databaseService)
     {
@@ -21,43 +28,62 @@ public class PlayerPresetService
             _databaseService.GetConnectionString(),
             count
         );
+
+        // Load cache from DB
+        try
+        {
+            LoadCache();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load player presets into cache");
+        }
     }
 
-    public IReadOnlyList<PlayerPreset> GetAll(int count = -1, string? startsWith = null)
+    private void LoadCache()
     {
         lock (_lock)
         {
             using var conn = _databaseService.GetConnection();
+            var sql =
+                "SELECT Name, Score, Tag, Final, Flag FROM player_presets ORDER BY rowid DESC";
+            var result = conn.Query<PlayerPreset>(sql).ToList();
 
-            var builder = new SqlBuilder();
-            var template = builder.AddTemplate(
-                """
-                SELECT Name, Score, Tag, Final, Flag FROM player_presets /**where**/ /**orderby**/
-                """
-            );
+            _cache.Clear();
+            foreach (var p in result)
+            {
+                var n = Normalize(p);
+                if (!_cache.ContainsKey(n.Name))
+                {
+                    _cache[n.Name] = n;
+                }
+            }
+        }
+    }
+
+    public List<PlayerPreset> GetAll(int count = -1, string? startsWith = null)
+    {
+        lock (_lock)
+        {
+            IEnumerable<PlayerPreset> q = _cache.Values;
 
             if (!string.IsNullOrWhiteSpace(startsWith))
             {
                 startsWith = startsWith.Trim();
-                builder.Where(
-                    "Name LIKE @pattern ESCAPE '\\' COLLATE NOCASE",
-                    new { pattern = startsWith + "%" }
-                );
+                q = q.Where(p => p.Name.StartsWith(startsWith, StringComparison.OrdinalIgnoreCase));
             }
 
-            builder.OrderBy("rowid DESC");
-
-            var sql = template.RawSql;
-            var parameters = new DynamicParameters(template.Parameters);
+            // Order by insertion (cache filled from DB with rowid DESC), but dictionary doesn't preserve that.
+            // For predictable ordering, order by Name descending similar to previous behavior using rowid DESC is not possible here,
+            // so order by Name descending to maintain deterministic results.
+            q = q.OrderByDescending(p => p.Name);
 
             if (count >= 0)
             {
-                sql += " LIMIT @limit";
-                parameters.Add("limit", count);
+                q = q.Take(count);
             }
 
-            var result = conn.Query<PlayerPreset>(sql, parameters).ToList();
-            return result;
+            return [.. q];
         }
     }
 
@@ -86,6 +112,9 @@ public class PlayerPresetService
 
             conn.Execute(sql, normalized);
 
+            // Update cache
+            _cache[normalized.Name] = normalized;
+
             _logger.LogInformation("Upserted player preset: {Name}", normalized.Name);
         }
     }
@@ -104,6 +133,9 @@ public class PlayerPresetService
 
             var sql = """DELETE FROM player_presets WHERE Name = @Name""";
             var removed = conn.Execute(sql, new { Name = name });
+
+            // Remove from cache
+            _cache.Remove(name);
 
             _logger.LogInformation("Removed {Count} presets with name {Name}", removed, name);
         }

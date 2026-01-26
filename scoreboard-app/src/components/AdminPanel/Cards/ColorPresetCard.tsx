@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { Palette } from 'react-bootstrap-icons';
-import { SignalRContextType } from '../../../providers/SignalRProvider';
+import { Scoreboard, useConnection } from '../../../providers/SignalRProvider';
+import { useAdminStore } from '../../../store/adminStateStore';
 import ColorPickerWithTransparency from '../Forms/ColorPickerWithTransparency';
 import { ColorPreset, defaultPreset } from '../types';
 import styles from './ColorPresetCard.module.scss';
 
 type ColorPresetCardProps = {
-  onColorChange: (colors: Partial<ColorPreset>) => void;
-  context: SignalRContextType;
+  // no external props; uses Zustand store internally
 };
 
 type ColorPresetModel = {
@@ -19,11 +19,16 @@ type ColorPresetModel = {
   scoreColor?: string;
 };
 
-const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
-  onColorChange,
-  context,
-}) => {
-  const signalRContext = context;
+const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
+  console.log('[ColorPresetCard] Render');
+
+  const connection = useConnection();
+  console.log('[ColorPresetCard] Connection:', connection?.state);
+
+  const handleColorChange = useCallback((colors: ColorPreset) => {
+    useAdminStore.getState().handleColorChange(colors);
+  }, []);
+
   const [customColors, setCustomColors] = useState<Partial<ColorPreset>>({
     playerNamesColor: defaultPreset.playerNamesColor,
     tournamentTitleColor: defaultPreset.tournamentTitleColor,
@@ -34,41 +39,39 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
 
   const handleReceiveColorPresets = useCallback(
     (presets: ColorPresetModel[]) => {
-      console.log('SignalR ReceiveColorPresets (ColorPresetCard):', presets);
+      console.log('[ColorPresetCard] SignalR ReceiveColorPresets', presets);
       setColorPresets(presets);
     },
     []
   );
 
+  // Подписка на SignalR события
+  Scoreboard.useSignalREffect(
+    'ReceiveColorPresets',
+    handleReceiveColorPresets,
+    [handleReceiveColorPresets]
+  );
+
   useEffect(() => {
-    onColorChange({
+    handleColorChange({
       playerNamesColor: defaultPreset.playerNamesColor,
       tournamentTitleColor: defaultPreset.tournamentTitleColor,
       fightModeColor: defaultPreset.fightModeColor,
       scoreColor: defaultPreset.scoreColor,
     });
-  }, [onColorChange]);
+  }, [handleColorChange]);
 
   useEffect(() => {
-    signalRContext.connection?.on(
-      'ReceiveColorPresets',
-      handleReceiveColorPresets
-    );
+    if (!connection || connection.state !== 'Connected') return;
+
     (async () => {
       try {
-        await signalRContext.connection?.invoke('GetColorPresets');
+        await connection.invoke('GetColorPresets');
       } catch (err) {
         console.error('Error fetching color presets:', err);
       }
     })();
-
-    return () => {
-      signalRContext.connection?.off(
-        'ReceiveColorPresets',
-        handleReceiveColorPresets
-      );
-    };
-  }, [signalRContext.connection]);
+  }, [connection]);
 
   const applyPreset = useCallback(
     (preset: ColorPresetModel) => {
@@ -83,27 +86,28 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
 
       // Обновим локально UI сразу
       setCustomColors(newColors);
-      onColorChange(newColors);
+      handleColorChange(newColors);
 
       // Посылаем на сервер
-      signalRContext.connection
-        ?.invoke('ApplyColorPreset', preset.name)
-        .catch(err => {
-          console.error('Error applying color preset:', err);
-        });
+      if (connection && connection.state === 'Connected') {
+        connection
+          .invoke('ApplyColorPreset', preset.name)
+          .catch((err: Error) => {
+            console.error('Error applying color preset:', err);
+          });
+      }
     },
-    [signalRContext.connection]
+    [connection, handleColorChange]
   );
 
   const handleCustomColorChange = useCallback(
     (field: keyof typeof customColors, value: string) => {
       const newColors = { ...customColors, [field]: value };
       setCustomColors(newColors);
-      onColorChange(newColors);
+      handleColorChange(newColors);
     },
-    [customColors, onColorChange]
+    [customColors, handleColorChange]
   );
-
   return (
     <Card className={styles.colorPresetCard}>
       <Card.Body>
@@ -206,4 +210,4 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = ({
   );
 };
 
-export default ColorPresetCard;
+export default memo(ColorPresetCard);
