@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using scoreboard_backend.Hubs;
 using scoreboard_backend.Models;
 using scoreboard_backend.Services;
 
@@ -8,17 +10,27 @@ namespace scoreboard_backend.Controllers;
 [Route("api/[controller]")]
 public class BackgroundImagesController(
     ScoreboardStateService service,
-    BackgroundImagesService backgroundImagesService
+    BackgroundImagesService backgroundImagesService,
+    IHubContext<ScoreboardHub> hubContext
 ) : Controller
 {
     [HttpPost]
-    public ActionResult UpdateBackgroundImage(
+    public async Task<ActionResult> UpdateBackgroundImage(
         [FromForm] ImageType imageType,
         [FromForm] IFormFile? file
     )
     {
         if (file != null)
         {
+            // Validate file type
+            var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".webm", ".mov" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                return BadRequest($"Unsupported file type. Allowed: {string.Join(", ", allowedExtensions)}");
+            }
+
             var backgroundImage = new BackgroundImage()
             {
                 ImageName = Enum.GetName(imageType) + Path.GetExtension(file.FileName),
@@ -28,6 +40,12 @@ public class BackgroundImagesController(
             };
 
             service.UpdateBackgroundImage(backgroundImage);
+            
+            // Отправляем обновленное состояние всем клиентам через SignalR
+            await hubContext.Clients.All.SendAsync(
+                ScoreboardHub.MainReceiveStateMethodName,
+                service.GetState()
+            );
         }
         else
         {
@@ -38,7 +56,7 @@ public class BackgroundImagesController(
     }
 
     [HttpDelete]
-    public ActionResult DeleteImage([FromForm] ImageType imageType)
+    public async Task<ActionResult> DeleteImage([FromForm] ImageType imageType)
     {
         try
         {
@@ -50,6 +68,12 @@ public class BackgroundImagesController(
                     ImageType = imageType,
                     ImageName = string.Empty,
                 }
+            );
+
+            // Отправляем обновленное состояние всем клиентам через SignalR
+            await hubContext.Clients.All.SendAsync(
+                ScoreboardHub.MainReceiveStateMethodName,
+                service.GetState()
             );
 
             return Ok();
@@ -69,6 +93,12 @@ public class BackgroundImagesController(
             var state = service.GetState();
             state.Images = new Images();
             service.SetState(state);
+            
+            // Отправляем обновленное состояние всем клиентам через SignalR
+            await hubContext.Clients.All.SendAsync(
+                ScoreboardHub.MainReceiveStateMethodName,
+                service.GetState()
+            );
         }
         catch (Exception e)
         {

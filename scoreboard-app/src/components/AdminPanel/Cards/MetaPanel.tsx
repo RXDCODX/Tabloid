@@ -7,28 +7,31 @@ import styles from './MetaPanel.module.scss';
 
 const MetaPanel: React.FC = () => {
   const meta = useAdminStore(useShallow(s => s.meta));
-  const [customFightRule, setCustomFightRule] = useState(meta.fightRule || '');
+  const [isCustomMode, setIsCustomMode] = useState(false);
+  const [customFightRule, setCustomFightRule] = useState('');
 
   const fightRules = ['FT1', 'FT2', 'FT3', 'FT4', 'FT5'];
 
   const handleFightRuleChange = useCallback(
     (rule: string) => {
       const setMeta = useAdminStore.getState().setMeta;
-      setMeta({ ...meta, fightRule: rule });
-      if (fightRules.includes(rule) || rule === 'None') {
-        setCustomFightRule(''); // сбрасываем customFightRule
+      if (rule === 'Custom') {
+        setIsCustomMode(true);
+        setMeta({ ...meta, fightRule: customFightRule || 'Custom' });
       } else {
-        setCustomFightRule(rule);
+        setIsCustomMode(false);
+        setCustomFightRule('');
+        setMeta({ ...meta, fightRule: rule });
       }
     },
-    [fightRules, meta]
+    [customFightRule, meta]
   );
 
   const handleCustomFightRuleChange = useCallback(
     (value: string) => {
       setCustomFightRule(value);
       const setMeta = useAdminStore.getState().setMeta;
-      setMeta({ ...meta, fightRule: value });
+      setMeta({ ...meta, fightRule: value || 'Custom' });
     },
     [meta]
   );
@@ -106,32 +109,18 @@ const MetaPanel: React.FC = () => {
 
             <div className='d-flex flex-column gap-2'>
               <Button
-                variant={
-                  meta.fightRule === 'Custom' ||
-                  (!fightRules.includes(meta.fightRule) &&
-                    meta.fightRule !== 'None')
-                    ? 'primary'
-                    : 'outline-primary'
-                }
+                variant={isCustomMode ? 'primary' : 'outline-primary'}
                 onClick={() => handleFightRuleChange('Custom')}
                 className={`${styles.customButton} fw-bold`}
                 style={
                   {
-                    '--button-bg':
-                      meta.fightRule === 'Custom' ||
-                      (!fightRules.includes(meta.fightRule) &&
-                        meta.fightRule !== 'None')
-                        ? '#0d6efd'
-                        : 'transparent',
+                    '--button-bg': isCustomMode ? '#0d6efd' : 'transparent',
                   } as React.CSSProperties
                 }
               >
                 Custom
               </Button>
-              {(meta.fightRule === 'Custom' ||
-                (customFightRule &&
-                  !fightRules.includes(meta.fightRule) &&
-                  meta.fightRule !== 'None')) && (
+              {isCustomMode && (
                 <Form.Control
                   type='text'
                   placeholder='Кастомный режим (например: FT10, BO3)'

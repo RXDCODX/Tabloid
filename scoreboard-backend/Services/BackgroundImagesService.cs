@@ -242,6 +242,10 @@ public class BackgroundImagesService
             ".jpg" => "image/jpeg",
             ".jpeg" => "image/jpeg",
             ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            ".mp4" => "video/mp4",
+            ".webm" => "video/webm",
+            ".mov" => "video/quicktime",
             _ => "application/octet-stream",
         };
     }

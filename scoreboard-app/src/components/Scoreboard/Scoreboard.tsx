@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../store/adminStateStore';
+import MediaBackground from './MediaBackground';
 import styles from './Scoreboard.module.scss';
 
 const Scoreboard: React.FC = () => {
@@ -81,6 +82,11 @@ const Scoreboard: React.FC = () => {
           backgroundRepeat: 'no-repeat',
         }
       : {};
+
+  // Функция для проверки, является ли файл видео
+  const isVideoFile = (imageName?: string) => {
+    return imageName ? /\.(mp4|webm|mov)$/i.test(imageName) : false;
+  };
 
   // Функция для проверки, нужно ли отображать див режима драки
   const shouldShowFightMode = () => {
@@ -179,10 +185,24 @@ const Scoreboard: React.FC = () => {
             right: layout?.center?.right,
             width: layout?.center?.width,
             height: layout?.center?.height,
-            ...bgStyleFor(imgs?.centerImage as any),
+            position: 'absolute',
+            ...(isVideoFile(imgs?.centerImage?.imageName)
+              ? {}
+              : bgStyleFor(imgs?.centerImage as any)),
           }}
         >
-          <h5 id='metaTitle' style={{ color: c.tournamentTitleColor }}>
+          {isVideoFile(imgs?.centerImage?.imageName) && (
+            <MediaBackground imageName={imgs?.centerImage?.imageName} />
+          )}
+          <h5
+            id='metaTitle'
+            style={{
+              color: c.tournamentTitleColor,
+              position: 'absolute',
+
+              zIndex: 1,
+            }}
+          >
             {m.title}
           </h5>
         </motion.div>
@@ -200,10 +220,20 @@ const Scoreboard: React.FC = () => {
             right: layout?.left?.right,
             width: layout?.left?.width,
             height: layout?.left?.height,
-            ...bgStyleFor(imgs?.leftImage as any),
+            position: 'absolute',
+
+            ...(isVideoFile(imgs?.leftImage?.imageName)
+              ? {}
+              : bgStyleFor(imgs?.leftImage as any)),
           }}
         >
-          <div className={styles.playerInfo}>
+          {isVideoFile(imgs?.leftImage?.imageName) && (
+            <MediaBackground imageName={imgs?.leftImage?.imageName} />
+          )}
+          <div
+            className={styles.playerInfo}
+            style={{ position: 'absolute', zIndex: 1 }}
+          >
             <h4
               className={styles.playerName}
               style={{ color: c.playerNamesColor }}
@@ -232,6 +262,8 @@ const Scoreboard: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
+                position: 'absolute',
+                zIndex: 1,
               }}
             >
               <img
@@ -251,7 +283,10 @@ const Scoreboard: React.FC = () => {
               />
             </div>
           )}
-          <div className={styles.score}>
+          <div
+            className={styles.score}
+            style={{ position: 'absolute', zIndex: 1 }}
+          >
             <h2 data-side='left' style={{ color: c.scoreColor }}>
               {p1.score}
             </h2>
@@ -271,10 +306,19 @@ const Scoreboard: React.FC = () => {
             right: layout?.right?.right,
             width: layout?.right?.width,
             height: layout?.right?.height,
-            ...bgStyleFor(imgs?.rightImage as any),
+            position: 'absolute',
+            ...(isVideoFile(imgs?.rightImage?.imageName)
+              ? {}
+              : bgStyleFor(imgs?.rightImage as any)),
           }}
         >
-          <div className={styles.score}>
+          {isVideoFile(imgs?.rightImage?.imageName) && (
+            <MediaBackground imageName={imgs?.rightImage?.imageName} />
+          )}
+          <div
+            className={styles.score}
+            style={{ position: 'absolute', zIndex: 1 }}
+          >
             <h2 data-side='right' style={{ color: c.scoreColor }}>
               {p2.score}
             </h2>
@@ -289,6 +333,8 @@ const Scoreboard: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
+                position: 'absolute',
+                zIndex: 1,
               }}
             >
               <img
@@ -308,7 +354,10 @@ const Scoreboard: React.FC = () => {
               />
             </div>
           )}
-          <div className={styles.playerInfo}>
+          <div
+            className={styles.playerInfo}
+            style={{ position: 'absolute', zIndex: 1 }}
+          >
             <h4
               className={styles.playerName}
               style={{ color: c.playerNamesColor }}
@@ -343,10 +392,24 @@ const Scoreboard: React.FC = () => {
               right: layout?.fightMode?.right,
               width: layout?.fightMode?.width,
               height: layout?.fightMode?.height,
-              ...bgStyleFor(imgs?.fightModeImage as any),
+              position: 'absolute',
+              ...(isVideoFile(imgs?.fightModeImage?.imageName)
+                ? {}
+                : bgStyleFor(imgs?.fightModeImage as any)),
             }}
           >
-            <h4 style={{ color: c.fightModeColor }}>{m.fightRule}</h4>
+            {isVideoFile(imgs?.fightModeImage?.imageName) && (
+              <MediaBackground imageName={imgs?.fightModeImage?.imageName} />
+            )}
+            <h4
+              style={{
+                color: c.fightModeColor,
+                position: 'absolute',
+                zIndex: 1,
+              }}
+            >
+              {m.fightRule}
+            </h4>
           </motion.div>
         )}
       </motion.div>

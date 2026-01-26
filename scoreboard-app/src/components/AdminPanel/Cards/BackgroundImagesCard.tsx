@@ -35,8 +35,35 @@ const BackgroundImagesCard: React.FC = () => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      if (!file.type.startsWith('image/')) {
-        alert('Пожалуйста, выберите файл изображения');
+      // Проверка типа файла: изображения или видео
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+
+      if (!isImage && !isVideo) {
+        alert('Пожалуйста, выберите файл изображения или видео');
+        return;
+      }
+
+      // Проверка расширения файла
+      const allowedExtensions = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.webp',
+        '.mp4',
+        '.webm',
+        '.mov',
+      ];
+      const fileName = file.name.toLowerCase();
+      const hasValidExtension = allowedExtensions.some(ext =>
+        fileName.endsWith(ext)
+      );
+
+      if (!hasValidExtension) {
+        alert(
+          'Поддерживаемые форматы: PNG, JPG, JPEG, GIF, WebP, MP4, WebM, MOV'
+        );
         return;
       }
 
@@ -47,8 +74,21 @@ const BackgroundImagesCard: React.FC = () => {
 
       try {
         await BackgroundImageService.updateImage(imageType, file);
+
+        // Обновляем состояние после успешной загрузки
+        const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
+        const imageName = `${imageType}${fileExtension}`;
+
+        useAdminStore.getState().setBackgroundImages({
+          ...backgroundImages,
+          [field]: {
+            imageName: imageName,
+            isShouldExists: true,
+            imageType: imageType,
+          },
+        });
       } catch (e: any) {
-        alert('Не удалось загрузить изображение: ' + (e.message || e));
+        alert('Не удалось загрузить файл: ' + (e.message || e));
         useAdminStore.getState().setBackgroundImages({
           ...backgroundImages,
           [field]: undefined,
@@ -117,6 +157,12 @@ const BackgroundImagesCard: React.FC = () => {
         : undefined;
       const hasImage = f ? backgroundImage?.isShouldExists : undefined;
 
+      // Определяем, является ли файл видео по расширению
+      const isVideo =
+        hasImage && backgroundImage?.imageName
+          ? /\.(mp4|webm|mov)$/i.test(backgroundImage.imageName)
+          : false;
+
       return (
         <Col md={6} className='mb-3'>
           <Form.Group>
@@ -127,14 +173,27 @@ const BackgroundImagesCard: React.FC = () => {
             >
               {hasImage ? (
                 <div className={styles.imagePreview}>
-                  <img
-                    src={
-                      '/Images/' +
-                      (hasImage ? backgroundImage?.imageName || '' : '')
-                    }
-                    alt={`Preview for ${label}`}
-                    className={styles.previewImage}
-                  />
+                  {isVideo ? (
+                    <video
+                      src={
+                        '/Images/' +
+                        (hasImage ? backgroundImage?.imageName || '' : '')
+                      }
+                      className={styles.previewImage}
+                      autoPlay
+                      loop
+                      muted
+                    />
+                  ) : (
+                    <img
+                      src={
+                        '/Images/' +
+                        (hasImage ? backgroundImage?.imageName || '' : '')
+                      }
+                      alt={`Preview for ${label}`}
+                      className={styles.previewImage}
+                    />
+                  )}
                   <Button
                     variant='danger'
                     size='sm'
@@ -156,7 +215,7 @@ const BackgroundImagesCard: React.FC = () => {
               <input
                 ref={fileInputRefs[field] as React.RefObject<HTMLInputElement>}
                 type='file'
-                accept='image/*'
+                accept='image/*,video/mp4,video/webm,video/quicktime'
                 onChange={e => handleImageUpload(field, e)}
                 className={styles.hiddenInput}
               />
@@ -198,7 +257,8 @@ const BackgroundImagesCard: React.FC = () => {
         </Row>
 
         <Form.Text className={styles.commonDescription}>
-          Изображение будет отображаться растянутыми на весь блок
+          Изображение или видео будет отображаться растянутым на весь блок.
+          Поддерживаемые форматы: PNG, JPG, JPEG, GIF, WebP, MP4, WebM, MOV
         </Form.Text>
 
         <div className='mt-3'>
