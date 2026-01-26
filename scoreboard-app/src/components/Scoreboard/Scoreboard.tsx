@@ -185,7 +185,6 @@ const Scoreboard: React.FC = () => {
             right: layout?.center?.right,
             width: layout?.center?.width,
             height: layout?.center?.height,
-            position: 'absolute',
             ...(isVideoFile(imgs?.centerImage?.imageName)
               ? {}
               : bgStyleFor(imgs?.centerImage as any)),
@@ -198,8 +197,7 @@ const Scoreboard: React.FC = () => {
             id='metaTitle'
             style={{
               color: c.tournamentTitleColor,
-              position: 'absolute',
-
+              position: 'relative',
               zIndex: 1,
             }}
           >
@@ -220,8 +218,6 @@ const Scoreboard: React.FC = () => {
             right: layout?.left?.right,
             width: layout?.left?.width,
             height: layout?.left?.height,
-            position: 'absolute',
-
             ...(isVideoFile(imgs?.leftImage?.imageName)
               ? {}
               : bgStyleFor(imgs?.leftImage as any)),
@@ -232,7 +228,7 @@ const Scoreboard: React.FC = () => {
           )}
           <div
             className={styles.playerInfo}
-            style={{ position: 'absolute', zIndex: 1 }}
+            style={{ position: 'relative', zIndex: 1 }}
           >
             <h4
               className={styles.playerName}
@@ -256,13 +252,7 @@ const Scoreboard: React.FC = () => {
             <div
               className={styles.flag}
               style={{
-                width: 40,
-                height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                position: 'absolute',
+                position: 'relative',
                 zIndex: 1,
               }}
             >
@@ -285,7 +275,7 @@ const Scoreboard: React.FC = () => {
           )}
           <div
             className={styles.score}
-            style={{ position: 'absolute', zIndex: 1 }}
+            style={{ position: 'relative', zIndex: 1 }}
           >
             <h2 data-side='left' style={{ color: c.scoreColor }}>
               {p1.score}
@@ -306,7 +296,6 @@ const Scoreboard: React.FC = () => {
             right: layout?.right?.right,
             width: layout?.right?.width,
             height: layout?.right?.height,
-            position: 'absolute',
             ...(isVideoFile(imgs?.rightImage?.imageName)
               ? {}
               : bgStyleFor(imgs?.rightImage as any)),
@@ -317,7 +306,7 @@ const Scoreboard: React.FC = () => {
           )}
           <div
             className={styles.score}
-            style={{ position: 'absolute', zIndex: 1 }}
+            style={{ position: 'relative', zIndex: 1 }}
           >
             <h2 data-side='right' style={{ color: c.scoreColor }}>
               {p2.score}
@@ -327,13 +316,7 @@ const Scoreboard: React.FC = () => {
             <div
               className={styles.flag}
               style={{
-                width: 40,
-                height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                position: 'absolute',
+                position: 'relative',
                 zIndex: 1,
               }}
             >
@@ -356,7 +339,7 @@ const Scoreboard: React.FC = () => {
           )}
           <div
             className={styles.playerInfo}
-            style={{ position: 'absolute', zIndex: 1 }}
+            style={{ position: 'relative', zIndex: 1 }}
           >
             <h4
               className={styles.playerName}
@@ -392,7 +375,6 @@ const Scoreboard: React.FC = () => {
               right: layout?.fightMode?.right,
               width: layout?.fightMode?.width,
               height: layout?.fightMode?.height,
-              position: 'absolute',
               ...(isVideoFile(imgs?.fightModeImage?.imageName)
                 ? {}
                 : bgStyleFor(imgs?.fightModeImage as any)),
@@ -404,7 +386,7 @@ const Scoreboard: React.FC = () => {
             <h4
               style={{
                 color: c.fightModeColor,
-                position: 'absolute',
+                position: 'relative',
                 zIndex: 1,
               }}
             >
