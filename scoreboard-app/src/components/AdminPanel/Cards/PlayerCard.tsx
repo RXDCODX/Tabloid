@@ -149,6 +149,21 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     }
   }, [connection, playerNumber]);
 
+  const handleDropdownWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      const el = e.currentTarget;
+      const deltaY = e.deltaY;
+      const atTop = el.scrollTop === 0;
+      const atBottom =
+        Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
+
+      if ((deltaY < 0 && atTop) || (deltaY > 0 && atBottom)) {
+        e.preventDefault();
+      }
+    },
+    []
+  );
+
   return (
     <Card
       className={`${styles.playerCard} shadow-lg p-4 mb-2 player-card-responsive`}
@@ -195,7 +210,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               className={`form-control form-control-sm ${styles.nameInput} fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100`}
             />
             {isNameOpen && filteredPresets.length > 0 && (
-              <div className={styles.presetsDropdown}>
+              <div
+                className={styles.presetsDropdown}
+                onWheel={handleDropdownWheel}
+              >
                 {filteredPresets.map((p: Player) => (
                   <div
                     key={`${p.name}-${p.tag}-${p.flag}`}
