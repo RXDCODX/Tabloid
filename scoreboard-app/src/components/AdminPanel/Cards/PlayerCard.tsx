@@ -57,12 +57,11 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     (data: Player[]) => {
       const normalized: Player[] = (Array.isArray(data) ? data : []).map(
         (p: any) => {
-          const rawFlag =
-            p.player1?.flag || p.player1?.country || p.flag || p.country || '';
+          const rawFlag = p.flag || p.country || '';
           const flagCode = getCountryCodeFromValue(rawFlag);
           return {
-            name: p.player1?.name || p.name || '',
-            tag: p.player1?.tag || '',
+            name: p.name || '',
+            tag: p.tag || '',
             flag: flagCode || '',
             final: 'none',
             score: 0,
