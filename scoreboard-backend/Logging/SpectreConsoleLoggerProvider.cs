@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Spectre.Console;
 
 namespace scoreboard_backend.Logging;
@@ -10,9 +9,7 @@ public class SpectreConsoleLoggerProvider : ILoggerProvider
         return new SpectreConsoleLogger(categoryName);
     }
 
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 }
 
 public class SpectreConsoleLogger : ILogger
@@ -24,7 +21,8 @@ public class SpectreConsoleLogger : ILogger
         _categoryName = categoryName;
     }
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
         return null;
     }
@@ -74,7 +72,8 @@ public class SpectreConsoleLogger : ILogger
 
         var timestamp = DateTime.Now.ToString("HH:mm:ss");
 
-        var logLine = $"[dim]{timestamp}[/] [{logColor}]{logLevelShort}[/] [blue]{categoryShort}[/]: {Markup.Escape(message)}";
+        var logLine =
+            $"[dim]{timestamp}[/] [{logColor}]{logLevelShort}[/] [blue]{categoryShort}[/]: {Markup.Escape(message)}";
 
         ConsoleDisplayManager.Instance.WriteLog(logLine);
 

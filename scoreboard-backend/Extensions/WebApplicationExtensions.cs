@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Builder;
-using Spectre.Console;
 using scoreboard_backend.Logging;
+using Spectre.Console;
 
 namespace scoreboard_backend;
 

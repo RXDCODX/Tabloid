@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-namespace scoreboard_backend.Services;
+﻿namespace scoreboard_backend.Services;
 
 public class IniConfig
 {

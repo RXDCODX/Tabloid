@@ -23,12 +23,24 @@ public class BackgroundImagesController(
         if (file != null)
         {
             // Validate file type
-            var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".webm", ".mov" };
+            var allowedExtensions = new[]
+            {
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".gif",
+                ".webp",
+                ".mp4",
+                ".webm",
+                ".mov",
+            };
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            
+
             if (!allowedExtensions.Contains(fileExtension))
             {
-                return BadRequest($"Unsupported file type. Allowed: {string.Join(", ", allowedExtensions)}");
+                return BadRequest(
+                    $"Unsupported file type. Allowed: {string.Join(", ", allowedExtensions)}"
+                );
             }
 
             var backgroundImage = new BackgroundImage()
@@ -40,7 +52,7 @@ public class BackgroundImagesController(
             };
 
             service.UpdateBackgroundImage(backgroundImage);
-            
+
             // Отправляем обновленное состояние всем клиентам через SignalR
             await hubContext.Clients.All.SendAsync(
                 ScoreboardHub.MainReceiveStateMethodName,
@@ -93,7 +105,7 @@ public class BackgroundImagesController(
             var state = service.GetState();
             state.Images = new Images();
             service.SetState(state);
-            
+
             // Отправляем обновленное состояние всем клиентам через SignalR
             await hubContext.Clients.All.SendAsync(
                 ScoreboardHub.MainReceiveStateMethodName,

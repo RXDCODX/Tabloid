@@ -1,11 +1,8 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+﻿using Microsoft.AspNetCore.HttpLogging;
 using scoreboard_backend.Hubs;
 using scoreboard_backend.Logging;
 using scoreboard_backend.Serialization;
 using scoreboard_backend.Services;
-using Spectre.Console;
 
 namespace scoreboard_backend;
 

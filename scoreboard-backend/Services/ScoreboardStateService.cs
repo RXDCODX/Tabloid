@@ -1,9 +1,4 @@
 ﻿using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-using scoreboard_backend.Hubs;
 using scoreboard_backend.Models;
 using scoreboard_backend.Serialization;
 

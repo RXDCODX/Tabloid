@@ -8,7 +8,7 @@ public class ConsoleDisplayManager
     private static ConsoleDisplayManager? _instance;
     private static readonly object _instanceLock = new();
     private readonly object _writeLock = new();
-    
+
     private IRenderable? _headerContent;
     private int _headerHeight;
     private int _logStartLine;
@@ -29,9 +29,7 @@ public class ConsoleDisplayManager
         }
     }
 
-    private ConsoleDisplayManager()
-    {
-    }
+    private ConsoleDisplayManager() { }
 
     public void Initialize(IRenderable headerContent)
     {
@@ -41,19 +39,18 @@ public class ConsoleDisplayManager
                 return;
 
             _headerContent = headerContent;
-            
+
             Console.Clear();
             Console.CursorVisible = false;
 
             // Рендерим заголовок и определяем его высоту
-            var tempConsole = AnsiConsole.Create(new AnsiConsoleSettings
-            {
-                Out = new AnsiConsoleOutput(Console.Out)
-            });
+            var tempConsole = AnsiConsole.Create(
+                new AnsiConsoleSettings { Out = new AnsiConsoleOutput(Console.Out) }
+            );
 
             // Сохраняем текущую позицию
             var startPos = Console.CursorTop;
-            
+
             AnsiConsole.Write(headerContent);
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new Rule("[dim]Логи приложения[/]") { Style = Style.Parse("dim") });
@@ -61,7 +58,7 @@ public class ConsoleDisplayManager
 
             _headerHeight = Console.CursorTop - startPos;
             _logStartLine = Console.CursorTop;
-            
+
             _initialized = true;
         }
     }
@@ -94,23 +91,23 @@ public class ConsoleDisplayManager
             return;
 
         var currentLogLine = Console.CursorTop;
-        
+
         // Возвращаемся в начало
         Console.SetCursorPosition(0, 0);
-        
+
         // Очищаем область заголовка
         for (int i = 0; i < _headerHeight; i++)
         {
             Console.Write(new string(' ', Console.WindowWidth));
         }
-        
+
         // Возвращаемся в начало и перерисовываем
         Console.SetCursorPosition(0, 0);
         AnsiConsole.Write(_headerContent);
         AnsiConsole.WriteLine();
         AnsiConsole.Write(new Rule("[dim]Логи приложения[/]") { Style = Style.Parse("dim") });
         AnsiConsole.WriteLine();
-        
+
         // Возвращаемся к логам
         Console.SetCursorPosition(0, currentLogLine);
     }

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using scoreboard_backend.Models;
+﻿using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;
 

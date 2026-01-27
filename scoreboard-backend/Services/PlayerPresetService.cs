@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Dapper;
+﻿using Dapper;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;

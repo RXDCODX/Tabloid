@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Services;

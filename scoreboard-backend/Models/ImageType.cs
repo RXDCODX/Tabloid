@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace scoreboard_backend.Models;
+﻿namespace scoreboard_backend.Models;
 
 public enum ImageType
 {
