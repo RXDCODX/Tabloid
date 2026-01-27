@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using scoreboard_backend.Hubs;
+using scoreboard_backend.Logging;
 using scoreboard_backend.Serialization;
 using scoreboard_backend.Services;
+using Spectre.Console;
 
 namespace scoreboard_backend;
 
@@ -12,6 +14,10 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Настраиваем логирование с использованием Spectre.Console для всех режимов
+        builder.Logging.ClearProviders();
+        builder.Logging.AddProvider(new SpectreConsoleLoggerProvider());
 
         // Добавляем SPA сервисы
         builder.Services.AddSpaYarp();
@@ -56,7 +62,11 @@ public static class Program
             {
                 options.LoggingFields = HttpLoggingFields.All;
             });
-            builder.Logging.SetMinimumLevel(LogLevel.Trace);
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+        }
+        else
+        {
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
         }
 
         var app = builder.Build();
@@ -69,32 +79,6 @@ public static class Program
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseHttpLogging();
-        }
-        else
-        {
-            // Красивое сообщение о доступности страниц
-            var adminUrl = "http://localhost:5035/adminpanel";
-            var scoreboardUrl = "http://localhost:5035/scoreboard";
-            var oldColor = Console.ForegroundColor;
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(
-                "═══════════════════════════════════════════════════════════════════════════"
-            );
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("★ Добро пожаловать в Fighting ScoreBoard! ★");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(
-                $"""
-                🛡️  Админ-панель:                    {adminUrl}
-                🏆  Scoreboard (вставить в обс):     {scoreboardUrl}
-                
-                """
-            );
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(
-                "═══════════════════════════════════════════════════════════════════════════"
-            );
         }
 
         // Настройки для статических файлов с предотвращением кеширования
@@ -129,6 +113,9 @@ public static class Program
 
         app.MapHub<ScoreboardHub>("/scoreboardHub");
         app.MapControllers();
+
+        // Выводим приветственную панель через метод-расширение
+        app.ShowWelcomePanel();
 
         app.Run();
     }

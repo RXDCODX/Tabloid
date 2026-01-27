@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { Image } from 'react-bootstrap-icons';
 import { useAdminStore } from '../../../store/adminStateStore';
@@ -6,81 +6,177 @@ import { BackgroundImage, ImageType, Images } from '../../../types/types';
 import { BackgroundImageService } from '../services/BackgroundImagesService';
 import styles from './BackgroundImagesCard.module.scss';
 
-const BackgroundImagesCard: React.FC = () => {
-  const backgroundImages = useAdminStore(s => s.backgroundImages);
-  const fileInputRefs: Record<
-    ImageType,
-    React.RefObject<HTMLInputElement | null>
-  > = {
-    [ImageType.TopImage]: useRef<HTMLInputElement>(null),
-    [ImageType.LeftImage]: useRef<HTMLInputElement>(null),
-    [ImageType.RightImage]: useRef<HTMLInputElement>(null),
-    [ImageType.FightModeImage]: useRef<HTMLInputElement>(null),
-    [ImageType.None]: useRef<HTMLInputElement>(null),
-  };
+const IMAGE_TYPE_TO_FIELD: Record<ImageType, keyof Images | undefined> = {
+  [ImageType.TopImage]: 'centerImage',
+  [ImageType.LeftImage]: 'leftImage',
+  [ImageType.RightImage]: 'rightImage',
+  [ImageType.FightModeImage]: 'fightModeImage',
+  [ImageType.None]: undefined,
+};
 
-  const IMAGE_TYPE_TO_FIELD: Record<ImageType, keyof Images | undefined> = {
-    [ImageType.TopImage]: 'centerImage',
-    [ImageType.LeftImage]: 'leftImage',
-    [ImageType.RightImage]: 'rightImage',
-    [ImageType.FightModeImage]: 'fightModeImage',
-    [ImageType.None]: undefined,
-  };
+interface ImageUploadFieldProps {
+  field: ImageType;
+  label: string;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  onImageUpload: (imageType: ImageType, file: File) => void;
+  onRemoveImage: (imageType: ImageType) => void;
+}
+
+const ImageUploadField = memo<ImageUploadFieldProps>(
+  ({ field, label, fileInputRef, onImageUpload, onRemoveImage }) => {
+    const f = IMAGE_TYPE_TO_FIELD[field];
+    const backgroundImage = useAdminStore(
+      useCallback(
+        s =>
+          f
+            ? (s.backgroundImages[f] as BackgroundImage | undefined)
+            : undefined,
+        [f]
+      )
+    );
+    const hasImage = backgroundImage?.isShouldExists;
+
+    const isVideo = useMemo(
+      () =>
+        hasImage && backgroundImage?.imageName
+          ? /\.(mp4|webm|mov)$/i.test(backgroundImage.imageName)
+          : false,
+      [hasImage, backgroundImage?.imageName]
+    );
+
+    const handleFileChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const isImage = file.type.startsWith('image/');
+        const isVideo = file.type.startsWith('video/');
+
+        if (!isImage && !isVideo) {
+          alert('Пожалуйста, выберите файл изображения или видео');
+          return;
+        }
+
+        const allowedExtensions = [
+          '.png',
+          '.jpg',
+          '.jpeg',
+          '.gif',
+          '.webp',
+          '.mp4',
+          '.webm',
+          '.mov',
+        ];
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = allowedExtensions.some(ext =>
+          fileName.endsWith(ext)
+        );
+
+        if (!hasValidExtension) {
+          alert(
+            'Поддерживаемые форматы: PNG, JPG, JPEG, GIF, WebP, MP4, WebM, MOV'
+          );
+          return;
+        }
+
+        onImageUpload(field, file);
+      },
+      [field, onImageUpload]
+    );
+
+    const handleContainerClick = useCallback(() => {
+      fileInputRef.current?.click();
+    }, [fileInputRef]);
+
+    const handleRemove = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onRemoveImage(field);
+      },
+      [field, onRemoveImage]
+    );
+
+    return (
+      <Col md={6} className='mb-3'>
+        <Form.Group>
+          <Form.Label className={styles.brightLabel}>{label}</Form.Label>
+          <div
+            className={styles.imageUploadContainer}
+            onClick={handleContainerClick}
+          >
+            {hasImage ? (
+              <div className={styles.imagePreview}>
+                {isVideo ? (
+                  <video
+                    src={'/Images/' + (backgroundImage?.imageName || '')}
+                    className={styles.previewImage}
+                    autoPlay
+                    loop
+                    muted
+                  />
+                ) : (
+                  <img
+                    src={'/Images/' + (backgroundImage?.imageName || '')}
+                    alt={`Preview for ${label}`}
+                    className={styles.previewImage}
+                  />
+                )}
+                <Button
+                  variant='danger'
+                  size='sm'
+                  className={styles.removeButton}
+                  onClick={handleRemove}
+                >
+                  ×
+                </Button>
+              </div>
+            ) : (
+              <div className={styles.uploadPlaceholder}>
+                <div className={styles.uploadIcon}>📷</div>
+                <div className={styles.uploadText}>Нажмите для загрузки</div>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type='file'
+              accept='image/*,video/mp4,video/webm,video/quicktime'
+              onChange={handleFileChange}
+              className={styles.hiddenInput}
+            />
+          </div>
+        </Form.Group>
+      </Col>
+    );
+  }
+);
+
+ImageUploadField.displayName = 'ImageUploadField';
+
+const BackgroundImagesCard: React.FC = () => {
+  const fileInputRefs = useMemo(
+    () => ({
+      [ImageType.TopImage]: React.createRef<HTMLInputElement>(),
+      [ImageType.LeftImage]: React.createRef<HTMLInputElement>(),
+      [ImageType.RightImage]: React.createRef<HTMLInputElement>(),
+      [ImageType.FightModeImage]: React.createRef<HTMLInputElement>(),
+      [ImageType.None]: React.createRef<HTMLInputElement>(),
+    }),
+    []
+  );
 
   const handleImageUpload = useCallback(
-    async (
-      imageType: ImageType,
-      event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      // Проверка типа файла: изображения или видео
-      const isImage = file.type.startsWith('image/');
-      const isVideo = file.type.startsWith('video/');
-
-      if (!isImage && !isVideo) {
-        alert('Пожалуйста, выберите файл изображения или видео');
-        return;
-      }
-
-      // Проверка расширения файла
-      const allowedExtensions = [
-        '.png',
-        '.jpg',
-        '.jpeg',
-        '.gif',
-        '.webp',
-        '.mp4',
-        '.webm',
-        '.mov',
-      ];
-      const fileName = file.name.toLowerCase();
-      const hasValidExtension = allowedExtensions.some(ext =>
-        fileName.endsWith(ext)
-      );
-
-      if (!hasValidExtension) {
-        alert(
-          'Поддерживаемые форматы: PNG, JPG, JPEG, GIF, WebP, MP4, WebM, MOV'
-        );
-        return;
-      }
-
+    async (imageType: ImageType, file: File) => {
       const field = IMAGE_TYPE_TO_FIELD[imageType];
-      if (!field) {
-        return;
-      }
+      if (!field) return;
 
       try {
         await BackgroundImageService.updateImage(imageType, file);
 
-        // Обновляем состояние после успешной загрузки
         const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
         const imageName = `${imageType}${fileExtension}`;
 
         useAdminStore.getState().setBackgroundImages({
-          ...backgroundImages,
+          ...useAdminStore.getState().backgroundImages,
           [field]: {
             imageName: imageName,
             isShouldExists: true,
@@ -90,14 +186,14 @@ const BackgroundImagesCard: React.FC = () => {
       } catch (e: any) {
         alert('Не удалось загрузить файл: ' + (e.message || e));
         useAdminStore.getState().setBackgroundImages({
-          ...backgroundImages,
+          ...useAdminStore.getState().backgroundImages,
           [field]: undefined,
         });
         const input = fileInputRefs[imageType].current;
         if (input) input.value = '';
       }
     },
-    [backgroundImages, fileInputRefs]
+    [fileInputRefs]
   );
 
   const handleRemoveImage = useCallback(
@@ -113,7 +209,7 @@ const BackgroundImagesCard: React.FC = () => {
       }
 
       useAdminStore.getState().setBackgroundImages({
-        ...backgroundImages,
+        ...useAdminStore.getState().backgroundImages,
         [field]: undefined,
       });
       const input = fileInputRefs[imageType].current;
@@ -121,11 +217,10 @@ const BackgroundImagesCard: React.FC = () => {
         input.value = '';
       }
     },
-    [backgroundImages, fileInputRefs]
+    [fileInputRefs]
   );
 
   const handleClearAll = useCallback(() => {
-    // Очищаем все inputs
     [
       ImageType.TopImage,
       ImageType.LeftImage,
@@ -139,95 +234,6 @@ const BackgroundImagesCard: React.FC = () => {
     useAdminStore.getState().setBackgroundImages({});
   }, [fileInputRefs]);
 
-  const handleContainerClick = useCallback(
-    (imageType: ImageType) => {
-      const ref = fileInputRefs[imageType];
-      if (ref?.current) {
-        ref.current.click();
-      }
-    },
-    [fileInputRefs]
-  );
-
-  const ImageUploadField = useCallback(
-    ({ field, label }: { field: ImageType; label: string }) => {
-      const f = IMAGE_TYPE_TO_FIELD[field];
-      const backgroundImage = f
-        ? (backgroundImages[f] as BackgroundImage | undefined)
-        : undefined;
-      const hasImage = f ? backgroundImage?.isShouldExists : undefined;
-
-      // Определяем, является ли файл видео по расширению
-      const isVideo =
-        hasImage && backgroundImage?.imageName
-          ? /\.(mp4|webm|mov)$/i.test(backgroundImage.imageName)
-          : false;
-
-      return (
-        <Col md={6} className='mb-3'>
-          <Form.Group>
-            <Form.Label className={styles.brightLabel}>{label}</Form.Label>
-            <div
-              className={styles.imageUploadContainer}
-              onClick={() => handleContainerClick(field)}
-            >
-              {hasImage ? (
-                <div className={styles.imagePreview}>
-                  {isVideo ? (
-                    <video
-                      src={
-                        '/Images/' +
-                        (hasImage ? backgroundImage?.imageName || '' : '')
-                      }
-                      className={styles.previewImage}
-                      autoPlay
-                      loop
-                      muted
-                    />
-                  ) : (
-                    <img
-                      src={
-                        '/Images/' +
-                        (hasImage ? backgroundImage?.imageName || '' : '')
-                      }
-                      alt={`Preview for ${label}`}
-                      className={styles.previewImage}
-                    />
-                  )}
-                  <Button
-                    variant='danger'
-                    size='sm'
-                    className={styles.removeButton}
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleRemoveImage(field);
-                    }}
-                  >
-                    ×
-                  </Button>
-                </div>
-              ) : (
-                <div className={styles.uploadPlaceholder}>
-                  <div className={styles.uploadIcon}>📷</div>
-                  <div className={styles.uploadText}>Нажмите для загрузки</div>
-                </div>
-              )}
-              <input
-                ref={fileInputRefs[field] as React.RefObject<HTMLInputElement>}
-                type='file'
-                accept='image/*,video/mp4,video/webm,video/quicktime'
-                onChange={e => handleImageUpload(field, e)}
-                className={styles.hiddenInput}
-              />
-            </div>
-            {/* Описание перемещено в общий блок снизу карточки */}
-          </Form.Group>
-        </Col>
-      );
-    },
-    [backgroundImages, handleRemoveImage, handleImageUpload, fileInputRefs]
-  );
-
   return (
     <Card className={`mb-4 ${styles.backgroundImagesCard}`}>
       <Card.Body>
@@ -239,20 +245,32 @@ const BackgroundImagesCard: React.FC = () => {
           <ImageUploadField
             field={ImageType.TopImage}
             label='Центральный блок (название турнира)'
+            fileInputRef={fileInputRefs[ImageType.TopImage]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
           />
           <ImageUploadField
             field={ImageType.LeftImage}
             label='Левый блок (игрок 1)'
+            fileInputRef={fileInputRefs[ImageType.LeftImage]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
           />
         </Row>
         <Row>
           <ImageUploadField
             field={ImageType.RightImage}
             label='Правый блок (игрок 2)'
+            fileInputRef={fileInputRefs[ImageType.RightImage]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
           />
           <ImageUploadField
             field={ImageType.FightModeImage}
             label='Блок режима драки'
+            fileInputRef={fileInputRefs[ImageType.FightModeImage]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
           />
         </Row>
 

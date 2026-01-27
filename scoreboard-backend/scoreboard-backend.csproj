@@ -25,13 +25,14 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.0" />
+    <PackageReference Include="Spectre.Console" Version="0.54.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
   </ItemGroup>
 
   <!-- Основной Target для копирования frontend файлов -->
-  <Target Name="CopyFrontendToWwwroot" AfterTargets="Build">
+  <Target Name="CopyFrontendToWwwroot" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <PropertyGroup>
       <FrontendDistPath>..\scoreboard-app\dist</FrontendDistPath>
     </PropertyGroup>
@@ -45,24 +46,30 @@
       <DistFolderExists>false</DistFolderExists>
     </PropertyGroup>
     
-    <!-- Очищаем wwwroot -->
-    <RemoveDir Directories="wwwroot" Condition="Exists('wwwroot')" />
-    <MakeDir Directories="wwwroot" />
+    <!-- Создаем wwwroot и Images папки если их нет -->
+    <MakeDir Directories="wwwroot" Condition="!Exists('wwwroot')" />
+    <MakeDir Directories="wwwroot\Images" Condition="!Exists('wwwroot\Images')" />
     
-    <!-- Копируем все файлы из dist, если папка существует -->
+    <!-- Копируем все файлы из dist, если папка существует (только измененные) -->
     <ItemGroup Condition="'$(DistFolderExists)' == 'true'">
-      <DistFiles Include="$(FrontendDistPath)\**\*.*" />
+      <DistFiles Include="$(FrontendDistPath)\**\*.*" Exclude="$(FrontendDistPath)\Images\**\*.*" />
     </ItemGroup>
     
-    <Copy SourceFiles="@(DistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" ContinueOnError="true" />
+    <Copy SourceFiles="@(DistFiles)" 
+          DestinationFolder="wwwroot\%(RecursiveDir)" 
+          SkipUnchangedFiles="true" 
+          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
+          ContinueOnError="true" />
     
     <!-- Логируем результат -->
-    <Message Text="Frontend dist folder found: $(DistFolderExists)" Importance="high" />
-    <Message Text="Files to copy: @(DistFiles)" Importance="normal" Condition="'$(DistFolderExists)' == 'true'" />
-    <Message Text="No frontend files found, using fallback" Importance="high" Condition="'$(DistFolderExists)' != 'true'" />
+    <Message Text="[SPA] Frontend dist folder found: $(DistFolderExists)" Importance="high" />
+    <Message Text="[SPA] Copied $(DistFiles->Count()) frontend files to wwwroot" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
+    <Message Text="[SPA] No frontend files found" Importance="high" Condition="'$(DistFolderExists)' != 'true'" />
     
     <!-- Создаем fallback index.html если копирование не удалось -->
-    <WriteLinesToFile File="wwwroot\index.html" Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
+    <WriteLinesToFile File="wwwroot\index.html" 
+                      Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" 
+                      Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
   </Target>
   
       <ItemGroup>
