@@ -34,6 +34,7 @@ export interface ColorPreset {
   scoreColor?: string;
   backgroundColor?: string;
   borderColor?: string;
+  textOutlineColor?: string;
 }
 
 export interface TextConfiguration {
@@ -104,4 +105,5 @@ export const defaultPreset: ColorPreset = {
   scoreColor: '#FFFFFF',
   backgroundColor: '#1a1a1a',
   borderColor: '#3F00FF',
+  textOutlineColor: '#000000',
 };

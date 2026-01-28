@@ -2,12 +2,15 @@
 .colorPickerContainer {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+  width: 100%;
 }
 
 .colorInput {
   padding: 0.25rem;
   width: 50px;
   height: 38px;
+  flex-shrink: 0;
 }
 
 .textInput {
@@ -17,6 +20,8 @@
   font-weight: bold;
   border-radius: 1rem;
   font-size: 12px;
+  flex: 1;
+  width: auto;
 
   &::placeholder {
     color: #ffffff !important;
@@ -35,5 +40,6 @@
   width: 38px;
   height: 38px;
   min-width: 38px;
+  flex-shrink: 0;
   font-size: 12px;
 }

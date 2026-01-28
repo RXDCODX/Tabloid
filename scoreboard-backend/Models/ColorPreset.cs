@@ -10,4 +10,5 @@ public class ColorPreset
     public string ScoreColor { get; set; } = "#ffffff"; // Цвет счета
     public string BackgroundColor { get; set; } = "#23272f"; // Цвет фона всех дивов
     public string BorderColor { get; set; } = "#3F00FF"; // Цвет обводки всех дивов
+    public string TextOutlineColor { get; set; } = "#000000"; // Цвет обводки текста (никнейм и тег)
 }

@@ -17,6 +17,7 @@ type ColorPresetModel = {
   tournamentTitleColor?: string;
   fightModeColor?: string;
   scoreColor?: string;
+  textOutlineColor?: string;
 };
 
 const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
@@ -34,8 +35,12 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
     tournamentTitleColor: defaultPreset.tournamentTitleColor,
     fightModeColor: defaultPreset.fightModeColor,
     scoreColor: defaultPreset.scoreColor,
+    textOutlineColor: defaultPreset.textOutlineColor,
   });
   const [colorPresets, setColorPresets] = useState<ColorPresetModel[]>([]);
+  const [presetName, setPresetName] = useState<string>('');
+  const [selectedPresetToDelete, setSelectedPresetToDelete] =
+    useState<string>('');
 
   const handleReceiveColorPresets = useCallback(
     (presets: ColorPresetModel[]) => {
@@ -58,6 +63,7 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
       tournamentTitleColor: defaultPreset.tournamentTitleColor,
       fightModeColor: defaultPreset.fightModeColor,
       scoreColor: defaultPreset.scoreColor,
+      textOutlineColor: defaultPreset.textOutlineColor,
     });
   }, [handleColorChange]);
 
@@ -82,6 +88,8 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
           preset.tournamentTitleColor || defaultPreset.tournamentTitleColor,
         fightModeColor: preset.fightModeColor || defaultPreset.fightModeColor,
         scoreColor: preset.scoreColor || defaultPreset.scoreColor,
+        textOutlineColor:
+          preset.textOutlineColor || defaultPreset.textOutlineColor,
       };
 
       // Обновим локально UI сразу
@@ -108,6 +116,82 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
     },
     [customColors, handleColorChange]
   );
+
+  const handleSavePreset = useCallback(async () => {
+    if (!presetName.trim()) {
+      alert('Пожалуйста, введите название пресета');
+      return;
+    }
+
+    const newPreset: ColorPresetModel = {
+      name: presetName.trim(),
+      playerNamesColor: customColors.playerNamesColor,
+      tournamentTitleColor: customColors.tournamentTitleColor,
+      fightModeColor: customColors.fightModeColor,
+      scoreColor: customColors.scoreColor,
+      textOutlineColor: customColors.textOutlineColor,
+    };
+
+    try {
+      const response = await fetch('/api/ColorPresets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPreset),
+      });
+
+      if (response.ok) {
+        // Обновляем список пресетов
+        if (connection && connection.state === 'Connected') {
+          await connection.invoke('GetColorPresets');
+        }
+        setPresetName('');
+        alert(`Пресет "${newPreset.name}" успешно сохранен!`);
+      } else {
+        alert('Ошибка при сохранении пресета');
+      }
+    } catch (error) {
+      console.error('Error saving preset:', error);
+      alert('Ошибка при сохранении пресета');
+    }
+  }, [presetName, customColors, connection]);
+
+  const handleDeletePreset = useCallback(async () => {
+    if (!selectedPresetToDelete) {
+      alert('Пожалуйста, выберите пресет для удаления');
+      return;
+    }
+
+    if (
+      !confirm(
+        `Вы уверены, что хотите удалить пресет "${selectedPresetToDelete}"?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/ColorPresets/${encodeURIComponent(selectedPresetToDelete)}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (response.ok) {
+        // Обновляем список пресетов
+        if (connection && connection.state === 'Connected') {
+          await connection.invoke('GetColorPresets');
+        }
+        setSelectedPresetToDelete('');
+        alert(`Пресет "${selectedPresetToDelete}" успешно удален!`);
+      } else {
+        alert('Ошибка при удалении пресета');
+      }
+    } catch (error) {
+      console.error('Error deleting preset:', error);
+      alert('Ошибка при удалении пресета');
+    }
+  }, [selectedPresetToDelete, connection]);
   return (
     <Card className={styles.colorPresetCard}>
       <Card.Body>
@@ -116,95 +200,193 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
           <span className={styles.cardTitle}>Color Presets</span>
         </div>
 
-        {/* Пресеты цветов */}
-        <div className={styles.presetsSection}>
-          <h6 className={styles.sectionTitle}>Presets:</h6>
-          <div className={styles.presetsContainer}>
-            {colorPresets.map(preset => (
-              <Button
-                key={preset.name}
-                variant='outline-primary'
-                size='sm'
-                onClick={() => applyPreset(preset)}
-                className={`${styles.presetButton} fw-bold`}
-                style={
-                  {
-                    '--preset-color':
-                      preset.tournamentTitleColor ||
-                      preset.fightModeColor ||
-                      preset.scoreColor ||
-                      '#6f42c1',
-                  } as React.CSSProperties
-                }
-              >
-                {preset.name}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <Row className='g-3'>
+          {/* ОБЛАСТЬ 1: Пресеты цветов */}
+          <Col xs={12} lg={5}>
+            <div className={styles.presetsArea}>
+              <div className={styles.areaHeader}>
+                <h6 className={styles.areaTitle}>Доступные пресеты</h6>
+              </div>
+              <div className={styles.presetsContainer}>
+                {colorPresets.map(preset => (
+                  <Button
+                    key={preset.name}
+                    variant='outline-primary'
+                    size='sm'
+                    onClick={() => applyPreset(preset)}
+                    className={`${styles.presetButton} fw-bold`}
+                    style={
+                      {
+                        '--preset-color':
+                          preset.tournamentTitleColor ||
+                          preset.fightModeColor ||
+                          preset.scoreColor ||
+                          '#6f42c1',
+                      } as React.CSSProperties
+                    }
+                  >
+                    {preset.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </Col>
 
-        {/* Кастомные цвета */}
-        <div className={styles.customColorsSection}>
-          <h6 className={styles.sectionTitle}>Custom Colors:</h6>
-          <Row className='g-3 d-flex justify-content-center'>
-            <Col xs={6} md={3} className={styles.colorField}>
-              <Form.Group>
-                <Form.Label className={styles.fieldLabel}>
-                  Player Names
-                </Form.Label>
-                <ColorPickerWithTransparency
-                  value={customColors.playerNamesColor as string}
-                  onChange={value =>
-                    handleCustomColorChange('playerNamesColor', value)
-                  }
-                  placeholder='hex или rgba'
-                />
-              </Form.Group>
-            </Col>
-            <Col xs={6} md={3} className={styles.colorField}>
-              <Form.Group>
-                <Form.Label className={styles.fieldLabel}>
-                  Tournament Title
-                </Form.Label>
-                <ColorPickerWithTransparency
-                  value={customColors.tournamentTitleColor as string}
-                  onChange={value =>
-                    handleCustomColorChange('tournamentTitleColor', value)
-                  }
-                  placeholder='hex или rgba'
-                />
-              </Form.Group>
-            </Col>
-            <Col xs={6} md={3} className={styles.colorField}>
-              <Form.Group>
-                <Form.Label className={styles.fieldLabel}>
-                  Fight Mode
-                </Form.Label>
-                <ColorPickerWithTransparency
-                  value={customColors.fightModeColor as string}
-                  onChange={value =>
-                    handleCustomColorChange('fightModeColor', value)
-                  }
-                  placeholder='hex или rgba'
-                />
-              </Form.Group>
-            </Col>
-            <Col xs={6} md={3} className={styles.colorField}>
-              <Form.Group>
-                <Form.Label className={styles.fieldLabel}>
-                  Score Color
-                </Form.Label>
-                <ColorPickerWithTransparency
-                  value={customColors.scoreColor as string}
-                  onChange={value =>
-                    handleCustomColorChange('scoreColor', value)
-                  }
-                  placeholder='hex или rgba'
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-        </div>
+          {/* ОБЛАСТЬ 2: Управление пресетами */}
+          <Col xs={12} lg={7}>
+            <div className={styles.managementArea}>
+              <div className={styles.areaHeader}>
+                <h6 className={styles.areaTitle}>Создание и управление</h6>
+              </div>
+
+              {/* Настройка цветов */}
+              <div className={styles.colorSettings}>
+                {/* Первый ряд */}
+                <Row className='g-3 mb-3 justify-content-center'>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Player Names
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.playerNamesColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('playerNamesColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Tournament Title
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.tournamentTitleColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('tournamentTitleColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                {/* Второй ряд */}
+                <Row className='g-3 mb-3 justify-content-center'>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Fight Mode
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.fightModeColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('fightModeColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Score Color
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.scoreColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('scoreColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                {/* Третий ряд - обводка текста */}
+                <Row className='g-3 justify-content-center'>
+                  <Col xs={12} md={12} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Text Outline
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.textOutlineColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('textOutlineColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+
+              {/* Блок управления сохранением/удалением */}
+              <div className={styles.presetActions}>
+                <Row className='g-2 align-items-end'>
+                  <Col xs={12} md={4}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Название пресета
+                      </Form.Label>
+                      <Form.Control
+                        type='text'
+                        value={presetName}
+                        onChange={e => setPresetName(e.target.value)}
+                        placeholder='Введите название'
+                        className={`${styles.presetNameInput} bg-dark text-white border-secondary`}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={6} md={2}>
+                    <Button
+                      variant='success'
+                      size='sm'
+                      onClick={handleSavePreset}
+                      disabled={!presetName.trim()}
+                      className='w-100 fw-bold'
+                    >
+                      Сохранить
+                    </Button>
+                  </Col>
+                  <Col xs={12} md={4}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Удалить пресет
+                      </Form.Label>
+                      <Form.Select
+                        value={selectedPresetToDelete}
+                        onChange={e =>
+                          setSelectedPresetToDelete(e.target.value)
+                        }
+                        className={`${styles.presetSelect} bg-dark text-white border-secondary`}
+                      >
+                        <option value=''>Выберите пресет</option>
+                        {colorPresets.map(preset => (
+                          <option key={preset.name} value={preset.name}>
+                            {preset.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={6} md={2}>
+                    <Button
+                      variant='danger'
+                      size='sm'
+                      onClick={handleDeletePreset}
+                      disabled={!selectedPresetToDelete}
+                      className='w-100 fw-bold'
+                    >
+                      Удалить
+                    </Button>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+          </Col>
+        </Row>
       </Card.Body>
     </Card>
   );

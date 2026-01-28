@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button, Form } from "react-bootstrap";
-import { Eye, EyeSlash } from "react-bootstrap-icons";
-import styles from "./ColorPickerWithTransparency.module.scss";
+import React, { useState } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import { Eye, EyeSlash } from 'react-bootstrap-icons';
+import styles from './ColorPickerWithTransparency.module.scss';
 
 type ColorPickerWithTransparencyProps = {
   value: string;
@@ -9,12 +9,11 @@ type ColorPickerWithTransparencyProps = {
   placeholder?: string;
 };
 
-const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = ({
-  value,
-  onChange,
-  placeholder = "hex или rgba"
-}) => {
+const ColorPickerWithTransparency: React.FC<
+  ColorPickerWithTransparencyProps
+> = ({ value, onChange, placeholder = 'hex или rgba' }) => {
   const [isTransparent, setIsTransparent] = useState(false);
+  const [lastOpaqueColor, setLastOpaqueColor] = useState('#ffffff');
 
   // Функция для проверки, является ли цвет прозрачным
   const isTransparentColor = (color: string) => {
@@ -33,22 +32,30 @@ const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = 
 
   // Функция для установки прозрачного цвета
   const setTransparent = () => {
+    // Сохраняем текущий цвет перед тем как сделать прозрачным
+    if (!isTransparentColor(value)) {
+      setLastOpaqueColor(value);
+    }
     onChange('rgba(255, 255, 255, 0)');
     setIsTransparent(true);
   };
 
   // Функция для установки непрозрачного цвета
   const setOpaque = () => {
-    if (isTransparentColor(value)) {
-      onChange('#ffffff');
-    }
+    // Восстанавливаем сохраненный цвет
+    onChange(lastOpaqueColor);
     setIsTransparent(false);
   };
 
   // Обработчик изменения цвета
   const handleColorChange = (newValue: string) => {
     onChange(newValue);
-    setIsTransparent(isTransparentColor(newValue));
+    const isTransp = isTransparentColor(newValue);
+    setIsTransparent(isTransp);
+    // Сохраняем цвет если он непрозрачный
+    if (!isTransp) {
+      setLastOpaqueColor(newValue);
+    }
   };
 
   // Обработчик изменения текстового поля
@@ -66,13 +73,13 @@ const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = 
   return (
     <div className={styles.colorPickerContainer}>
       <Form.Control
-        type="color"
+        type='color'
         value={isTransparent ? '#ffffff' : value}
         onChange={handleColorPickerChange}
         className={styles.colorInput}
       />
       <Form.Control
-        type="text"
+        type='text'
         value={value}
         onChange={handleTextChange}
         placeholder={placeholder}
@@ -80,11 +87,11 @@ const ColorPickerWithTransparency: React.FC<ColorPickerWithTransparencyProps> = 
         style={{ fontSize: 12 }}
       />
       <Button
-        variant={isTransparent ? "success" : "outline-secondary"}
-        size="sm"
+        variant={isTransparent ? 'success' : 'outline-secondary'}
+        size='sm'
         onClick={isTransparent ? setOpaque : setTransparent}
         className={styles.transparencyButton}
-        title={isTransparent ? "Сделать непрозрачным" : "Сделать прозрачным"}
+        title={isTransparent ? 'Сделать непрозрачным' : 'Сделать прозрачным'}
       >
         {isTransparent ? <EyeSlash size={14} /> : <Eye size={14} />}
       </Button>

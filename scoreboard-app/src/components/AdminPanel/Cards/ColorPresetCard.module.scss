@@ -24,6 +24,31 @@
   letter-spacing: 1px;
 }
 
+// ОБЛАСТЬ 1: Отображение пресетов
+.presetsArea {
+  background: rgba(111, 66, 193, 0.05);
+  border: 1px solid rgba(111, 66, 193, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.areaHeader {
+  margin-bottom: 1rem;
+}
+
+.areaTitle {
+  color: #6f42c1;
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
 .presetsSection {
   margin-bottom: 1.5rem;
 }
@@ -40,13 +65,51 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
+  flex: 1;
+  align-content: flex-start;
 }
 
 .presetButton {
   border-color: var(--preset-color);
   color: var(--preset-color);
-  min-width: 100px;
+  min-width: 90px;
   font-weight: bold;
+}
+
+// ОБЛАСТЬ 2: Управление пресетами
+.managementArea {
+  background: rgba(111, 66, 193, 0.05);
+  border: 1px solid rgba(111, 66, 193, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.colorSettings {
+  margin-bottom: 1.5rem;
+}
+
+.colorField {
+  display: flex;
+  justify-content: center;
+
+  .form-group {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  // Убедимся что ColorPicker растягивается
+  :global(.colorPickerContainer) {
+    width: 100%;
+  }
+}
+
+.presetActions {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(111, 66, 193, 0.2);
 }
 
 .customColorsSection {
@@ -55,6 +118,28 @@
     font-weight: bold;
     margin-bottom: 0.75rem;
     text-align: center;
+  }
+}
+
+.presetManagement {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(111, 66, 193, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(111, 66, 193, 0.3);
+}
+
+.presetNameInput {
+  &::placeholder {
+    color: #adb5bd;
+  }
+}
+
+.presetSelect {
+  cursor: pointer;
+  
+  option {
+    background-color: #212529;
   }
 }
 

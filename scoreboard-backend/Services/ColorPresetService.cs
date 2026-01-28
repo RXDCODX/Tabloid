@@ -113,6 +113,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#FFFFFF",
                 FightModeColor = "#FFFFFF",
                 ScoreColor = "#FFFFFF",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -121,6 +122,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#0dcaf0",
                 FightModeColor = "#0dcaf0",
                 ScoreColor = "#0dcaf0",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -129,6 +131,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#dc3545",
                 FightModeColor = "#dc3545",
                 ScoreColor = "#dc3545",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -137,6 +140,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#198754",
                 FightModeColor = "#198754",
                 ScoreColor = "#198754",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -145,6 +149,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#6f42c1",
                 FightModeColor = "#6f42c1",
                 ScoreColor = "#6f42c1",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -153,6 +158,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#ffc107",
                 FightModeColor = "#ffc107",
                 ScoreColor = "#ffc107",
+                TextOutlineColor = "#000000",
             },
             new()
             {
@@ -161,6 +167,7 @@ public class ColorPresetService
                 TournamentTitleColor = "#0088ff",
                 FightModeColor = "#00ff88",
                 ScoreColor = "#00ff88",
+                TextOutlineColor = "#000000",
             },
         };
 
@@ -183,5 +190,6 @@ public class ColorPresetService
             ScoreColor = p.ScoreColor,
             BackgroundColor = p.BackgroundColor,
             BorderColor = p.BorderColor,
+            TextOutlineColor = p.TextOutlineColor,
         };
 }

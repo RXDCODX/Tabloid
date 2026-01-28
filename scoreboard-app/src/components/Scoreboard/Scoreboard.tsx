@@ -57,6 +57,12 @@ const Scoreboard: React.FC = () => {
   const c = colors;
   const layout = layoutConfig;
   const animDur = animationDuration ?? 800;
+
+  // Функция для создания обводки текста
+  const getTextOutline = (color: string = '#000000') => {
+    return `${color} 2px 0px 0px, ${color} 1.75517px 0.958851px 0px, ${color} 1.0806px 1.68294px 0px, ${color} 0.141474px 1.99499px 0px, ${color} -0.832294px 1.81859px 0px, ${color} -1.60229px 1.19694px 0px, ${color} -1.97998px 0.28224px 0px, ${color} -1.87291px -0.701566px 0px, ${color} -1.30729px -1.5136px 0px, ${color} -0.421592px -1.95506px 0px, ${color} 0.567324px -1.91785px 0px, ${color} 1.41734px -1.41108px 0px, ${color} 1.92034px -0.558831px 0px`;
+  };
+
   // Функция для создания неонового свечения с уменьшенной силой (15-20% от текущей)
   const getNeonGlow = (color: string) => {
     return `0 0 1px ${color}, 0 0 2px ${color}, 0 0 3px ${color}, 0 0 4px ${color}, 0 0 5px ${color}, 0 0 6px ${color}`;
@@ -240,7 +246,10 @@ const Scoreboard: React.FC = () => {
           >
             <h4
               className={styles.playerName}
-              style={{ color: c.playerNamesColor }}
+              style={{
+                color: c.playerNamesColor,
+                textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+              }}
             >
               <span data-side='left' style={{ color: c.playerNamesColor }}>
                 {p1.final === 'winner'
@@ -249,7 +258,16 @@ const Scoreboard: React.FC = () => {
                     ? '[L] '
                     : ''}
                 {isValidTag(p1.tag) && (
-                  <span style={{ color: c.mainColor }}>{p1.tag}</span>
+                  <span
+                    style={{
+                      color: c.mainColor,
+                      textShadow: getTextOutline(
+                        c.textOutlineColor || '#000000'
+                      ),
+                    }}
+                  >
+                    {p1.tag}
+                  </span>
                 )}
                 {isValidTag(p1.tag) && ' | '}
                 {p1.name}
@@ -354,7 +372,10 @@ const Scoreboard: React.FC = () => {
           >
             <h4
               className={styles.playerName}
-              style={{ color: c.playerNamesColor }}
+              style={{
+                color: c.playerNamesColor,
+                textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+              }}
             >
               <span data-side='right' style={{ color: c.playerNamesColor }}>
                 {p2.final === 'winner'
@@ -365,7 +386,16 @@ const Scoreboard: React.FC = () => {
                 {p2.name}
                 {isValidTag(p2.tag) && ' | '}
                 {isValidTag(p2.tag) && (
-                  <span style={{ color: c.mainColor }}>{p2.tag}</span>
+                  <span
+                    style={{
+                      color: c.mainColor,
+                      textShadow: getTextOutline(
+                        c.textOutlineColor || '#000000'
+                      ),
+                    }}
+                  >
+                    {p2.tag}
+                  </span>
                 )}
               </span>
             </h4>
