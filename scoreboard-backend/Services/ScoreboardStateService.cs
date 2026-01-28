@@ -298,6 +298,7 @@ public class ScoreboardStateService
                     _logger.LogInformation("No persisted state found in DB. Using default state.");
                 }
 
+                SyncImagesFromFileSystem();
                 return;
             }
 
@@ -306,6 +307,10 @@ public class ScoreboardStateService
                 ScoreboardJsonContext.Default.ScoreboardState
             );
             _state = loaded ?? new ScoreboardState();
+            
+            // Sync images from filesystem to ensure UploadedAt is current
+            SyncImagesFromFileSystem();
+            
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation("Loaded persisted state from DB");
@@ -322,6 +327,45 @@ public class ScoreboardStateService
             }
 
             _state = new ScoreboardState();
+            SyncImagesFromFileSystem();
+        }
+    }
+
+    private void SyncImagesFromFileSystem()
+    {
+        try
+        {
+            var images = _backgroundImagesService.GetAllImages().GetAwaiter().GetResult();
+            foreach (var img in images)
+            {
+                switch (img.ImageType)
+                {
+                    case ImageType.TopImage:
+                        _state.Images.CenterImage = img;
+                        break;
+                    case ImageType.LeftImage:
+                        _state.Images.LeftImage = img;
+                        break;
+                    case ImageType.RightImage:
+                        _state.Images.RightImage = img;
+                        break;
+                    case ImageType.FightModeImage:
+                        _state.Images.FightModeImage = img;
+                        break;
+                }
+            }
+            
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Synced {Count} images from filesystem", images.Count);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_logger.IsEnabled(LogLevel.Error))
+            {
+                _logger.LogError(ex, "Error syncing images from filesystem");
+            }
         }
     }
 

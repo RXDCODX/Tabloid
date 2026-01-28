@@ -73,10 +73,12 @@ const Scoreboard: React.FC = () => {
 
   // background images (stretch to cover corresponding containers)
   const imgs = backgroundImages;
-  const bgStyleFor = (img?: { imageName?: string } | null) =>
+  const bgStyleFor = (
+    img?: { imageName?: string; uploadedAt?: number } | null
+  ) =>
     img && img.imageName
       ? {
-          backgroundImage: `url(${'Images/' + img.imageName})`,
+          backgroundImage: `url(Images/${img.imageName}${img.uploadedAt ? `?t=${img.uploadedAt}` : ''})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -191,7 +193,10 @@ const Scoreboard: React.FC = () => {
           }}
         >
           {isVideoFile(imgs?.centerImage?.imageName) && (
-            <MediaBackground imageName={imgs?.centerImage?.imageName} />
+            <MediaBackground
+              imageName={imgs?.centerImage?.imageName}
+              uploadedAt={imgs?.centerImage?.uploadedAt}
+            />
           )}
           <h5
             id='metaTitle'
@@ -224,7 +229,10 @@ const Scoreboard: React.FC = () => {
           }}
         >
           {isVideoFile(imgs?.leftImage?.imageName) && (
-            <MediaBackground imageName={imgs?.leftImage?.imageName} />
+            <MediaBackground
+              imageName={imgs?.leftImage?.imageName}
+              uploadedAt={imgs?.leftImage?.uploadedAt}
+            />
           )}
           <div
             className={styles.playerInfo}
@@ -302,7 +310,10 @@ const Scoreboard: React.FC = () => {
           }}
         >
           {isVideoFile(imgs?.rightImage?.imageName) && (
-            <MediaBackground imageName={imgs?.rightImage?.imageName} />
+            <MediaBackground
+              imageName={imgs?.rightImage?.imageName}
+              uploadedAt={imgs?.rightImage?.uploadedAt}
+            />
           )}
           <div
             className={styles.score}
@@ -381,7 +392,10 @@ const Scoreboard: React.FC = () => {
             }}
           >
             {isVideoFile(imgs?.fightModeImage?.imageName) && (
-              <MediaBackground imageName={imgs?.fightModeImage?.imageName} />
+              <MediaBackground
+                imageName={imgs?.fightModeImage?.imageName}
+                uploadedAt={imgs?.fightModeImage?.uploadedAt}
+              />
             )}
             <h4
               style={{

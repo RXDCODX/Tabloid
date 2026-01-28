@@ -56,6 +56,7 @@ export interface BackgroundImage {
   imageName: string;
   imageType: ImageType;
   isShouldExists: boolean;
+  uploadedAt?: number;
 }
 
 export enum ImageType {

@@ -146,6 +146,10 @@ public class BackgroundImagesService
 
                 var fileName = Path.GetFileName(filePath);
 
+                // Get file modification time
+                var fileInfo = new FileInfo(filePath);
+                var uploadedAt = new DateTimeOffset(fileInfo.LastWriteTimeUtc).ToUnixTimeMilliseconds();
+
                 // Read file into memory so the returned IFormFile is usable after this method returns
                 var bytes = await File.ReadAllBytesAsync(filePath);
                 var memoryStream = new MemoryStream(bytes);
@@ -169,6 +173,7 @@ public class BackgroundImagesService
                         File = formFile,
                         ImageName = fileName,
                         ImageType = imageType,
+                        UploadedAt = uploadedAt,
                     }
                 );
             }

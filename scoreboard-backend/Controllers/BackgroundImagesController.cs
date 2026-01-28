@@ -49,6 +49,7 @@ public class BackgroundImagesController(
                 File = file,
                 ImageType = imageType,
                 IsShouldExists = true,
+                UploadedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             };
 
             service.UpdateBackgroundImage(backgroundImage);

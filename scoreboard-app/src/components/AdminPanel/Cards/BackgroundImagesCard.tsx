@@ -108,17 +108,31 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
               <div className={styles.imagePreview}>
                 {isVideo ? (
                   <video
-                    src={'/Images/' + (backgroundImage?.imageName || '')}
+                    src={
+                      '/Images/' +
+                      (backgroundImage?.imageName || '') +
+                      (backgroundImage?.uploadedAt
+                        ? `?t=${backgroundImage.uploadedAt}`
+                        : '')
+                    }
                     className={styles.previewImage}
                     autoPlay
                     loop
                     muted
+                    key={backgroundImage?.uploadedAt || 0}
                   />
                 ) : (
                   <img
-                    src={'/Images/' + (backgroundImage?.imageName || '')}
+                    src={
+                      '/Images/' +
+                      (backgroundImage?.imageName || '') +
+                      (backgroundImage?.uploadedAt
+                        ? `?t=${backgroundImage.uploadedAt}`
+                        : '')
+                    }
                     alt={`Preview for ${label}`}
                     className={styles.previewImage}
+                    key={backgroundImage?.uploadedAt || 0}
                   />
                 )}
                 <Button
@@ -181,6 +195,7 @@ const BackgroundImagesCard: React.FC = () => {
             imageName: imageName,
             isShouldExists: true,
             imageType: imageType,
+            uploadedAt: Date.now(),
           },
         });
       } catch (e: any) {

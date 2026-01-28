@@ -11,6 +11,8 @@ public class BackgroundImage
 
     public bool IsShouldExists { get; set; } = true;
 
+    public long? UploadedAt { get; set; }
+
     [JsonIgnore]
     public IFormFile? File { get; set; }
 }
