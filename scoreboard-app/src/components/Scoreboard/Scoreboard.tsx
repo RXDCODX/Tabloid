@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../store/adminStateStore';
 import MediaBackground from './MediaBackground';
 import styles from './Scoreboard.module.scss';
+import SponsorBanner from './SponsorBanner';
 
 const Scoreboard: React.FC = () => {
   const {
@@ -438,6 +439,9 @@ const Scoreboard: React.FC = () => {
             </h4>
           </motion.div>
         )}
+
+        {/* Спонсорский баннер */}
+        <SponsorBanner />
       </motion.div>
     </AnimatePresence>
   );
