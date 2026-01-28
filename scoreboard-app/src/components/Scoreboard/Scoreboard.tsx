@@ -86,7 +86,7 @@ const Scoreboard: React.FC = () => {
     img && img.imageName
       ? {
           backgroundImage: `url(Images/${img.imageName}${img.uploadedAt ? `?t=${img.uploadedAt}` : ''})`,
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }
@@ -209,6 +209,7 @@ const Scoreboard: React.FC = () => {
             id='metaTitle'
             style={{
               color: c.tournamentTitleColor,
+              textShadow: getTextOutline(c.textOutlineColor || '#000000'),
               position: 'relative',
               zIndex: 1,
             }}
@@ -291,8 +292,7 @@ const Scoreboard: React.FC = () => {
                   height: '100%',
                   maxWidth: '100%',
                   maxHeight: '100%',
-                  objectFit: 'contain',
-                  boxShadow: isShowBorders ? glow : undefined,
+                  objectFit: 'fill',
                 }}
                 onError={e => {
                   e.currentTarget.style.display = 'none';
@@ -358,8 +358,7 @@ const Scoreboard: React.FC = () => {
                   height: '100%',
                   maxWidth: '100%',
                   maxHeight: '100%',
-                  objectFit: 'contain',
-                  boxShadow: isShowBorders ? glow : undefined,
+                  objectFit: 'fill',
                 }}
                 onError={e => {
                   e.currentTarget.style.display = 'none';
@@ -431,6 +430,7 @@ const Scoreboard: React.FC = () => {
             <h4
               style={{
                 color: c.fightModeColor,
+                textShadow: getTextOutline(c.textOutlineColor || '#000000'),
                 position: 'relative',
                 zIndex: 1,
               }}

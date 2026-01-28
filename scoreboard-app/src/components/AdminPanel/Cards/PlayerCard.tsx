@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowRepeat,
   ArrowUp,
+  CheckCircleFill,
   PersonFill,
   Save,
   Trash,
@@ -114,6 +115,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 
   const filteredPresets = useMemo(() => presets.slice(0, 8), [presets]);
 
+  // Проверяем, совпадают ли текущие данные игрока с каким-либо пресетом
+  const matchesPreset = useMemo(() => {
+    if (!player.name || !player.name.trim()) return false;
+    return presets.some(
+      p =>
+        p.name === player.name && p.tag === player.tag && p.flag === player.flag
+    );
+  }, [player.name, player.tag, player.flag, presets]);
+
   const handleSelectPreset = useCallback(
     (p: Player) => {
       setPlayer({
@@ -208,7 +218,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               onFocus={() => setIsNameOpen(true)}
               onBlur={() => setTimeout(() => setIsNameOpen(false), 150)}
               className={`form-control form-control-sm ${styles.nameInput} fw-bold bg-dark text-white border-primary border-2 rounded-3 w-100`}
+              style={{ paddingRight: matchesPreset ? '32px' : undefined }}
             />
+            {matchesPreset && (
+              <CheckCircleFill
+                className={styles.checkIcon}
+                color='#198754'
+                size={18}
+              />
+            )}
             {isNameOpen && filteredPresets.length > 0 && (
               <div
                 className={styles.presetsDropdown}
@@ -261,6 +279,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               className={styles.saveButton}
               onClick={handleSavePreset}
               title='Сохранить пресет игрока'
+              disabled={matchesPreset}
             >
               <Save />
             </Button>

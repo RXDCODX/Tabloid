@@ -35,7 +35,7 @@ const MediaBackground: React.FC<MediaBackgroundProps> = ({
           className={styles.mediaContent}
           style={{
             backgroundImage: `url(${mediaPath})`,
-            backgroundSize: 'cover',
+            backgroundSize: '100% 100%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}
