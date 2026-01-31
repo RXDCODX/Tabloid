@@ -51,10 +51,7 @@ public class PlayerPresetService
             foreach (var p in result)
             {
                 var n = Normalize(p);
-                if (!_cache.ContainsKey(n.Name))
-                {
-                    _cache[n.Name] = n;
-                }
+                _cache.TryAdd(n.Name, n);
             }
         }
     }

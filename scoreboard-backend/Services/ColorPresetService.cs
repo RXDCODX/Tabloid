@@ -86,22 +86,6 @@ public class ColorPresetService
         }
     }
 
-    public void ReplaceAll(IEnumerable<ColorPresetModel> presets)
-    {
-        lock (_lock)
-        {
-            _presets.Clear();
-            _presets.AddRange(presets.Select(Normalize));
-            _logger.LogInformation(
-                "Replaced all color presets. New count: {Count}",
-                _presets.Count
-            );
-
-            // Persist all
-            _databaseService.ReplaceAllColorPresets(_presets);
-        }
-    }
-
     private void InitializeDefaultPresets()
     {
         var defaultPresets = new List<ColorPresetModel>

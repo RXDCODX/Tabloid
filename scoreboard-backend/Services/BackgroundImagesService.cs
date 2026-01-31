@@ -5,7 +5,6 @@ namespace scoreboard_backend.Services;
 public class BackgroundImagesService
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private readonly string _imagesFolder;
     private readonly ILogger<BackgroundImagesService> _logger;
     private readonly DatabaseService _databaseService;
 
@@ -23,11 +22,9 @@ public class BackgroundImagesService
     {
         _logger = logger;
         _databaseService = databaseService;
-        _imagesFolder = Path.Combine(environment.WebRootPath, "Images");
+        Path.Combine(environment.WebRootPath, "Images");
 
-        _logger.LogInformation(
-            "BackgroundImagesService initialized with database-only storage"
-        );
+        _logger.LogInformation("BackgroundImagesService initialized with database-only storage");
 
         LoadCacheFromDatabase();
     }
@@ -108,7 +105,10 @@ public class BackgroundImagesService
                 contentType,
                 uploadedAt
             );
-            _logger.LogInformation("Saved background image to database for type {ImageType}", imageTypeString);
+            _logger.LogInformation(
+                "Saved background image to database for type {ImageType}",
+                imageTypeString
+            );
         }
         catch (Exception ex)
         {
@@ -134,10 +134,7 @@ public class BackgroundImagesService
 
             // Delete from database
             _databaseService.DeleteBackgroundImage(imageTypeString);
-            _logger.LogInformation(
-                "Deleted {ImageType} from database",
-                imageTypeString
-            );
+            _logger.LogInformation("Deleted {ImageType} from database", imageTypeString);
         }
         catch (Exception ex)
         {
@@ -163,10 +160,7 @@ public class BackgroundImagesService
             var fileList = new List<BackgroundImage>();
 
             // Use cache to return images
-            _logger.LogInformation(
-                "Returning {Count} images from cache",
-                _imageCache.Count
-            );
+            _logger.LogInformation("Returning {Count} images from cache", _imageCache.Count);
 
             foreach (var kvp in _imageCache)
             {
@@ -208,10 +202,7 @@ public class BackgroundImagesService
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                ex,
-                "Error while reading background images from cache"
-            );
+            _logger.LogError(ex, "Error while reading background images from cache");
             throw;
         }
         finally
