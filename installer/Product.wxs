@@ -4,7 +4,7 @@
            Version="1.0.0"
            UpgradeCode="2F44C98E-CA09-4A34-8B8F-9D10E6A8D176">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate />
+    <MediaTemplate EmbedCab="yes" />
 
     <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" Name="Scoreboard" />
