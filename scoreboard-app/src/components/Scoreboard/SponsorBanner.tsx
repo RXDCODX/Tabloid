@@ -4,8 +4,33 @@ import styles from './SponsorBanner.module.scss';
 
 const SponsorBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isSponsorDisabled, setIsSponsorDisabled] = useState(false);
 
   useEffect(() => {
+    // Проверяем, отключен ли спонсорский баннер
+    (async () => {
+      try {
+        const response = await fetch('/api/Sponsor/is-sponsor-disabled');
+        if (!response.ok) {
+          console.warn('Sponsor API returned status:', response.status);
+          setIsSponsorDisabled(false);
+          return;
+        }
+        const disabled = await response.json();
+        setIsSponsorDisabled(disabled);
+      } catch (error) {
+        console.error('Error checking sponsor status:', error);
+        setIsSponsorDisabled(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    // Если баннер отключен, не показываем его
+    if (isSponsorDisabled) {
+      return;
+    }
+
     // Функция для показа баннера
     const showBanner = () => {
       setIsVisible(true);
@@ -22,7 +47,7 @@ const SponsorBanner: React.FC = () => {
     const interval = setInterval(showBanner, 3600000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isSponsorDisabled]);
 
   return (
     <AnimatePresence>
@@ -44,7 +69,8 @@ const SponsorBanner: React.FC = () => {
               ease: 'linear',
             }}
           >
-            при поддержке RXDCODX
+            при поддержке <span style={{ color: '#9146FF' }}>twitch.tv/</span>
+            <span style={{ color: '#FF0000' }}>RXDCODX</span>
           </motion.div>
         </motion.div>
       )}
