@@ -1,15 +1,15 @@
 using scoreboard_backend.Logging;
 using Spectre.Console;
 
-namespace scoreboard_backend;
+namespace scoreboard_backend.Extensions;
 
 public static class WebApplicationExtensions
 {
     public static void ShowWelcomePanel(this WebApplication app)
     {
         // Выводим приветственную панель перед запуском сервера
-        var adminUrl = "http://localhost:5035/adminpanel";
-        var scoreboardUrl = "http://localhost:5035/scoreboard";
+        const string adminUrl = "http://localhost:5035/adminpanel";
+        const string scoreboardUrl = "http://localhost:5035/scoreboard";
 
         // Создаем заголовок
         var ruleTitle = app.Environment.IsDevelopment()

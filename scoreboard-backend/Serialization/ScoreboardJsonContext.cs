@@ -3,7 +3,6 @@ using scoreboard_backend.Models;
 
 namespace scoreboard_backend.Serialization;
 
-/// <inheritdoc />
 [JsonSourceGenerationOptions(WriteIndented = true, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(Player))]
 [JsonSerializable(typeof(MetaInfo))]

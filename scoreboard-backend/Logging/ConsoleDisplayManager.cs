@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
@@ -5,27 +6,26 @@ namespace scoreboard_backend.Logging;
 
 public class ConsoleDisplayManager
 {
-    private static ConsoleDisplayManager? _instance;
-    private static readonly object _instanceLock = new();
-    private readonly object _writeLock = new();
+    private static readonly Lock InstanceLock = new();
+    private readonly Lock _writeLock = new();
 
     private IRenderable? _headerContent;
     private int _headerHeight;
-    private int _logStartLine;
     private bool _initialized;
 
+    [field: AllowNull, MaybeNull]
     public static ConsoleDisplayManager Instance
     {
         get
         {
-            if (_instance == null)
+            if (field == null)
             {
-                lock (_instanceLock)
+                lock (InstanceLock)
                 {
-                    _instance ??= new ConsoleDisplayManager();
+                    field ??= new ConsoleDisplayManager();
                 }
             }
-            return _instance;
+            return field;
         }
     }
 
@@ -57,7 +57,6 @@ public class ConsoleDisplayManager
             AnsiConsole.WriteLine();
 
             _headerHeight = Console.CursorTop - startPos;
-            _logStartLine = Console.CursorTop;
 
             _initialized = true;
         }

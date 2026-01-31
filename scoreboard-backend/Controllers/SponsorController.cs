@@ -13,13 +13,13 @@ public class SponsorController : ControllerBase
         {
             // Получаем текущую директорию приложения
             var appDirectory = AppContext.BaseDirectory;
-            
+
             // Ищем файлы с названием "RXDCODX" с любым расширением
             var files = Directory.GetFiles(appDirectory, "RXDCODX*");
-            
+
             // Если файл найден - спонсорский баннер отключен (возвращаем true)
             var isSponsorDisabled = files.Length > 0;
-            
+
             return Ok(isSponsorDisabled);
         }
         catch (Exception ex)
