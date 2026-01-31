@@ -1,7 +1,7 @@
 using scoreboard_backend.Logging;
 using Spectre.Console;
 
-namespace scoreboard_backend;
+namespace scoreboard_backend.Extensions;
 
 public static class WebApplicationExtensions
 {

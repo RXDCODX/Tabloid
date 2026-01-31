@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.HttpLogging;
+using scoreboard_backend.Extensions;
 using scoreboard_backend.Hubs;
 using scoreboard_backend.Logging;
 using scoreboard_backend.Serialization;
