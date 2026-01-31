@@ -229,6 +229,7 @@ const Scoreboard: React.FC = () => {
               {isVideoFile(imgs?.centerImage?.imageName) && (
                 <MediaBackground
                   imageName={imgs?.centerImage?.imageName}
+                  imageType={ImageType.TopImage}
                   uploadedAt={imgs?.centerImage?.uploadedAt}
                 />
               )}
@@ -266,6 +267,7 @@ const Scoreboard: React.FC = () => {
               {isVideoFile(imgs?.leftImage?.imageName) && (
                 <MediaBackground
                   imageName={imgs?.leftImage?.imageName}
+                  imageType={ImageType.LeftImage}
                   uploadedAt={imgs?.leftImage?.uploadedAt}
                 />
               )}
@@ -358,6 +360,7 @@ const Scoreboard: React.FC = () => {
               {isVideoFile(imgs?.rightImage?.imageName) && (
                 <MediaBackground
                   imageName={imgs?.rightImage?.imageName}
+                  imageType={ImageType.RightImage}
                   uploadedAt={imgs?.rightImage?.uploadedAt}
                 />
               )}
@@ -451,6 +454,7 @@ const Scoreboard: React.FC = () => {
                 {isVideoFile(imgs?.fightModeImage?.imageName) && (
                   <MediaBackground
                     imageName={imgs?.fightModeImage?.imageName}
+                    imageType={ImageType.FightModeImage}
                     uploadedAt={imgs?.fightModeImage?.uploadedAt}
                   />
                 )}
