@@ -108,12 +108,10 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
               <div className={styles.imagePreview}>
                 {isVideo ? (
                   <video
-                    src={
-                      BackgroundImageService.getImageUrl(
-                        field,
-                        backgroundImage?.uploadedAt
-                      )
-                    }
+                    src={BackgroundImageService.getImageUrl(
+                      field,
+                      backgroundImage?.uploadedAt
+                    )}
                     className={styles.previewImage}
                     autoPlay
                     loop
@@ -122,12 +120,10 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
                   />
                 ) : (
                   <img
-                    src={
-                      BackgroundImageService.getImageUrl(
-                        field,
-                        backgroundImage?.uploadedAt
-                      )
-                    }
+                    src={BackgroundImageService.getImageUrl(
+                      field,
+                      backgroundImage?.uploadedAt
+                    )}
                     alt={`Preview for ${label}`}
                     className={styles.previewImage}
                     key={backgroundImage?.uploadedAt || 0}
@@ -289,6 +285,7 @@ const BackgroundImagesCard: React.FC = () => {
 
         <Form.Text className={styles.commonDescription}>
           Изображение или видео будет отображаться растянутым на весь блок.
+          <br />
           Поддерживаемые форматы: PNG, JPG, JPEG, GIF, WebP, MP4, WebM, MOV
         </Form.Text>
 

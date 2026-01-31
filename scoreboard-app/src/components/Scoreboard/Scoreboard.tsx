@@ -49,11 +49,6 @@ const Scoreboard: React.FC = () => {
     return `/assets/flags/${countryCode.toLowerCase()}.svg`;
   }, []);
 
-  // Ждём первичного состояния и видимости панели
-  if (!isVisible) {
-    return null;
-  }
-
   const p1 = player1;
   const p2 = player2;
   const m = meta;
@@ -202,278 +197,282 @@ const Scoreboard: React.FC = () => {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key='scoreboard-container'
-        variants={containerVariants}
-        initial='hidden'
-        animate='visible'
-        exit='hidden'
-        transition={{ duration: animDur / 1000 }}
-      >
-        {/* Центральный див - в самом верху по центру */}
-        <motion.div
-          className={styles.centerDiv}
-          variants={centerVariants}
-          style={{
-            backgroundColor: bgColor,
-            border: borderStyle,
-            boxShadow: glow,
-            top: layout?.center?.top,
-            left: layout?.center?.left,
-            right: layout?.center?.right,
-            width: layout?.center?.width,
-            height: layout?.center?.height,
-            ...(isVideoFile(imgs?.centerImage?.imageName)
-              ? {}
-              : bgStyleFor(ImageType.TopImage)),
-          }}
-        >
-          {isVideoFile(imgs?.centerImage?.imageName) && (
-            <MediaBackground
-              imageName={imgs?.centerImage?.imageName}
-              uploadedAt={imgs?.centerImage?.uploadedAt}
-            />
-          )}
-          <h5
-            id='metaTitle'
-            style={{
-              color: c.tournamentTitleColor,
-              textShadow: getTextOutline(c.textOutlineColor || '#000000'),
-              position: 'relative',
-              zIndex: 1,
-            }}
-          >
-            {m.title}
-          </h5>
-        </motion.div>
-
-        {/* Левый див - 167px от левого края, длина 540px, отступ сверху 15px */}
-        <motion.div
-          className={styles.leftDiv}
-          variants={itemVariants}
-          style={{
-            backgroundColor: bgColor,
-            border: borderStyle,
-            boxShadow: glow,
-            top: layout?.left?.top,
-            left: layout?.left?.left,
-            right: layout?.left?.right,
-            width: layout?.left?.width,
-            height: layout?.left?.height,
-            ...(isVideoFile(imgs?.leftImage?.imageName)
-              ? {}
-              : bgStyleFor(ImageType.LeftImage)),
-          }}
-        >
-          {isVideoFile(imgs?.leftImage?.imageName) && (
-            <MediaBackground
-              imageName={imgs?.leftImage?.imageName}
-              uploadedAt={imgs?.leftImage?.uploadedAt}
-            />
-          )}
-          <div
-            className={styles.playerInfo}
-            style={{ position: 'relative', zIndex: 1 }}
-          >
-            <h4
-              className={styles.playerName}
-              style={{
-                color: c.playerNamesColor,
-                textShadow: getTextOutline(c.textOutlineColor || '#000000'),
-              }}
-            >
-              <span data-side='left' style={{ color: c.playerNamesColor }}>
-                {p1.final === 'winner'
-                  ? '[W] '
-                  : p1.final === 'loser'
-                    ? '[L] '
-                    : ''}
-                {isValidTag(p1.tag) && (
-                  <span
-                    style={{
-                      color: c.mainColor,
-                      textShadow: getTextOutline(
-                        c.textOutlineColor || '#000000'
-                      ),
-                    }}
-                  >
-                    {p1.tag}
-                  </span>
-                )}
-                {isValidTag(p1.tag) && ' | '}
-                {p1.name}
-              </span>
-            </h4>
-          </div>
-          {p1.flag && p1.flag !== 'none' && (
-            <div
-              className={styles.flag}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-              }}
-            >
-              <img
-                src={getFlagPath(p1.flag)}
-                alt='Player 1 flag'
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'fill',
-                }}
-                onError={e => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-          <div
-            className={styles.score}
-            style={{ position: 'relative', zIndex: 1 }}
-          >
-            <h2 data-side='left' style={{ color: c.scoreColor }}>
-              {p1.score}
-            </h2>
-          </div>
-        </motion.div>
-
-        {/* Правый див - 167px от правого края, длина 540px, отступ сверху 15px */}
-        <motion.div
-          className={styles.rightDiv}
-          variants={itemVariants}
-          style={{
-            backgroundColor: bgColor,
-            border: borderStyle,
-            boxShadow: glow,
-            top: layout?.right?.top,
-            left: layout?.right?.left,
-            right: layout?.right?.right,
-            width: layout?.right?.width,
-            height: layout?.right?.height,
-            ...(isVideoFile(imgs?.rightImage?.imageName)
-              ? {}
-              : bgStyleFor(ImageType.RightImage)),
-          }}
-        >
-          {isVideoFile(imgs?.rightImage?.imageName) && (
-            <MediaBackground
-              imageName={imgs?.rightImage?.imageName}
-              uploadedAt={imgs?.rightImage?.uploadedAt}
-            />
-          )}
-          <div
-            className={styles.score}
-            style={{ position: 'relative', zIndex: 1 }}
-          >
-            <h2 data-side='right' style={{ color: c.scoreColor }}>
-              {p2.score}
-            </h2>
-          </div>
-          {p2.flag && p2.flag !== 'none' && (
-            <div
-              className={styles.flag}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-              }}
-            >
-              <img
-                src={getFlagPath(p2.flag)}
-                alt='Player 2 flag'
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'fill',
-                }}
-                onError={e => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-          <div
-            className={styles.playerInfo}
-            style={{ position: 'relative', zIndex: 1 }}
-          >
-            <h4
-              className={styles.playerName}
-              style={{
-                color: c.playerNamesColor,
-                textShadow: getTextOutline(c.textOutlineColor || '#000000'),
-              }}
-            >
-              <span data-side='right' style={{ color: c.playerNamesColor }}>
-                {p2.final === 'winner'
-                  ? '[W] '
-                  : p2.final === 'loser'
-                    ? '[L] '
-                    : ''}
-                {p2.name}
-                {isValidTag(p2.tag) && ' | '}
-                {isValidTag(p2.tag) && (
-                  <span
-                    style={{
-                      color: c.mainColor,
-                      textShadow: getTextOutline(
-                        c.textOutlineColor || '#000000'
-                      ),
-                    }}
-                  >
-                    {p2.tag}
-                  </span>
-                )}
-              </span>
-            </h4>
-          </div>
-        </motion.div>
-
-        {/* Четвертый див - режим драки (отображается только если есть значение и не "None") */}
-        {shouldShowFightMode() && (
+    <>
+      <AnimatePresence mode='wait'>
+        {isVisible && (
           <motion.div
-            className={styles.fightModeDiv}
-            variants={fightModeVariants}
+            key='scoreboard-container'
+            variants={containerVariants}
+            initial='hidden'
+            animate='visible'
+            exit='hidden'
+            transition={{ duration: animDur / 1000 }}
+          >
+          {/* Центральный див - в самом верху по центру */}
+          <motion.div
+            className={styles.centerDiv}
+            variants={centerVariants}
             style={{
               backgroundColor: bgColor,
               border: borderStyle,
               boxShadow: glow,
-              top: layout?.fightMode?.top,
-              left: layout?.fightMode?.left,
-              right: layout?.fightMode?.right,
-              width: layout?.fightMode?.width,
-              height: layout?.fightMode?.height,
-              ...(isVideoFile(imgs?.fightModeImage?.imageName)
+              top: layout?.center?.top,
+              left: layout?.center?.left,
+              right: layout?.center?.right,
+              width: layout?.center?.width,
+              height: layout?.center?.height,
+              ...(isVideoFile(imgs?.centerImage?.imageName)
                 ? {}
-                : bgStyleFor(ImageType.FightModeImage)),
+                : bgStyleFor(ImageType.TopImage)),
             }}
           >
-            {isVideoFile(imgs?.fightModeImage?.imageName) && (
+            {isVideoFile(imgs?.centerImage?.imageName) && (
               <MediaBackground
-                imageName={imgs?.fightModeImage?.imageName}
-                uploadedAt={imgs?.fightModeImage?.uploadedAt}
+                imageName={imgs?.centerImage?.imageName}
+                uploadedAt={imgs?.centerImage?.uploadedAt}
               />
             )}
-            <h4
+            <h5
+              id='metaTitle'
               style={{
-                color: c.fightModeColor,
+                color: c.tournamentTitleColor,
                 textShadow: getTextOutline(c.textOutlineColor || '#000000'),
                 position: 'relative',
                 zIndex: 1,
               }}
             >
-              {m.fightRule}
-            </h4>
+              {m.title}
+            </h5>
           </motion.div>
-        )}
 
-        {/* Спонсорский баннер */}
-        <SponsorBanner />
-      </motion.div>
-    </AnimatePresence>
+          {/* Левый див - 167px от левого края, длина 540px, отступ сверху 15px */}
+          <motion.div
+            className={styles.leftDiv}
+            variants={itemVariants}
+            style={{
+              backgroundColor: bgColor,
+              border: borderStyle,
+              boxShadow: glow,
+              top: layout?.left?.top,
+              left: layout?.left?.left,
+              right: layout?.left?.right,
+              width: layout?.left?.width,
+              height: layout?.left?.height,
+              ...(isVideoFile(imgs?.leftImage?.imageName)
+                ? {}
+                : bgStyleFor(ImageType.LeftImage)),
+            }}
+          >
+            {isVideoFile(imgs?.leftImage?.imageName) && (
+              <MediaBackground
+                imageName={imgs?.leftImage?.imageName}
+                uploadedAt={imgs?.leftImage?.uploadedAt}
+              />
+            )}
+            <div
+              className={styles.playerInfo}
+              style={{ position: 'relative', zIndex: 1 }}
+            >
+              <h4
+                className={styles.playerName}
+                style={{
+                  color: c.playerNamesColor,
+                  textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+                }}
+              >
+                <span data-side='left' style={{ color: c.playerNamesColor }}>
+                  {p1.final === 'winner'
+                    ? '[W] '
+                    : p1.final === 'loser'
+                      ? '[L] '
+                      : ''}
+                  {isValidTag(p1.tag) && (
+                    <span
+                      style={{
+                        color: c.mainColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                      }}
+                    >
+                      {p1.tag}
+                    </span>
+                  )}
+                  {isValidTag(p1.tag) && ' | '}
+                  {p1.name}
+                </span>
+              </h4>
+            </div>
+            {p1.flag && p1.flag !== 'none' && (
+              <div
+                className={styles.flag}
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                <img
+                  src={getFlagPath(p1.flag)}
+                  alt='Player 1 flag'
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'fill',
+                  }}
+                  onError={e => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div
+              className={styles.score}
+              style={{ position: 'relative', zIndex: 1 }}
+            >
+              <h2 data-side='left' style={{ color: c.scoreColor }}>
+                {p1.score}
+              </h2>
+            </div>
+          </motion.div>
+
+          {/* Правый див - 167px от правого края, длина 540px, отступ сверху 15px */}
+          <motion.div
+            className={styles.rightDiv}
+            variants={itemVariants}
+            style={{
+              backgroundColor: bgColor,
+              border: borderStyle,
+              boxShadow: glow,
+              top: layout?.right?.top,
+              left: layout?.right?.left,
+              right: layout?.right?.right,
+              width: layout?.right?.width,
+              height: layout?.right?.height,
+              ...(isVideoFile(imgs?.rightImage?.imageName)
+                ? {}
+                : bgStyleFor(ImageType.RightImage)),
+            }}
+          >
+            {isVideoFile(imgs?.rightImage?.imageName) && (
+              <MediaBackground
+                imageName={imgs?.rightImage?.imageName}
+                uploadedAt={imgs?.rightImage?.uploadedAt}
+              />
+            )}
+            <div
+              className={styles.score}
+              style={{ position: 'relative', zIndex: 1 }}
+            >
+              <h2 data-side='right' style={{ color: c.scoreColor }}>
+                {p2.score}
+              </h2>
+            </div>
+            {p2.flag && p2.flag !== 'none' && (
+              <div
+                className={styles.flag}
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                <img
+                  src={getFlagPath(p2.flag)}
+                  alt='Player 2 flag'
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'fill',
+                  }}
+                  onError={e => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div
+              className={styles.playerInfo}
+              style={{ position: 'relative', zIndex: 1 }}
+            >
+              <h4
+                className={styles.playerName}
+                style={{
+                  color: c.playerNamesColor,
+                  textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+                }}
+              >
+                <span data-side='right' style={{ color: c.playerNamesColor }}>
+                  {p2.final === 'winner'
+                    ? '[W] '
+                    : p2.final === 'loser'
+                      ? '[L] '
+                      : ''}
+                  {p2.name}
+                  {isValidTag(p2.tag) && ' | '}
+                  {isValidTag(p2.tag) && (
+                    <span
+                      style={{
+                        color: c.mainColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                      }}
+                    >
+                      {p2.tag}
+                    </span>
+                  )}
+                </span>
+              </h4>
+            </div>
+          </motion.div>
+
+          {/* Четвертый див - режим драки (отображается только если есть значение и не "None") */}
+          {shouldShowFightMode() && (
+            <motion.div
+              className={styles.fightModeDiv}
+              variants={fightModeVariants}
+              style={{
+                backgroundColor: bgColor,
+                border: borderStyle,
+                boxShadow: glow,
+                top: layout?.fightMode?.top,
+                left: layout?.fightMode?.left,
+                right: layout?.fightMode?.right,
+                width: layout?.fightMode?.width,
+                height: layout?.fightMode?.height,
+                ...(isVideoFile(imgs?.fightModeImage?.imageName)
+                  ? {}
+                  : bgStyleFor(ImageType.FightModeImage)),
+              }}
+            >
+              {isVideoFile(imgs?.fightModeImage?.imageName) && (
+                <MediaBackground
+                  imageName={imgs?.fightModeImage?.imageName}
+                  uploadedAt={imgs?.fightModeImage?.uploadedAt}
+                />
+              )}
+              <h4
+                style={{
+                  color: c.fightModeColor,
+                  textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                {m.fightRule}
+              </h4>
+            </motion.div>
+          )}
+
+          {/* Спонсорский баннер */}
+        </motion.div>
+      )}
+      </AnimatePresence>
+      <SponsorBanner />
+    </>
   );
 };
 
