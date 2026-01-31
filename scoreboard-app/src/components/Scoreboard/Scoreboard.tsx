@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../store/adminStateStore';
+import { ImageType } from '../../types/types';
+import { BackgroundImageService } from '../AdminPanel/services/BackgroundImagesService';
 import MediaBackground from './MediaBackground';
 import styles from './Scoreboard.module.scss';
 import SponsorBanner from './SponsorBanner';
@@ -80,17 +82,45 @@ const Scoreboard: React.FC = () => {
 
   // background images (stretch to cover corresponding containers)
   const imgs = backgroundImages;
-  const bgStyleFor = (
-    img?: { imageName?: string; uploadedAt?: number } | null
-  ) =>
-    img && img.imageName
-      ? {
-          backgroundImage: `url(Images/${img.imageName}${img.uploadedAt ? `?t=${img.uploadedAt}` : ''})`,
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }
-      : {};
+
+  const bgStyleFor = useCallback(
+    (imageType?: ImageType) => {
+      if (!imageType || imageType === ImageType.None) {
+        return {};
+      }
+      const imageKey =
+        imageType === ImageType.TopImage
+          ? 'centerImage'
+          : imageType === ImageType.LeftImage
+            ? 'leftImage'
+            : imageType === ImageType.RightImage
+              ? 'rightImage'
+              : imageType === ImageType.FightModeImage
+                ? 'fightModeImage'
+                : undefined;
+
+      if (!imageKey) {
+        return {};
+      }
+
+      const img = imgs[imageKey];
+
+      if (!img?.imageName) {
+        return {};
+      }
+
+      return {
+        backgroundImage: `url(${BackgroundImageService.getImageUrl(
+          imageType,
+          img.uploadedAt
+        )})`,
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      };
+    },
+    [imgs]
+  );
 
   // Функция для проверки, является ли файл видео
   const isVideoFile = (imageName?: string) => {
@@ -196,7 +226,7 @@ const Scoreboard: React.FC = () => {
             height: layout?.center?.height,
             ...(isVideoFile(imgs?.centerImage?.imageName)
               ? {}
-              : bgStyleFor(imgs?.centerImage as any)),
+              : bgStyleFor(ImageType.TopImage)),
           }}
         >
           {isVideoFile(imgs?.centerImage?.imageName) && (
@@ -233,7 +263,7 @@ const Scoreboard: React.FC = () => {
             height: layout?.left?.height,
             ...(isVideoFile(imgs?.leftImage?.imageName)
               ? {}
-              : bgStyleFor(imgs?.leftImage as any)),
+              : bgStyleFor(ImageType.LeftImage)),
           }}
         >
           {isVideoFile(imgs?.leftImage?.imageName) && (
@@ -325,7 +355,7 @@ const Scoreboard: React.FC = () => {
             height: layout?.right?.height,
             ...(isVideoFile(imgs?.rightImage?.imageName)
               ? {}
-              : bgStyleFor(imgs?.rightImage as any)),
+              : bgStyleFor(ImageType.RightImage)),
           }}
         >
           {isVideoFile(imgs?.rightImage?.imageName) && (
@@ -418,7 +448,7 @@ const Scoreboard: React.FC = () => {
               height: layout?.fightMode?.height,
               ...(isVideoFile(imgs?.fightModeImage?.imageName)
                 ? {}
-                : bgStyleFor(imgs?.fightModeImage as any)),
+                : bgStyleFor(ImageType.FightModeImage)),
             }}
           >
             {isVideoFile(imgs?.fightModeImage?.imageName) && (

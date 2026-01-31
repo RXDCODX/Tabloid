@@ -5,24 +5,51 @@ namespace scoreboard_backend.Services;
 public class BackgroundImagesService
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-
     private readonly string _imagesFolder;
     private readonly ILogger<BackgroundImagesService> _logger;
+    private readonly DatabaseService _databaseService;
+
+    // In-memory cache: ImageType -> (ImageName, ImageData, ContentType, UploadedAt)
+    private readonly Dictionary<
+        string,
+        (string ImageName, byte[] ImageData, string ContentType, long UploadedAt)
+    > _imageCache = new();
 
     public BackgroundImagesService(
         IWebHostEnvironment environment,
-        ILogger<BackgroundImagesService> logger
+        ILogger<BackgroundImagesService> logger,
+        DatabaseService databaseService
     )
     {
         _logger = logger;
+        _databaseService = databaseService;
         _imagesFolder = Path.Combine(environment.WebRootPath, "Images");
 
         _logger.LogInformation(
-            "BackgroundImagesService initialized. Images folder: {ImagesFolder}",
-            _imagesFolder
+            "BackgroundImagesService initialized with database-only storage"
         );
 
-        EnsureImagesFolderExists();
+        LoadCacheFromDatabase();
+    }
+
+    private void LoadCacheFromDatabase()
+    {
+        try
+        {
+            var images = _databaseService.LoadAllBackgroundImages();
+            foreach (var kvp in images)
+            {
+                _imageCache[kvp.Key] = kvp.Value;
+            }
+            _logger.LogInformation(
+                "Loaded {Count} background images from database into cache",
+                _imageCache.Count
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load background images from database");
+        }
     }
 
     public async Task UpdateBackgroundImage(BackgroundImage image)
@@ -53,30 +80,35 @@ public class BackgroundImagesService
                 throw new ArgumentException("Invalid image name", nameof(image));
             }
 
-            var filePath = Path.Combine(_imagesFolder, sanitizedFileName);
-            var fullPath = Path.GetFullPath(filePath);
-            var folderFullPath = Path.GetFullPath(_imagesFolder);
-            if (!fullPath.StartsWith(folderFullPath, StringComparison.OrdinalIgnoreCase))
+            // Read file data into memory
+            byte[] imageData;
+            using (var memoryStream = new MemoryStream())
             {
-                _logger.LogError(
-                    "Invalid file path detected. FilePath={FilePath}, ImagesFolder={ImagesFolder}",
-                    fullPath,
-                    folderFullPath
-                );
-                throw new InvalidOperationException("Invalid file path");
+                await image.File.CopyToAsync(memoryStream);
+                imageData = memoryStream.ToArray();
             }
 
-            await using var fileStream = new FileStream(
-                filePath,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                81920,
-                useAsync: true
+            var contentType = image.File.ContentType ?? GetContentType(sanitizedFileName);
+            var imageTypeString = image.ImageType.ToString();
+            var uploadedAt = image.UploadedAt ?? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            // Save to cache immediately
+            _imageCache[imageTypeString] = (sanitizedFileName, imageData, contentType, uploadedAt);
+            _logger.LogInformation(
+                "Saved {ImageType} to cache, size: {Size} bytes",
+                imageTypeString,
+                imageData.Length
             );
 
-            await image.File.CopyToAsync(fileStream);
-            _logger.LogInformation("Saved background image to {FilePath}", filePath);
+            // Save to database (synchronously to ensure persistence)
+            _databaseService.SaveBackgroundImage(
+                imageTypeString,
+                sanitizedFileName,
+                imageData,
+                contentType,
+                uploadedAt
+            );
+            _logger.LogInformation("Saved background image to database for type {ImageType}", imageTypeString);
         }
         catch (Exception ex)
         {
@@ -94,24 +126,24 @@ public class BackgroundImagesService
         await _semaphore.WaitAsync();
         try
         {
-            var files = Directory.GetFiles(_imagesFolder);
-            var targetName = imageType.ToString();
+            var imageTypeString = imageType.ToString();
 
-            foreach (var filePath in files)
-            {
-                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-                if (fileNameWithoutExtension.Equals(targetName, StringComparison.OrdinalIgnoreCase))
-                {
-                    File.Delete(filePath);
-                    _logger.LogInformation("Deleted background image file {FilePath}", filePath);
-                }
-            }
+            // Remove from cache
+            _imageCache.Remove(imageTypeString);
+            _logger.LogInformation("Removed {ImageType} from cache", imageTypeString);
+
+            // Delete from database
+            _databaseService.DeleteBackgroundImage(imageTypeString);
+            _logger.LogInformation(
+                "Deleted {ImageType} from database",
+                imageTypeString
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
-                "Error while deleting background images for type {ImageType}",
+                "Error while deleting background image type {ImageType}",
                 imageType
             );
             throw;
@@ -130,48 +162,41 @@ public class BackgroundImagesService
         {
             var fileList = new List<BackgroundImage>();
 
-            foreach (var filePath in Directory.GetFiles(_imagesFolder))
-            {
-                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            // Use cache to return images
+            _logger.LogInformation(
+                "Returning {Count} images from cache",
+                _imageCache.Count
+            );
 
-                if (!Enum.TryParse<ImageType>(fileNameWithoutExtension, true, out var imageType))
+            foreach (var kvp in _imageCache)
+            {
+                if (!Enum.TryParse<ImageType>(kvp.Key, true, out var imageType))
                 {
-                    // skip files that don't match the ImageType enum
-                    _logger.LogDebug(
-                        "Skipping file that doesn't match ImageType enum: {FilePath}",
-                        filePath
-                    );
                     continue;
                 }
 
-                var fileName = Path.GetFileName(filePath);
+                var (imageName, imageData, contentType, uploadedAt) = kvp.Value;
 
-                // Get file modification time
-                var fileInfo = new FileInfo(filePath);
-                var uploadedAt = new DateTimeOffset(fileInfo.LastWriteTimeUtc).ToUnixTimeMilliseconds();
-
-                // Read file into memory so the returned IFormFile is usable after this method returns
-                var bytes = await File.ReadAllBytesAsync(filePath);
-                var memoryStream = new MemoryStream(bytes);
+                var memoryStream = new MemoryStream(imageData);
                 memoryStream.Position = 0;
 
                 var formFile = new FormFile(
                     memoryStream,
                     0,
                     memoryStream.Length,
-                    fileNameWithoutExtension,
-                    fileName
+                    kvp.Key,
+                    imageName
                 )
                 {
                     Headers = new HeaderDictionary(),
-                    ContentType = GetContentType(fileName),
+                    ContentType = contentType,
                 };
 
                 fileList.Add(
                     new BackgroundImage()
                     {
                         File = formFile,
-                        ImageName = fileName,
+                        ImageName = imageName,
                         ImageType = imageType,
                         UploadedAt = uploadedAt,
                     }
@@ -185,8 +210,7 @@ public class BackgroundImagesService
         {
             _logger.LogError(
                 ex,
-                "Error while reading background images from folder {ImagesFolder}",
-                _imagesFolder
+                "Error while reading background images from cache"
             );
             throw;
         }
@@ -202,38 +226,22 @@ public class BackgroundImagesService
         await _semaphore.WaitAsync();
         try
         {
-            foreach (var file in Directory.GetFiles(_imagesFolder))
-            {
-                File.Delete(file);
-                _logger.LogInformation("Deleted image file {File}", file);
-            }
+            // Clear cache
+            _imageCache.Clear();
+            _logger.LogInformation("Cleared image cache");
+
+            // Clear database
+            _databaseService.ClearAllBackgroundImages();
+            _logger.LogInformation("Cleared all images from database");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while clearing image folder {ImagesFolder}", _imagesFolder);
+            _logger.LogError(ex, "Error while clearing background images");
             throw;
         }
         finally
         {
             _semaphore.Release();
-        }
-    }
-
-    private void EnsureImagesFolderExists()
-    {
-        try
-        {
-            Directory.CreateDirectory(_imagesFolder);
-            _logger.LogInformation("Ensured images folder exists: {ImagesFolder}", _imagesFolder);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Failed to ensure images folder exists: {ImagesFolder}",
-                _imagesFolder
-            );
-            throw;
         }
     }
 

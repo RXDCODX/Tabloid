@@ -109,11 +109,10 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
                 {isVideo ? (
                   <video
                     src={
-                      '/Images/' +
-                      (backgroundImage?.imageName || '') +
-                      (backgroundImage?.uploadedAt
-                        ? `?t=${backgroundImage.uploadedAt}`
-                        : '')
+                      BackgroundImageService.getImageUrl(
+                        field,
+                        backgroundImage?.uploadedAt
+                      )
                     }
                     className={styles.previewImage}
                     autoPlay
@@ -124,11 +123,10 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
                 ) : (
                   <img
                     src={
-                      '/Images/' +
-                      (backgroundImage?.imageName || '') +
-                      (backgroundImage?.uploadedAt
-                        ? `?t=${backgroundImage.uploadedAt}`
-                        : '')
+                      BackgroundImageService.getImageUrl(
+                        field,
+                        backgroundImage?.uploadedAt
+                      )
                     }
                     alt={`Preview for ${label}`}
                     className={styles.previewImage}

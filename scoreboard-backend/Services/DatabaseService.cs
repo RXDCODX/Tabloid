@@ -88,6 +88,21 @@ public class DatabaseService
             colorCmd.CommandText = colorSql;
             colorCmd.ExecuteNonQuery();
 
+            // Create table for background images
+            var imagesSql = """
+                CREATE TABLE IF NOT EXISTS background_images (
+                    ImageType TEXT PRIMARY KEY,
+                    ImageName TEXT NOT NULL,
+                    ImageData BLOB NOT NULL,
+                    ContentType TEXT NOT NULL,
+                    UploadedAt INTEGER NOT NULL
+                );
+                """;
+
+            using var imagesCmd = conn.CreateCommand();
+            imagesCmd.CommandText = imagesSql;
+            imagesCmd.ExecuteNonQuery();
+
             // Detect legacy schema: if player_presets has a 'Country' column, migrate it to 'Flag'
             try
             {
@@ -369,6 +384,109 @@ public class DatabaseService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to replace all color presets in DB");
+        }
+    }
+
+    // Background images methods
+    public void SaveBackgroundImage(
+        string imageType,
+        string imageName,
+        byte[] imageData,
+        string contentType,
+        long uploadedAt
+    )
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = """
+                INSERT OR REPLACE INTO background_images(ImageType, ImageName, ImageData, ContentType, UploadedAt)
+                VALUES(@imageType, @imageName, @imageData, @contentType, @uploadedAt)
+                """;
+
+            cmd.Parameters.AddWithValue("@imageType", imageType);
+            cmd.Parameters.AddWithValue("@imageName", imageName);
+            cmd.Parameters.AddWithValue("@imageData", imageData);
+            cmd.Parameters.AddWithValue("@contentType", contentType);
+            cmd.Parameters.AddWithValue("@uploadedAt", uploadedAt);
+
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save background image to DB: {ImageType}", imageType);
+        }
+    }
+
+    public void DeleteBackgroundImage(string imageType)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM background_images WHERE ImageType = @imageType";
+            cmd.Parameters.AddWithValue("@imageType", imageType);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to delete background image from DB: {ImageType}",
+                imageType
+            );
+        }
+    }
+
+    public Dictionary<string, (string ImageName, byte[] ImageData, string ContentType, long UploadedAt)>
+        LoadAllBackgroundImages()
+    {
+        var result =
+            new Dictionary<
+                string,
+                (string ImageName, byte[] ImageData, string ContentType, long UploadedAt)
+            >();
+
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText =
+                "SELECT ImageType, ImageName, ImageData, ContentType, UploadedAt FROM background_images";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var imageType = reader.GetString(0);
+                var imageName = reader.GetString(1);
+                var imageData = (byte[])reader["ImageData"];
+                var contentType = reader.GetString(3);
+                var uploadedAt = reader.GetInt64(4);
+
+                result[imageType] = (imageName, imageData, contentType, uploadedAt);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load background images from DB");
+        }
+
+        return result;
+    }
+
+    public void ClearAllBackgroundImages()
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM background_images";
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to clear all background images from DB");
         }
     }
 }

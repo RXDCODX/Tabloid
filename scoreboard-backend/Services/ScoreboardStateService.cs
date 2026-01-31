@@ -11,7 +11,6 @@ public class ScoreboardStateService
     private readonly bool _persistenceDisabled;
 
     private readonly BackgroundImagesService _backgroundImagesService;
-    private readonly IServiceProvider _serviceCollection;
     private readonly ILogger<ScoreboardStateService> _logger;
     private readonly DatabaseService _databaseService;
 
@@ -22,13 +21,11 @@ public class ScoreboardStateService
 
     public ScoreboardStateService(
         BackgroundImagesService backgroundImagesService,
-        IServiceProvider serviceCollection,
         ILogger<ScoreboardStateService> logger,
         DatabaseService databaseService
     )
     {
         _backgroundImagesService = backgroundImagesService;
-        _serviceCollection = serviceCollection;
         _logger = logger;
         _databaseService = databaseService;
 
@@ -307,10 +304,10 @@ public class ScoreboardStateService
                 ScoreboardJsonContext.Default.ScoreboardState
             );
             _state = loaded ?? new ScoreboardState();
-            
+
             // Sync images from filesystem to ensure UploadedAt is current
             SyncImagesFromFileSystem();
-            
+
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation("Loaded persisted state from DB");
@@ -354,7 +351,7 @@ public class ScoreboardStateService
                         break;
                 }
             }
-            
+
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation("Synced {Count} images from filesystem", images.Count);
