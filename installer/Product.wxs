@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Scoreboard"
+           Manufacturer="Scoreboard"
+           Version="1.0.0"
+           UpgradeCode="2F44C98E-CA09-4A34-8B8F-9D10E6A8D176">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="Scoreboard" />
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="Scoreboard" Level="1">
+      <ComponentGroupRef Id="PublishFiles" />
+    </Feature>
+  </Package>
+</Wix>

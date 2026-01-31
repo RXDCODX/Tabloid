@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/4.0.0">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <ProductVersion>1.0.0</ProductVersion>
+    <PackageName>Scoreboard</PackageName>
+    <Manufacturer>Scoreboard</Manufacturer>
+    <UpgradeCode>2F44C98E-CA09-4A34-8B8F-9D10E6A8D176</UpgradeCode>
+    <PublishOutputDir>..\scoreboard-backend\bin\Release\net10.0\publish</PublishOutputDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HarvestDirectory Include="$(PublishOutputDir)">
+      <ComponentGroupName>PublishFiles</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+    </HarvestDirectory>
+  </ItemGroup>
+</Project>

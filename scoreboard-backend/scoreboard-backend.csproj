@@ -17,6 +17,7 @@
     <SpaProxyTimeoutInSeconds>1200</SpaProxyTimeoutInSeconds>
     <!-- Optionally forward only request starting with the specified path 
     <SpaPublicPath>/dist</SpaPublicPath> -->
+    <FrontendDistPath>$(SpaRoot)/dist</FrontendDistPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,10 +32,15 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
   </ItemGroup>
 
+  <Target Name="BuildFrontendOnPublish" BeforeTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" Condition="!Exists('$(SpaRoot)/node_modules')" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+  </Target>
+
   <!-- Основной Target для копирования frontend файлов -->
   <Target Name="CopyFrontendToWwwroot" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <PropertyGroup>
-      <FrontendDistPath>..\scoreboard-app\dist</FrontendDistPath>
+      <FrontendDistPath>$(SpaRoot)/dist</FrontendDistPath>
     </PropertyGroup>
     
     <!-- Проверяем существование dist папки -->
@@ -70,6 +76,35 @@
     <WriteLinesToFile File="wwwroot\index.html" 
                       Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" 
                       Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
+  </Target>
+  
+  <Target Name="CopyFrontendToPublish" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <PublishWwwroot>$(PublishDir)wwwroot</PublishWwwroot>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="Exists('$(FrontendDistPath)')">
+      <DistFolderExists>true</DistFolderExists>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="!Exists('$(FrontendDistPath)')">
+      <DistFolderExists>false</DistFolderExists>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(PublishWwwroot)" Condition="!Exists('$(PublishWwwroot)')" />
+    <MakeDir Directories="$(PublishWwwroot)\Images" Condition="!Exists('$(PublishWwwroot)\Images')" />
+
+    <ItemGroup Condition="'$(DistFolderExists)' == 'true'">
+      <DistFiles Include="$(FrontendDistPath)/**/*.*" Exclude="$(FrontendDistPath)/Images/**/*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(DistFiles)" 
+          DestinationFolder="$(PublishWwwroot)\%(RecursiveDir)" 
+          SkipUnchangedFiles="true" 
+          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
+          ContinueOnError="true" />
+
+    <Message Text="[SPA] Copied $(DistFiles->Count()) frontend files to publish output" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
   </Target>
   
       <ItemGroup>
