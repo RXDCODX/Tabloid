@@ -5,9 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>scoreboard_backend</RootNamespace>
+    <!-- Ensure published assembly has a stable name that trimming can reference -->
+    <AssemblyName>scoreboard_backend</AssemblyName>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+    <TrimMode>partial</TrimMode>
 
     <!-- SpaYarp configuration -->
     <SpaRoot>../scoreboard-app</SpaRoot>
@@ -30,6 +33,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Ensure assemblies that may be resolved via ApplicationPartAttribute are preserved when publishing with trimming or single-file
+       This prevents runtime FileNotFoundException for Microsoft.AspNetCore.OpenApi when ApplicationPartManager attempts to load it. -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Microsoft.AspNetCore.OpenApi" />
+    <!-- Prevent trimming from removing controller types in the app assembly which would make API routes unavailable -->
+    <TrimmerRootAssembly Include="scoreboard_backend" />
   </ItemGroup>
 
   <Target Name="BuildFrontendOnPublish" BeforeTargets="Publish" Condition="'$(Configuration)' == 'Release'">
@@ -61,21 +72,15 @@
       <DistFiles Include="$(FrontendDistPath)\**\*.*" Exclude="$(FrontendDistPath)\Images\**\*.*" />
     </ItemGroup>
     
-    <Copy SourceFiles="@(DistFiles)" 
-          DestinationFolder="wwwroot\%(RecursiveDir)" 
-          SkipUnchangedFiles="true" 
-          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
-          ContinueOnError="true" />
+    <Copy SourceFiles="@(DistFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" ContinueOnError="true" />
     
     <!-- Логируем результат -->
     <Message Text="[SPA] Frontend dist folder found: $(DistFolderExists)" Importance="high" />
-    <Message Text="[SPA] Copied $(DistFiles->Count()) frontend files to wwwroot" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
+    <Message Text="[SPA] Copied $(DistFiles-&gt;Count()) frontend files to wwwroot" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
     <Message Text="[SPA] No frontend files found" Importance="high" Condition="'$(DistFolderExists)' != 'true'" />
     
     <!-- Создаем fallback index.html если копирование не удалось -->
-    <WriteLinesToFile File="wwwroot\index.html" 
-                      Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" 
-                      Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
+    <WriteLinesToFile File="wwwroot\index.html" Lines="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Scoreboard&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Scoreboard Backend Running&lt;/h1&gt;&lt;p&gt;Frontend files not found. Please build the frontend separately.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;" Condition="'$(DistFolderExists)' != 'true' OR '@(DistFiles)' == ''" />
   </Target>
   
   <Target Name="CopyFrontendToPublish" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
@@ -98,13 +103,9 @@
       <DistFiles Include="$(FrontendDistPath)/**/*.*" Exclude="$(FrontendDistPath)/Images/**/*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(DistFiles)" 
-          DestinationFolder="$(PublishWwwroot)\%(RecursiveDir)" 
-          SkipUnchangedFiles="true" 
-          Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" 
-          ContinueOnError="true" />
+    <Copy SourceFiles="@(DistFiles)" DestinationFolder="$(PublishWwwroot)\%(RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" ContinueOnError="true" />
 
-    <Message Text="[SPA] Copied $(DistFiles->Count()) frontend files to publish output" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
+    <Message Text="[SPA] Copied $(DistFiles-&gt;Count()) frontend files to publish output" Importance="high" Condition="'$(DistFolderExists)' == 'true' AND '@(DistFiles)' != ''" />
   </Target>
   
       <ItemGroup>

@@ -12,7 +12,7 @@ public class BackgroundImagesController(
     ScoreboardStateService service,
     BackgroundImagesService backgroundImagesService,
     IHubContext<ScoreboardHub> hubContext
-) : Controller
+) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> UpdateBackgroundImage(

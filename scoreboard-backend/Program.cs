@@ -18,7 +18,10 @@ public static class Program
         builder.Logging.AddProvider(new SpectreConsoleLoggerProvider());
 
         // Добавляем SPA сервисы
-        builder.Services.AddSpaYarp();
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddSpaYarp();
+        }
 
         // Add services to the container.
         builder.Services.AddSingleton<ScoreboardStateService>();
@@ -51,10 +54,10 @@ public static class Program
             )
         );
 
-        builder.Services.AddEndpointsApiExplorer();
         if (builder.Environment.IsDevelopment())
         {
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddHttpLogging(options =>
             {
@@ -70,13 +73,17 @@ public static class Program
         var app = builder.Build();
 
         // Настройка SpaYarp для обработки SPA маршрутов
-        app.UseSpaYarp();
 
         if (app.Environment.IsDevelopment())
         {
+            app.UseSpaYarp();
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseHttpLogging();
+        }
+        else
+        {
+            app.MapFallbackToFile("index.html");
         }
 
         // Настройки для статических файлов с предотвращением кеширования

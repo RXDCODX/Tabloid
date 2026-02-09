@@ -17,6 +17,7 @@ public class ScoreboardHub(
     {
         logger.LogInformation("Client connected: {ConnectionId}", Context.ConnectionId);
         await Clients.Caller.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        await Clients.Caller.SendAsync("ReceiveColorPresets", colorPresetService.GetAll());
     }
 
     public async Task GetState()

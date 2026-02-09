@@ -8,8 +8,10 @@ public static class WebApplicationExtensions
     public static void ShowWelcomePanel(this WebApplication app)
     {
         // Выводим приветственную панель перед запуском сервера
-        const string adminUrl = "http://localhost:5035/adminpanel";
-        const string scoreboardUrl = "http://localhost:5035/scoreboard";
+        // Try to read URLs from configuration, fall back to defaults if not set
+        var basicUrl = app.Configuration["Kestrel:Endpoints:Http:Url"] ?? "http://localhost:5073";
+        var adminUrl = basicUrl + "/adminpanel";
+        var scoreboardUrl = basicUrl + "/scoreboard";
 
         // Создаем заголовок
         var ruleTitle = app.Environment.IsDevelopment()
