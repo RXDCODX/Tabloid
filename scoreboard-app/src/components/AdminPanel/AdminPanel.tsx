@@ -1,6 +1,7 @@
 import { memo, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useAdminPanelVisibilityStore } from '../../store/adminPanelVisibilityStore';
 import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
@@ -10,11 +11,14 @@ import LayoutConfigCard from './Cards/LayoutConfigCard';
 import MetaPanel from './Cards/MetaPanel';
 import PlayerCard from './Cards/PlayerCard';
 import VisibilityCard from './Cards/VisibilityCard';
+import Sidebar from './Sidebar/Sidebar';
 
 import ActionButtons from './UI/ActionButtons';
 
 const AdminPanel = () => {
   console.log('[AdminPanel] Render');
+
+  const { cardVisibility } = useAdminPanelVisibilityStore();
 
   // Редирект на админку при открытии с телефона
   const navigate = useNavigate();
@@ -29,63 +33,82 @@ const AdminPanel = () => {
 
   return (
     <>
+      <Sidebar />
       <Container className={`py-4 admin-panel ${styles.adminPanel}`}>
         {/* Visibility Panel и Meta Panel в один ряд с одинаковой шириной */}
-        <Row className='mb-4'>
-          <Col xs={12} md={6} lg={6}>
-            <VisibilityCard />
-          </Col>
-          <Col xs={12} md={6} lg={6}>
-            <MetaPanel />
-          </Col>
-        </Row>
+        {(cardVisibility.visibility || cardVisibility.meta) && (
+          <Row className='mb-4'>
+            {cardVisibility.visibility && (
+              <Col
+                xs={12}
+                md={cardVisibility.meta ? 6 : 12}
+                lg={cardVisibility.meta ? 6 : 12}
+              >
+                <VisibilityCard />
+              </Col>
+            )}
+            {cardVisibility.meta && (
+              <Col
+                xs={12}
+                md={cardVisibility.visibility ? 6 : 12}
+                lg={cardVisibility.visibility ? 6 : 12}
+              >
+                <MetaPanel />
+              </Col>
+            )}
+          </Row>
+        )}
 
         {/* Color Preset Panel */}
-        <ColorPresetCard />
+        {cardVisibility.colorPreset && <ColorPresetCard />}
 
         {/* Borders Toggle */}
-        <Row className='mb-4'>
-          <Col xs={12}>
-            <BordersToggleCard />
-          </Col>
-        </Row>
+        {cardVisibility.borders && (
+          <Row className='mb-4'>
+            <Col xs={12}>
+              <BordersToggleCard />
+            </Col>
+          </Row>
+        )}
 
         {/* Background Images Panel */}
-        <BackgroundImagesCard />
+        {cardVisibility.backgroundImages && <BackgroundImagesCard />}
 
         {/* Fonts Panel */}
-        <FontsCard />
+        {cardVisibility.fonts && <FontsCard />}
 
         {/* Layout Config Panel */}
-        <LayoutConfigCard />
+        {cardVisibility.layoutConfig && <LayoutConfigCard />}
 
         {/* Players Cards */}
-        <Row className='justify-content-center align-items-center g-4'>
-          <Col
-            xs={12}
-            md={5}
-            lg={4}
-            className='d-flex justify-content-center mb-3 mb-md-0'
-          >
-            <PlayerCard label='Player 1' playerNumber={1} accent='#0dcaf0' />
-          </Col>
-          <Col
-            xs={12}
-            md={2}
-            lg={2}
-            className='d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2'
-          >
-            <ActionButtons />
-          </Col>
-          <Col
-            xs={12}
-            md={5}
-            lg={4}
-            className='d-flex justify-content-center mb-3 mb-md-0'
-          >
-            <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
-          </Col>
-        </Row>
+        {cardVisibility.players && (
+          <Row className='justify-content-center align-items-center g-4'>
+            <Col
+              xs={12}
+              md={5}
+              lg={4}
+              className='d-flex justify-content-center mb-3 mb-md-0'
+            >
+              <PlayerCard label='Player 1' playerNumber={1} accent='#0dcaf0' />
+            </Col>
+            <Col
+              xs={12}
+              md={2}
+              lg={2}
+              className='d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2'
+            >
+              <ActionButtons />
+            </Col>
+            <Col
+              xs={12}
+              md={5}
+              lg={4}
+              className='d-flex justify-content-center mb-3 mb-md-0'
+            >
+              <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
+            </Col>
+          </Row>
+        )}
       </Container>
       <style>
         {` 
