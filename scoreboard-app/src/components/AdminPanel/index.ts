@@ -10,6 +10,7 @@ export { default as FlagSelector } from './Forms/FlagSelector';
 
 // Карточки
 export { default as ColorPresetCard } from './Cards/ColorPresetCard';
+export { default as FontsCard } from './Cards/FontsCard';
 export { default as MetaPanel } from './Cards/MetaPanel';
 export { default as PlayerCard } from './Cards/PlayerCard';
 export { default as VisibilityCard } from './Cards/VisibilityCard';
@@ -23,3 +24,4 @@ export * from './types';
 // Сервисы
 // Репозиторий пресетов игроков располагается в src/services
 export { BackgroundImageService } from './services/BackgroundImagesService';
+export { FontsService } from './services/FontsService';

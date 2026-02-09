@@ -7,6 +7,7 @@ public class ScoreboardState
     public MetaInfo Meta { get; set; } = new();
     public ColorPreset Colors { get; set; } = new();
     public TextConfiguration TextConfig { get; set; } = new();
+    public FontConfiguration FontConfig { get; set; } = new();
     public Images Images { get; set; } = new();
     public bool IsVisible { get; set; } = true; // Новое поле для управления видимостью
     public int AnimationDuration { get; set; } = 2000; // Время анимации в миллисекундах

@@ -15,7 +15,7 @@ export const Home = () => {
       textConfig: s.textConfig,
       backgroundImages: s.backgroundImages,
       layoutConfig: s.layoutConfig,
-      fontConfiguration: s.fontConfiguration,
+      fontConfig: s.fontConfig,
       isVisible: s.isVisible,
       isShowBorders: s.isShowBorders,
       animationDuration: s.animationDuration,

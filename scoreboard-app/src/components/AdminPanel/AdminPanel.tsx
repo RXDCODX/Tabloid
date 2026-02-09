@@ -5,6 +5,7 @@ import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
 import ColorPresetCard from './Cards/ColorPresetCard';
+import FontsCard from './Cards/FontsCard';
 import LayoutConfigCard from './Cards/LayoutConfigCard';
 import MetaPanel from './Cards/MetaPanel';
 import PlayerCard from './Cards/PlayerCard';
@@ -51,6 +52,9 @@ const AdminPanel = () => {
 
         {/* Background Images Panel */}
         <BackgroundImagesCard />
+
+        {/* Fonts Panel */}
+        <FontsCard />
 
         {/* Layout Config Panel */}
         <LayoutConfigCard />

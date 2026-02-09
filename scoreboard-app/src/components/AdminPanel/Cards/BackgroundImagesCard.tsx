@@ -44,11 +44,8 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
       [hasImage, backgroundImage?.imageName]
     );
 
-    const handleFileChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
+    const handleFileSelected = useCallback(
+      (file: File) => {
         const isImage = file.type.startsWith('image/');
         const isVideo = file.type.startsWith('video/');
 
@@ -84,6 +81,29 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
       [field, onImageUpload]
     );
 
+    const handleFileChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        handleFileSelected(file);
+      },
+      [handleFileSelected]
+    );
+
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+    }, []);
+
+    const handleDrop = useCallback(
+      (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files?.[0];
+        if (!file) return;
+        handleFileSelected(file);
+      },
+      [handleFileSelected]
+    );
+
     const handleContainerClick = useCallback(() => {
       fileInputRef.current?.click();
     }, [fileInputRef]);
@@ -103,6 +123,8 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
           <div
             className={styles.imageUploadContainer}
             onClick={handleContainerClick}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
             {hasImage ? (
               <div className={styles.imagePreview}>
