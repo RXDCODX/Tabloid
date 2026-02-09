@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 assets
+/scoreboard-backend/wwwroot/index.html
