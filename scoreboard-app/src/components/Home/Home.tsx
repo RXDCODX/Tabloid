@@ -6,14 +6,23 @@ import styles from './Home.module.scss';
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { player1, player2, meta } = useAdminStore(
-    useShallow(s => ({ player1: s.player1, player2: s.player2, meta: s.meta }))
+  const state = useAdminStore(
+    useShallow(s => ({
+      player1: s.player1,
+      player2: s.player2,
+      meta: s.meta,
+      colors: s.colors,
+      textConfig: s.textConfig,
+      backgroundImages: s.backgroundImages,
+      layoutConfig: s.layoutConfig,
+      fontConfiguration: s.fontConfiguration,
+      isVisible: s.isVisible,
+      isShowBorders: s.isShowBorders,
+      animationDuration: s.animationDuration,
+    }))
   );
 
-  const displayed = useMemo(
-    () => JSON.stringify({ player1, player2, meta }, null, 2),
-    [player1, player2, meta]
-  );
+  const displayed = useMemo(() => JSON.stringify(state, null, 2), [state]);
 
   return (
     <div className={styles.container}>
