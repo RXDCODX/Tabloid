@@ -94,6 +94,15 @@ export interface ScoreboardState {
   animationDuration?: number;
   isShowBorders?: boolean;
   layoutConfig?: LayoutConfig;
+  fontConfig?: FontConfiguration;
+}
+
+export interface FontConfiguration {
+  PlayerNameFont: string; // Шрифт для имен игроков
+  PlayerTagFont: string; // Шрифт для тегов игроков
+  ScoreFont: string; // Шрифт для счета
+  TournamentTitleFont: string; // Шрифт для заголовка турнира
+  FightModeFont: string; // Шрифт для правила драки
 }
 
 export const defaultPreset: ColorPreset = {

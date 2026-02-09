@@ -54,7 +54,7 @@ public static class TestHelpers
             using var conn = new SqliteConnection($"Data Source={path}");
             conn.Open();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM player_presets; DELETE FROM scoreboard_state; DELETE FROM color_presets; DELETE FROM background_images;";
+            cmd.CommandText = "DELETE FROM player_presets; DELETE FROM scoreboard_state; DELETE FROM color_presets; DELETE FROM background_images; DELETE FROM fonts;";
             cmd.ExecuteNonQuery();
         }
         catch

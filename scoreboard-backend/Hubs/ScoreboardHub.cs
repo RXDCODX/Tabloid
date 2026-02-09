@@ -139,6 +139,23 @@ public class ScoreboardHub(
         }
     }
 
+    public async Task UpdateFontConfig(FontConfiguration config)
+    {
+        logger.LogInformation("UpdateFontConfig called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            stateService.UpdateFontConfig(config);
+            var updatedState = stateService.GetState();
+            updatedState.FontConfig = config ?? new FontConfiguration();
+            await Clients.All.SendAsync(MainReceiveStateMethodName, updatedState);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateFontConfig");
+            throw;
+        }
+    }
+
     public async Task UpdateBordersShowingState(bool isShowBorders)
     {
         logger.LogInformation(

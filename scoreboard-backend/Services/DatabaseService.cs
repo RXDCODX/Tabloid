@@ -12,7 +12,7 @@ public class DatabaseService
     {
         _logger = logger;
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        _dbPath = Path.Combine(baseDir, "player_presets.db");
+        _dbPath = Path.Combine(baseDir, "database.db");
 
         EnsureDatabase();
 
@@ -102,6 +102,21 @@ public class DatabaseService
             using var imagesCmd = conn.CreateCommand();
             imagesCmd.CommandText = imagesSql;
             imagesCmd.ExecuteNonQuery();
+
+            // Create table for fonts
+            var fontsSql = """
+                CREATE TABLE IF NOT EXISTS fonts (
+                    FontName TEXT PRIMARY KEY,
+                    FileName TEXT NOT NULL,
+                    FontData BLOB NOT NULL,
+                    ContentType TEXT NOT NULL,
+                    UploadedAt INTEGER NOT NULL
+                );
+                """;
+
+            using var fontsCmd = conn.CreateCommand();
+            fontsCmd.CommandText = fontsSql;
+            fontsCmd.ExecuteNonQuery();
 
             // Detect legacy schema: if player_presets has a 'Country' column, migrate it to 'Flag'
             try
@@ -439,8 +454,10 @@ public class DatabaseService
         }
     }
 
-    public Dictionary<string, (string ImageName, byte[] ImageData, string ContentType, long UploadedAt)>
-        LoadAllBackgroundImages()
+    public Dictionary<
+        string,
+        (string ImageName, byte[] ImageData, string ContentType, long UploadedAt)
+    > LoadAllBackgroundImages()
     {
         var result =
             new Dictionary<
@@ -487,6 +504,107 @@ public class DatabaseService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to clear all background images from DB");
+        }
+    }
+
+    // Font files methods
+    public void SaveFont(
+        string fontName,
+        string fileName,
+        byte[] fontData,
+        string contentType,
+        long uploadedAt
+    )
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = """
+                INSERT OR REPLACE INTO fonts(FontName, FileName, FontData, ContentType, UploadedAt)
+                VALUES(@fontName, @fileName, @fontData, @contentType, @uploadedAt)
+                """;
+
+            cmd.Parameters.AddWithValue("@fontName", fontName);
+            cmd.Parameters.AddWithValue("@fileName", fileName);
+            cmd.Parameters.AddWithValue("@fontData", fontData);
+            cmd.Parameters.AddWithValue("@contentType", contentType);
+            cmd.Parameters.AddWithValue("@uploadedAt", uploadedAt);
+
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save font to DB: {FontName}", fontName);
+        }
+    }
+
+    public void DeleteFont(string fontName)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM fonts WHERE FontName = @fontName";
+            cmd.Parameters.AddWithValue("@fontName", fontName);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete font from DB: {FontName}", fontName);
+        }
+    }
+
+    public Dictionary<
+        string,
+        (string FileName, byte[] FontData, string ContentType, long UploadedAt)
+    > LoadAllFonts()
+    {
+        var result =
+            new Dictionary<
+                string,
+                (string FileName, byte[] FontData, string ContentType, long UploadedAt)
+            >();
+
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText =
+                "SELECT FontName, FileName, FontData, ContentType, UploadedAt FROM fonts";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var fontName = reader.GetString(0);
+                var fileName = reader.GetString(1);
+                var fontData = (byte[])reader["FontData"];
+                var contentType = reader.GetString(3);
+                var uploadedAt = reader.GetInt64(4);
+
+                result[fontName] = (fileName, fontData, contentType, uploadedAt);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load fonts from DB");
+        }
+
+        return result;
+    }
+
+    public void ClearAllFonts()
+    {
+        try
+        {
+            using var conn = GetConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM fonts";
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to clear all fonts from DB");
         }
     }
 }

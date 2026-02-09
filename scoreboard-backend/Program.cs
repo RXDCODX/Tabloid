@@ -29,6 +29,7 @@ public static class Program
         builder.Services.AddSingleton<PlayerPresetService>();
         builder.Services.AddSingleton<BackgroundImagesService>();
         builder.Services.AddSingleton<ColorPresetService>();
+        builder.Services.AddSingleton<FontsService>();
 
         builder.Services.AddControllers();
         builder

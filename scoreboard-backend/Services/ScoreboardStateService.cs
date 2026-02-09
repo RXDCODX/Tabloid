@@ -198,6 +198,17 @@ public class ScoreboardStateService
         SaveState();
     }
 
+    public void UpdateFontConfig(FontConfiguration config)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateFontConfig called");
+        }
+
+        _state.FontConfig = config ?? new FontConfiguration();
+        SaveState();
+    }
+
     private void SaveState()
     {
         // Сохраняем старое поведение: если persistence отключен, ничего не делаем

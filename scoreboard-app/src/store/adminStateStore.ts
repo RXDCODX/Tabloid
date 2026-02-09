@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import {
   ColorPreset,
   defaultPreset,
+  FontConfiguration,
   Images,
   LayoutConfig,
   MetaInfo,
@@ -142,6 +143,7 @@ export type AdminStateStore = {
   textConfig: TextConfiguration;
   backgroundImages: Images;
   layoutConfig: LayoutConfig;
+  fontConfig: FontConfiguration;
 
   // actions (local + server)
   setPlayer1: (p: Player) => void;
@@ -159,6 +161,8 @@ export type AdminStateStore = {
   setBackgroundImages: (images: Images) => void;
 
   setLayoutConfig: (next: LayoutConfig) => void;
+
+  setFontConfiguration: (config: FontConfiguration) => void;
 
   reset: () => void;
 
@@ -180,6 +184,13 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
   textConfig: {},
   backgroundImages: {},
   layoutConfig: DEFAULT_LAYOUT,
+  fontConfig: {
+    PlayerNameFont: '',
+    PlayerTagFont: '',
+    ScoreFont: '',
+    TournamentTitleFont: '',
+    FightModeFont: '',
+  },
 
   setPlayer1: p => {
     console.log('[adminStateStore] setPlayer1', p);
@@ -238,6 +249,11 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
     debouncedInvoke(get().connection, 'UpdateLayoutConfig', next);
   },
 
+  setFontConfiguration: config => {
+    set({ fontConfig: config });
+    debouncedInvoke(get().connection, 'UpdateFontConfig', config);
+  },
+
   reset: () => {
     const connection = get().connection;
     if (isConnected(connection)) {
@@ -256,6 +272,13 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
       textConfig: {},
       backgroundImages: {},
       layoutConfig: DEFAULT_LAYOUT,
+      fontConfig: {
+        PlayerNameFont: '',
+        PlayerTagFont: '',
+        ScoreFont: '',
+        TournamentTitleFont: '',
+        FightModeFont: '',
+      },
     });
   },
 
@@ -335,6 +358,42 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
         new: state.layoutConfig,
       });
       patch.layoutConfig = state.layoutConfig;
+    }
+
+    // Handle both fontConfig and FontConfig (server sends camelCase keys)
+    const incomingFontConfig =
+      (state as any).fontConfig || (state as any).FontConfig;
+    if (incomingFontConfig) {
+      // Convert camelCase keys from server to PascalCase for frontend
+      const normalizedFontConfig: FontConfiguration = {
+        PlayerNameFont:
+          incomingFontConfig.PlayerNameFont ||
+          incomingFontConfig.playerNameFont ||
+          '',
+        PlayerTagFont:
+          incomingFontConfig.PlayerTagFont ||
+          incomingFontConfig.playerTagFont ||
+          '',
+        ScoreFont:
+          incomingFontConfig.ScoreFont || incomingFontConfig.scoreFont || '',
+        TournamentTitleFont:
+          incomingFontConfig.TournamentTitleFont ||
+          incomingFontConfig.tournamentTitleFont ||
+          '',
+        FightModeFont:
+          incomingFontConfig.FightModeFont ||
+          incomingFontConfig.fightModeFont ||
+          '',
+      };
+
+      if (!shallowEqualObject(normalizedFontConfig, current.fontConfig)) {
+        console.log('[adminStateStore] fontConfig changed', {
+          old: current.fontConfig,
+          new: normalizedFontConfig,
+          raw: incomingFontConfig,
+        });
+        patch.fontConfig = normalizedFontConfig;
+      }
     }
 
     if (Object.keys(patch).length > 0) {

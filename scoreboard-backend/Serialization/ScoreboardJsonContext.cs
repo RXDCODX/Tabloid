@@ -17,4 +17,9 @@ namespace scoreboard_backend.Serialization;
 [JsonSerializable(typeof(IReadOnlyList<PlayerPreset>))]
 [JsonSerializable(typeof(ScoreboardState))]
 [JsonSerializable(typeof(ImageType))]
+[JsonSerializable(typeof(FontConfiguration))]
+[JsonSerializable(typeof(FontFile))]
+[JsonSerializable(typeof(List<FontFile>))]
+[JsonSerializable(typeof(FontFile[]))]
+[JsonSerializable(typeof(IReadOnlyList<FontFile>))]
 public partial class ScoreboardJsonContext : JsonSerializerContext;

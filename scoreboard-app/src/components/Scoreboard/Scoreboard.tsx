@@ -1,10 +1,11 @@
 // Компонент создан на основе Scoreboard.cshtml из Tabloid
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../store/adminStateStore';
 import { ImageType } from '../../types/types';
 import { BackgroundImageService } from '../AdminPanel/services/BackgroundImagesService';
+import { FontsService } from '../AdminPanel/services/FontsService';
 import MediaBackground from './MediaBackground';
 import styles from './Scoreboard.module.scss';
 import SponsorBanner from './SponsorBanner';
@@ -20,6 +21,7 @@ const Scoreboard: React.FC = () => {
     isVisible,
     isShowBorders,
     backgroundImages,
+    fontConfig,
   } = useAdminStore(
     useShallow(s => ({
       player1: s.player1,
@@ -31,8 +33,53 @@ const Scoreboard: React.FC = () => {
       isVisible: s.isVisible,
       isShowBorders: s.isShowBorders,
       backgroundImages: s.backgroundImages,
+      fontConfig: s.fontConfig,
     }))
   );
+
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  // Load all fonts and create @font-face rules
+  useEffect(() => {
+    const loadFonts = async () => {
+      try {
+        const fonts = await FontsService.getAllFonts();
+
+        const styleId = 'scoreboard-fonts-dynamic-styles';
+        let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+
+        if (!styleElement) {
+          styleElement = document.createElement('style');
+          styleElement.id = styleId;
+          document.head.appendChild(styleElement);
+        }
+
+        // Create @font-face rules for all fonts
+        const fontFaceRules = fonts
+          .map(font => {
+            const fontUrl = FontsService.getFontUrl(
+              font.fontName,
+              font.uploadedAt
+            );
+            return `
+              @font-face {
+                font-family: '${font.fontName}';
+                src: url('${fontUrl}');
+                font-display: swap;
+              }
+            `;
+          })
+          .join('\n');
+
+        styleElement.textContent = fontFaceRules;
+        setFontsLoaded(true);
+      } catch (err) {
+        console.error('Error loading fonts:', err);
+      }
+    };
+
+    loadFonts();
+  }, []);
 
   // Функция для проверки валидности тега
   const isValidTag = useCallback((tag: string): boolean => {
@@ -240,6 +287,9 @@ const Scoreboard: React.FC = () => {
                   textShadow: getTextOutline(c.textOutlineColor || '#000000'),
                   position: 'relative',
                   zIndex: 1,
+                  fontFamily: fontConfig.TournamentTitleFont
+                    ? `'${fontConfig.TournamentTitleFont}', sans-serif`
+                    : undefined,
                 }}
               >
                 {m.title}
@@ -280,6 +330,9 @@ const Scoreboard: React.FC = () => {
                   style={{
                     color: c.playerNamesColor,
                     textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+                    fontFamily: fontConfig.PlayerNameFont
+                      ? `'${fontConfig.PlayerNameFont}', sans-serif`
+                      : undefined,
                   }}
                 >
                   <span data-side='left' style={{ color: c.playerNamesColor }}>
@@ -295,6 +348,9 @@ const Scoreboard: React.FC = () => {
                           textShadow: getTextOutline(
                             c.textOutlineColor || '#000000'
                           ),
+                          fontFamily: fontConfig.PlayerTagFont
+                            ? `'${fontConfig.PlayerTagFont}', sans-serif`
+                            : undefined,
                         }}
                       >
                         {p1.tag}
@@ -333,7 +389,15 @@ const Scoreboard: React.FC = () => {
                 className={styles.score}
                 style={{ position: 'relative', zIndex: 1 }}
               >
-                <h2 data-side='left' style={{ color: c.scoreColor }}>
+                <h2
+                  data-side='left'
+                  style={{
+                    color: c.scoreColor,
+                    fontFamily: fontConfig.ScoreFont
+                      ? `'${fontConfig.ScoreFont}', sans-serif`
+                      : undefined,
+                  }}
+                >
                   {p1.score}
                 </h2>
               </div>
@@ -368,7 +432,15 @@ const Scoreboard: React.FC = () => {
                 className={styles.score}
                 style={{ position: 'relative', zIndex: 1 }}
               >
-                <h2 data-side='right' style={{ color: c.scoreColor }}>
+                <h2
+                  data-side='right'
+                  style={{
+                    color: c.scoreColor,
+                    fontFamily: fontConfig.ScoreFont
+                      ? `'${fontConfig.ScoreFont}', sans-serif`
+                      : undefined,
+                  }}
+                >
                   {p2.score}
                 </h2>
               </div>
@@ -405,6 +477,9 @@ const Scoreboard: React.FC = () => {
                   style={{
                     color: c.playerNamesColor,
                     textShadow: getTextOutline(c.textOutlineColor || '#000000'),
+                    fontFamily: fontConfig.PlayerNameFont
+                      ? `'${fontConfig.PlayerNameFont}', sans-serif`
+                      : undefined,
                   }}
                 >
                   <span data-side='right' style={{ color: c.playerNamesColor }}>
@@ -422,6 +497,9 @@ const Scoreboard: React.FC = () => {
                           textShadow: getTextOutline(
                             c.textOutlineColor || '#000000'
                           ),
+                          fontFamily: fontConfig.PlayerTagFont
+                            ? `'${fontConfig.PlayerTagFont}', sans-serif`
+                            : undefined,
                         }}
                       >
                         {p2.tag}
@@ -464,6 +542,9 @@ const Scoreboard: React.FC = () => {
                     textShadow: getTextOutline(c.textOutlineColor || '#000000'),
                     position: 'relative',
                     zIndex: 1,
+                    fontFamily: fontConfig.FightModeFont
+                      ? `'${fontConfig.FightModeFont}', sans-serif`
+                      : undefined,
                   }}
                 >
                   {m.fightRule}

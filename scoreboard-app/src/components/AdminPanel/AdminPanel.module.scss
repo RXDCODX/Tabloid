@@ -1,5 +1,9 @@
 // Стили для админ панели
 
+.adminPanel {
+  // Убрали margin-left, чтобы контент был по центру
+}
+
 // Белые плейсхолдеры для всех input полей в админ панели
 :global(.admin-panel) {
   input::placeholder {
