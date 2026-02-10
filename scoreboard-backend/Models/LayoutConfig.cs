@@ -47,5 +47,41 @@ public class LayoutConfig
             Height = "50px",
         };
 
+    public LayoutBlockSizeAndPosition? Commentator1 { get; set; } =
+        new()
+        {
+            Top = "85%",
+            Left = "50px",
+            Width = "300px",
+            Height = "80px",
+        };
+
+    public LayoutBlockSizeAndPosition? Commentator2 { get; set; } =
+        new()
+        {
+            Top = "50%",
+            Left = "50px",
+            Width = "300px",
+            Height = "80px",
+        };
+
+    public LayoutBlockSizeAndPosition? Commentator3 { get; set; } =
+        new()
+        {
+            Top = "85%",
+            Right = "50px",
+            Width = "300px",
+            Height = "80px",
+        };
+
+    public LayoutBlockSizeAndPosition? Commentator4 { get; set; } =
+        new()
+        {
+            Top = "50%",
+            Right = "50px",
+            Width = "300px",
+            Height = "80px",
+        };
+
     // Default constructor with sensible defaults matching frontend layout
 }

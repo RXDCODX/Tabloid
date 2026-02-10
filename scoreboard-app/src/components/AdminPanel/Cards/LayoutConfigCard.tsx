@@ -1,6 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
-import { Columns } from 'react-bootstrap-icons';
+import { Columns, Mic } from 'react-bootstrap-icons';
 import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../../store/adminStateStore';
 import { LayoutConfig } from '../../../types/types';
@@ -13,6 +13,10 @@ const blocks: Array<{ key: keyof LayoutConfig; title: string }> = [
   { key: 'left', title: 'Игрок 1' },
   { key: 'right', title: 'Игрок 2' },
   { key: 'fightMode', title: 'Режим боя' },
+  { key: 'commentator1', title: 'Комментатор 1' },
+  { key: 'commentator2', title: 'Комментатор 2' },
+  { key: 'commentator3', title: 'Комментатор 3' },
+  { key: 'commentator4', title: 'Комментатор 4' },
 ];
 
 const fields: Array<{
@@ -58,77 +62,178 @@ const LayoutConfigCard: React.FC<Props> = () => {
         <span className={styles.cardTitle}>Layout</span>
       </div>
       <Card.Body>
-        {blocks.map(({ key, title }) => (
-          <div key={key} className='mb-3'>
-            <h6 className='mb-2 text-center'>{title}</h6>
-            {/* Row 1: Top, Left, Right */}
-            <Row className='g-2 justify-content-center'>
-              {fields
-                .filter(f => ['top', 'left', 'right'].includes(f.key))
-                .map(({ key: fkey, label, placeholder }) => (
-                  <Col
-                    xs={12}
-                    md={6}
-                    lg={4}
-                    key={fkey}
-                    className='d-flex justify-content-center'
-                  >
-                    <div
-                      className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
-                    >
-                      <label
-                        htmlFor={`${String(key)}-${fkey}`}
-                        className='mb-1 text-white text-center'
+        {blocks.map(({ key, title }, idx) => {
+          const isCommentatorBlock = key.startsWith('commentator');
+
+          // Пропускаем комментаторов на этом уровне, их отрендерим отдельно
+          if (isCommentatorBlock) {
+            return null;
+          }
+
+          return (
+            <div key={key}>
+              <div className='mb-3'>
+                <h6 className='mb-2 text-center'>{title}</h6>
+                <Row className='g-2 justify-content-center'>
+                  {fields
+                    .filter(f => ['top', 'left', 'right'].includes(f.key))
+                    .map(({ key: fkey, label, placeholder }) => (
+                      <Col
+                        xs={12}
+                        md={6}
+                        lg={4}
+                        key={fkey}
+                        className='d-flex justify-content-center'
                       >
-                        {label}
-                      </label>
-                      <input
-                        id={`${String(key)}-${fkey}`}
-                        type='text'
-                        className='form-control form-control-sm bg-dark text-white border-secondary text-center'
-                        value={layoutConfig[key]?.[fkey] ?? ''}
-                        onChange={e => handleChange(key, fkey, e.target.value)}
-                        placeholder={placeholder}
-                      />
-                    </div>
-                  </Col>
-                ))}
-            </Row>
-            {/* Row 2: Width, Height */}
-            <Row className='g-2 justify-content-center mt-2'>
-              {fields
-                .filter(f => ['width', 'height'].includes(f.key))
-                .map(({ key: fkey, label, placeholder }) => (
-                  <Col
-                    xs={12}
-                    md={6}
-                    lg={4}
-                    key={fkey}
-                    className='d-flex justify-content-center'
-                  >
-                    <div
-                      className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
-                    >
-                      <label
-                        htmlFor={`${String(key)}-${fkey}`}
-                        className='mb-1 text-white text-center'
+                        <div
+                          className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
+                        >
+                          <label
+                            htmlFor={`${String(key)}-${fkey}`}
+                            className='mb-1 text-white text-center'
+                          >
+                            {label}
+                          </label>
+                          <input
+                            id={`${String(key)}-${fkey}`}
+                            type='text'
+                            className='form-control form-control-sm bg-dark text-white border-secondary text-center'
+                            value={layoutConfig[key]?.[fkey] ?? ''}
+                            onChange={e =>
+                              handleChange(key, fkey, e.target.value)
+                            }
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      </Col>
+                    ))}
+                </Row>
+                <Row className='g-2 justify-content-center mt-2'>
+                  {fields
+                    .filter(f => ['width', 'height'].includes(f.key))
+                    .map(({ key: fkey, label, placeholder }) => (
+                      <Col
+                        xs={12}
+                        md={6}
+                        lg={4}
+                        key={fkey}
+                        className='d-flex justify-content-center'
                       >
-                        {label}
-                      </label>
-                      <input
-                        id={`${String(key)}-${fkey}`}
-                        type='text'
-                        className='form-control form-control-sm bg-dark text-white border-secondary text-center'
-                        value={layoutConfig[key]?.[fkey] ?? ''}
-                        onChange={e => handleChange(key, fkey, e.target.value)}
-                        placeholder={placeholder}
-                      />
-                    </div>
-                  </Col>
-                ))}
-            </Row>
-          </div>
-        ))}
+                        <div
+                          className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
+                        >
+                          <label
+                            htmlFor={`${String(key)}-${fkey}`}
+                            className='mb-1 text-white text-center'
+                          >
+                            {label}
+                          </label>
+                          <input
+                            id={`${String(key)}-${fkey}`}
+                            type='text'
+                            className='form-control form-control-sm bg-dark text-white border-secondary text-center'
+                            value={layoutConfig[key]?.[fkey] ?? ''}
+                            onChange={e =>
+                              handleChange(key, fkey, e.target.value)
+                            }
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      </Col>
+                    ))}
+                </Row>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Отдельный блок для комментаторов */}
+        <Card
+          className='mt-4 bg-dark text-white border-success border-2'
+          style={{ backgroundColor: 'rgba(111, 66, 193, 0.1)' }}
+        >
+          <Card.Header className='border-success d-flex align-items-center justify-content-center gap-2'>
+            <Mic color='#6f42c1' size={20} />
+            <span className='fw-bold text-success'>Commentators Layout</span>
+          </Card.Header>
+          <Card.Body className='pt-3'>
+            {blocks
+              .filter(({ key }) => key.startsWith('commentator'))
+              .map(({ key, title }) => (
+                <div key={key} className='mb-4'>
+                  <h6 className='mb-2 text-center text-success'>{title}</h6>
+                  <Row className='g-2 justify-content-center'>
+                    {fields
+                      .filter(f => ['top', 'left', 'right'].includes(f.key))
+                      .map(({ key: fkey, label, placeholder }) => (
+                        <Col
+                          xs={12}
+                          md={6}
+                          lg={4}
+                          key={fkey}
+                          className='d-flex justify-content-center'
+                        >
+                          <div
+                            className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
+                          >
+                            <label
+                              htmlFor={`${String(key)}-${fkey}`}
+                              className='mb-1 text-white text-center'
+                            >
+                              {label}
+                            </label>
+                            <input
+                              id={`${String(key)}-${fkey}`}
+                              type='text'
+                              className='form-control form-control-sm bg-dark text-white border-secondary text-center'
+                              value={layoutConfig[key]?.[fkey] ?? ''}
+                              onChange={e =>
+                                handleChange(key, fkey, e.target.value)
+                              }
+                              placeholder={placeholder}
+                            />
+                          </div>
+                        </Col>
+                      ))}
+                  </Row>
+                  <Row className='g-2 justify-content-center mt-2'>
+                    {fields
+                      .filter(f => ['width', 'height'].includes(f.key))
+                      .map(({ key: fkey, label, placeholder }) => (
+                        <Col
+                          xs={12}
+                          md={6}
+                          lg={4}
+                          key={fkey}
+                          className='d-flex justify-content-center'
+                        >
+                          <div
+                            className={`w-100 text-center ${styles.fieldBox} ${styles[fkey]}`}
+                          >
+                            <label
+                              htmlFor={`${String(key)}-${fkey}`}
+                              className='mb-1 text-white text-center'
+                            >
+                              {label}
+                            </label>
+                            <input
+                              id={`${String(key)}-${fkey}`}
+                              type='text'
+                              className='form-control form-control-sm bg-dark text-white border-secondary text-center'
+                              value={layoutConfig[key]?.[fkey] ?? ''}
+                              onChange={e =>
+                                handleChange(key, fkey, e.target.value)
+                              }
+                              placeholder={placeholder}
+                            />
+                          </div>
+                        </Col>
+                      ))}
+                  </Row>
+                </div>
+              ))}
+          </Card.Body>
+        </Card>
         <div className='d-flex align-items-center justify-content-center mb-2'>
           <small className='text-secondary'>px или % (до 100%)</small>
         </div>

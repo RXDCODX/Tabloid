@@ -14,6 +14,10 @@ const Scoreboard: React.FC = () => {
   const {
     player1,
     player2,
+    commentator1,
+    commentator2,
+    commentator3,
+    commentator4,
     meta,
     colors,
     layoutConfig,
@@ -26,6 +30,10 @@ const Scoreboard: React.FC = () => {
     useShallow(s => ({
       player1: s.player1,
       player2: s.player2,
+      commentator1: s.commentator1,
+      commentator2: s.commentator2,
+      commentator3: s.commentator3,
+      commentator4: s.commentator4,
       meta: s.meta,
       colors: s.colors,
       layoutConfig: s.layoutConfig,
@@ -36,7 +44,6 @@ const Scoreboard: React.FC = () => {
       fontConfig: s.fontConfig,
     }))
   );
-
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   // Load all fonts and create @font-face rules
@@ -98,6 +105,10 @@ const Scoreboard: React.FC = () => {
 
   const p1 = player1;
   const p2 = player2;
+  const c1 = commentator1;
+  const c2 = commentator2;
+  const c3 = commentator3;
+  const c4 = commentator4;
   const m = meta;
   const c = colors;
   const layout = layoutConfig;
@@ -260,6 +271,7 @@ const Scoreboard: React.FC = () => {
               className={styles.centerDiv}
               variants={centerVariants}
               style={{
+                position: 'absolute',
                 backgroundColor: bgColor,
                 border: borderStyle,
                 boxShadow: glow,
@@ -297,218 +309,234 @@ const Scoreboard: React.FC = () => {
             </motion.div>
 
             {/* Левый див - 167px от левого края, длина 540px, отступ сверху 15px */}
-            <motion.div
-              className={styles.leftDiv}
-              variants={itemVariants}
-              style={{
-                backgroundColor: bgColor,
-                border: borderStyle,
-                boxShadow: glow,
-                top: layout?.left?.top,
-                left: layout?.left?.left,
-                right: layout?.left?.right,
-                width: layout?.left?.width,
-                height: layout?.left?.height,
-                ...(isVideoFile(imgs?.leftImage?.imageName)
-                  ? {}
-                  : bgStyleFor(ImageType.LeftImage)),
-              }}
-            >
-              {isVideoFile(imgs?.leftImage?.imageName) && (
-                <MediaBackground
-                  imageName={imgs?.leftImage?.imageName}
-                  imageType={ImageType.LeftImage}
-                  uploadedAt={imgs?.leftImage?.uploadedAt}
-                />
-              )}
-              <div
-                className={styles.playerInfo}
-                style={{ position: 'relative', zIndex: 1 }}
+            {p1.name && (
+              <motion.div
+                className={styles.leftDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.left?.top,
+                  left: layout?.left?.left,
+                  right: layout?.left?.right,
+                  width: layout?.left?.width,
+                  height: layout?.left?.height,
+                  ...(isVideoFile(imgs?.leftImage?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.LeftImage)),
+                }}
               >
-                <h4
-                  className={styles.playerName}
-                  style={{
-                    color: c.playerNamesColor,
-                    textShadow: getTextOutline(c.textOutlineColor || '#000000'),
-                    fontFamily: fontConfig.PlayerNameFont
-                      ? `'${fontConfig.PlayerNameFont}', sans-serif`
-                      : undefined,
-                  }}
-                >
-                  <span data-side='left' style={{ color: c.playerNamesColor }}>
-                    {p1.final === 'winner'
-                      ? '[W] '
-                      : p1.final === 'loser'
-                        ? '[L] '
-                        : ''}
-                    {isValidTag(p1.tag) && (
-                      <span
-                        style={{
-                          color: c.mainColor,
-                          textShadow: getTextOutline(
-                            c.textOutlineColor || '#000000'
-                          ),
-                          fontFamily: fontConfig.PlayerTagFont
-                            ? `'${fontConfig.PlayerTagFont}', sans-serif`
-                            : undefined,
-                        }}
-                      >
-                        {p1.tag}
-                      </span>
-                    )}
-                    {isValidTag(p1.tag) && ' | '}
-                    {p1.name}
-                  </span>
-                </h4>
-              </div>
-              {p1.flag && p1.flag !== 'none' && (
-                <div
-                  className={styles.flag}
-                  style={{
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  <img
-                    src={getFlagPath(p1.flag)}
-                    alt='Player 1 flag'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'fill',
-                    }}
-                    onError={e => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+                {isVideoFile(imgs?.leftImage?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.leftImage?.imageName}
+                    imageType={ImageType.LeftImage}
+                    uploadedAt={imgs?.leftImage?.uploadedAt}
                   />
-                </div>
-              )}
-              <div
-                className={styles.score}
-                style={{ position: 'relative', zIndex: 1 }}
-              >
-                <h2
-                  data-side='left'
-                  style={{
-                    color: c.scoreColor,
-                    fontFamily: fontConfig.ScoreFont
-                      ? `'${fontConfig.ScoreFont}', sans-serif`
-                      : undefined,
-                  }}
+                )}
+                <div
+                  className={styles.playerInfo}
+                  style={{ position: 'relative', zIndex: 1 }}
                 >
-                  {p1.score}
-                </h2>
-              </div>
-            </motion.div>
+                  <h4
+                    className={styles.playerName}
+                    style={{
+                      color: c.playerNamesColor,
+                      textShadow: getTextOutline(
+                        c.textOutlineColor || '#000000'
+                      ),
+                      fontFamily: fontConfig.PlayerNameFont
+                        ? `'${fontConfig.PlayerNameFont}', sans-serif`
+                        : undefined,
+                    }}
+                  >
+                    <span
+                      data-side='left'
+                      style={{ color: c.playerNamesColor }}
+                    >
+                      {p1.final === 'winner'
+                        ? '[W] '
+                        : p1.final === 'loser'
+                          ? '[L] '
+                          : ''}
+                      {isValidTag(p1.tag) && (
+                        <span
+                          style={{
+                            color: c.mainColor,
+                            textShadow: getTextOutline(
+                              c.textOutlineColor || '#000000'
+                            ),
+                            fontFamily: fontConfig.PlayerTagFont
+                              ? `'${fontConfig.PlayerTagFont}', sans-serif`
+                              : undefined,
+                          }}
+                        >
+                          {p1.tag}
+                        </span>
+                      )}
+                      {isValidTag(p1.tag) && ' | '}
+                      {p1.name}
+                    </span>
+                  </h4>
+                </div>
+                {p1.flag && p1.flag !== 'none' && (
+                  <div
+                    className={styles.flag}
+                    style={{
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  >
+                    <img
+                      src={getFlagPath(p1.flag)}
+                      alt='Player 1 flag'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'fill',
+                      }}
+                      onError={e => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                <div
+                  className={styles.score}
+                  style={{ position: 'relative', zIndex: 1 }}
+                >
+                  <h2
+                    data-side='left'
+                    style={{
+                      color: c.scoreColor,
+                      fontFamily: fontConfig.ScoreFont
+                        ? `'${fontConfig.ScoreFont}', sans-serif`
+                        : undefined,
+                    }}
+                  >
+                    {p1.score}
+                  </h2>
+                </div>
+              </motion.div>
+            )}
 
             {/* Правый див - 167px от правого края, длина 540px, отступ сверху 15px */}
-            <motion.div
-              className={styles.rightDiv}
-              variants={itemVariants}
-              style={{
-                backgroundColor: bgColor,
-                border: borderStyle,
-                boxShadow: glow,
-                top: layout?.right?.top,
-                left: layout?.right?.left,
-                right: layout?.right?.right,
-                width: layout?.right?.width,
-                height: layout?.right?.height,
-                ...(isVideoFile(imgs?.rightImage?.imageName)
-                  ? {}
-                  : bgStyleFor(ImageType.RightImage)),
-              }}
-            >
-              {isVideoFile(imgs?.rightImage?.imageName) && (
-                <MediaBackground
-                  imageName={imgs?.rightImage?.imageName}
-                  imageType={ImageType.RightImage}
-                  uploadedAt={imgs?.rightImage?.uploadedAt}
-                />
-              )}
-              <div
-                className={styles.score}
-                style={{ position: 'relative', zIndex: 1 }}
+            {p2.name && (
+              <motion.div
+                className={styles.rightDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.right?.top,
+                  left: layout?.right?.left,
+                  right: layout?.right?.right,
+                  width: layout?.right?.width,
+                  height: layout?.right?.height,
+                  ...(isVideoFile(imgs?.rightImage?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.RightImage)),
+                }}
               >
-                <h2
-                  data-side='right'
-                  style={{
-                    color: c.scoreColor,
-                    fontFamily: fontConfig.ScoreFont
-                      ? `'${fontConfig.ScoreFont}', sans-serif`
-                      : undefined,
-                  }}
-                >
-                  {p2.score}
-                </h2>
-              </div>
-              {p2.flag && p2.flag !== 'none' && (
-                <div
-                  className={styles.flag}
-                  style={{
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  <img
-                    src={getFlagPath(p2.flag)}
-                    alt='Player 2 flag'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'fill',
-                    }}
-                    onError={e => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+                {isVideoFile(imgs?.rightImage?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.rightImage?.imageName}
+                    imageType={ImageType.RightImage}
+                    uploadedAt={imgs?.rightImage?.uploadedAt}
                   />
-                </div>
-              )}
-              <div
-                className={styles.playerInfo}
-                style={{ position: 'relative', zIndex: 1 }}
-              >
-                <h4
-                  className={styles.playerName}
-                  style={{
-                    color: c.playerNamesColor,
-                    textShadow: getTextOutline(c.textOutlineColor || '#000000'),
-                    fontFamily: fontConfig.PlayerNameFont
-                      ? `'${fontConfig.PlayerNameFont}', sans-serif`
-                      : undefined,
-                  }}
+                )}
+                <div
+                  className={styles.score}
+                  style={{ position: 'relative', zIndex: 1 }}
                 >
-                  <span data-side='right' style={{ color: c.playerNamesColor }}>
-                    {p2.final === 'winner'
-                      ? '[W] '
-                      : p2.final === 'loser'
-                        ? '[L] '
-                        : ''}
-                    {p2.name}
-                    {isValidTag(p2.tag) && ' | '}
-                    {isValidTag(p2.tag) && (
-                      <span
-                        style={{
-                          color: c.mainColor,
-                          textShadow: getTextOutline(
-                            c.textOutlineColor || '#000000'
-                          ),
-                          fontFamily: fontConfig.PlayerTagFont
-                            ? `'${fontConfig.PlayerTagFont}', sans-serif`
-                            : undefined,
-                        }}
-                      >
-                        {p2.tag}
-                      </span>
-                    )}
-                  </span>
-                </h4>
-              </div>
-            </motion.div>
+                  <h2
+                    data-side='right'
+                    style={{
+                      color: c.scoreColor,
+                      fontFamily: fontConfig.ScoreFont
+                        ? `'${fontConfig.ScoreFont}', sans-serif`
+                        : undefined,
+                    }}
+                  >
+                    {p2.score}
+                  </h2>
+                </div>
+                {p2.flag && p2.flag !== 'none' && (
+                  <div
+                    className={styles.flag}
+                    style={{
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  >
+                    <img
+                      src={getFlagPath(p2.flag)}
+                      alt='Player 2 flag'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'fill',
+                      }}
+                      onError={e => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                <div
+                  className={styles.playerInfo}
+                  style={{ position: 'relative', zIndex: 1 }}
+                >
+                  <h4
+                    className={styles.playerName}
+                    style={{
+                      color: c.playerNamesColor,
+                      textShadow: getTextOutline(
+                        c.textOutlineColor || '#000000'
+                      ),
+                      fontFamily: fontConfig.PlayerNameFont
+                        ? `'${fontConfig.PlayerNameFont}', sans-serif`
+                        : undefined,
+                    }}
+                  >
+                    <span
+                      data-side='right'
+                      style={{ color: c.playerNamesColor }}
+                    >
+                      {p2.final === 'winner'
+                        ? '[W] '
+                        : p2.final === 'loser'
+                          ? '[L] '
+                          : ''}
+                      {p2.name}
+                      {isValidTag(p2.tag) && ' | '}
+                      {isValidTag(p2.tag) && (
+                        <span
+                          style={{
+                            color: c.mainColor,
+                            textShadow: getTextOutline(
+                              c.textOutlineColor || '#000000'
+                            ),
+                            fontFamily: fontConfig.PlayerTagFont
+                              ? `'${fontConfig.PlayerTagFont}', sans-serif`
+                              : undefined,
+                          }}
+                        >
+                          {p2.tag}
+                        </span>
+                      )}
+                    </span>
+                  </h4>
+                </div>
+              </motion.div>
+            )}
 
             {/* Четвертый див - режим драки (отображается только если есть значение и не "None") */}
             {shouldShowFightMode() && (
@@ -516,6 +544,7 @@ const Scoreboard: React.FC = () => {
                 className={styles.fightModeDiv}
                 variants={fightModeVariants}
                 style={{
+                  position: 'absolute',
                   backgroundColor: bgColor,
                   border: borderStyle,
                   boxShadow: glow,
@@ -549,6 +578,298 @@ const Scoreboard: React.FC = () => {
                 >
                   {m.fightRule}
                 </h4>
+              </motion.div>
+            )}
+
+            {/* Комментатор 1 */}
+            {c1.name && (
+              <motion.div
+                className={styles.commentatorDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.commentator1?.top,
+                  left: layout?.commentator1?.left,
+                  right: layout?.commentator1?.right,
+                  width: layout?.commentator1?.width,
+                  height: layout?.commentator1?.height,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                  }}
+                >
+                  {c1.flag && c1.flag !== 'none' && (
+                    <img
+                      src={getFlagPath(c1.flag)}
+                      alt={c1.flag}
+                      style={{
+                        height: '30px',
+                        marginBottom: '5px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  {c1.name && (
+                    <h6
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        margin: 0,
+                        fontFamily: fontConfig.CommentatorNameFont
+                          ? `'${fontConfig.CommentatorNameFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c1.name}
+                    </h6>
+                  )}
+                  {isValidTag(c1.tag) && (
+                    <span
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        fontSize: '0.9em',
+                        fontFamily: fontConfig.CommentatorTagFont
+                          ? `'${fontConfig.CommentatorTagFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c1.tag}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Комментатор 2 */}
+            {c2.name && (
+              <motion.div
+                className={styles.commentatorDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.commentator2?.top,
+                  left: layout?.commentator2?.left,
+                  right: layout?.commentator2?.right,
+                  width: layout?.commentator2?.width,
+                  height: layout?.commentator2?.height,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                  }}
+                >
+                  {c2.flag && c2.flag !== 'none' && (
+                    <img
+                      src={getFlagPath(c2.flag)}
+                      alt={c2.flag}
+                      style={{
+                        height: '30px',
+                        marginBottom: '5px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  {c2.name && (
+                    <h6
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        margin: 0,
+                        fontFamily: fontConfig.CommentatorNameFont
+                          ? `'${fontConfig.CommentatorNameFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c2.name}
+                    </h6>
+                  )}
+                  {isValidTag(c2.tag) && (
+                    <span
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        fontSize: '0.9em',
+                        fontFamily: fontConfig.CommentatorTagFont
+                          ? `'${fontConfig.CommentatorTagFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c2.tag}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Комментатор 3 */}
+            {c3.name && (
+              <motion.div
+                className={styles.commentatorDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.commentator3?.top,
+                  left: layout?.commentator3?.left,
+                  right: layout?.commentator3?.right,
+                  width: layout?.commentator3?.width,
+                  height: layout?.commentator3?.height,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                  }}
+                >
+                  {c3.flag && c3.flag !== 'none' && (
+                    <img
+                      src={getFlagPath(c3.flag)}
+                      alt={c3.flag}
+                      style={{
+                        height: '30px',
+                        marginBottom: '5px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  {c3.name && (
+                    <h6
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        margin: 0,
+                        fontFamily: fontConfig.CommentatorNameFont
+                          ? `'${fontConfig.CommentatorNameFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c3.name}
+                    </h6>
+                  )}
+                  {isValidTag(c3.tag) && (
+                    <span
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        fontSize: '0.9em',
+                        fontFamily: fontConfig.CommentatorTagFont
+                          ? `'${fontConfig.CommentatorTagFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c3.tag}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Комментатор 4 */}
+            {c4.name && (
+              <motion.div
+                className={styles.commentatorDiv}
+                variants={itemVariants}
+                style={{
+                  position: 'absolute',
+                  backgroundColor: bgColor,
+                  border: borderStyle,
+                  boxShadow: glow,
+                  top: layout?.commentator4?.top,
+                  left: layout?.commentator4?.left,
+                  right: layout?.commentator4?.right,
+                  width: layout?.commentator4?.width,
+                  height: layout?.commentator4?.height,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                  }}
+                >
+                  {c4.flag && c4.flag !== 'none' && (
+                    <img
+                      src={getFlagPath(c4.flag)}
+                      alt={c4.flag}
+                      style={{
+                        height: '30px',
+                        marginBottom: '5px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  {c4.name && (
+                    <h6
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        margin: 0,
+                        fontFamily: fontConfig.CommentatorNameFont
+                          ? `'${fontConfig.CommentatorNameFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c4.name}
+                    </h6>
+                  )}
+                  {isValidTag(c4.tag) && (
+                    <span
+                      style={{
+                        color: c.playerNamesColor,
+                        textShadow: getTextOutline(
+                          c.textOutlineColor || '#000000'
+                        ),
+                        fontSize: '0.9em',
+                        fontFamily: fontConfig.CommentatorTagFont
+                          ? `'${fontConfig.CommentatorTagFont}', sans-serif`
+                          : undefined,
+                      }}
+                    >
+                      {c4.tag}
+                    </span>
+                  )}
+                </div>
               </motion.div>
             )}
 

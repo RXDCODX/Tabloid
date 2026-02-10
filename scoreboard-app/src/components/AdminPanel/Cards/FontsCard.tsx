@@ -637,6 +637,89 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                     ))}
                   </Form.Select>
                 </div>
+
+                <hr className='border-secondary' />
+
+                <div className={styles.fontConfigItem}>
+                  <Form.Label
+                    className={styles.fontConfigLabel}
+                    style={getLabelStyle(fontConfig.CommentatorNameFont)}
+                  >
+                    Имена комментаторов
+                  </Form.Label>
+                  <Form.Select
+                    value={fontConfig.CommentatorNameFont}
+                    onChange={e =>
+                      handleFontConfigChange(
+                        'CommentatorNameFont',
+                        e.target.value
+                      )
+                    }
+                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                    disabled={loading}
+                  >
+                    <option value=''>По умолчанию</option>
+                    {fonts.map(font => (
+                      <option key={font.fontName} value={font.fontName}>
+                        {font.fontName}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+
+                <div className={styles.fontConfigItem}>
+                  <Form.Label
+                    className={styles.fontConfigLabel}
+                    style={getLabelStyle(fontConfig.CommentatorTagFont)}
+                  >
+                    Теги комментаторов
+                  </Form.Label>
+                  <Form.Select
+                    value={fontConfig.CommentatorTagFont}
+                    onChange={e =>
+                      handleFontConfigChange(
+                        'CommentatorTagFont',
+                        e.target.value
+                      )
+                    }
+                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                    disabled={loading}
+                  >
+                    <option value=''>По умолчанию</option>
+                    {fonts.map(font => (
+                      <option key={font.fontName} value={font.fontName}>
+                        {font.fontName}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+
+                <div className={styles.fontConfigItem}>
+                  <Form.Label
+                    className={styles.fontConfigLabel}
+                    style={getLabelStyle(fontConfig.CommentatorScoreFont)}
+                  >
+                    Счет комментаторов
+                  </Form.Label>
+                  <Form.Select
+                    value={fontConfig.CommentatorScoreFont}
+                    onChange={e =>
+                      handleFontConfigChange(
+                        'CommentatorScoreFont',
+                        e.target.value
+                      )
+                    }
+                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                    disabled={loading}
+                  >
+                    <option value=''>По умолчанию</option>
+                    {fonts.map(font => (
+                      <option key={font.fontName} value={font.fontName}>
+                        {font.fontName}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
               </div>
             </div>
           </Col>

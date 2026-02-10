@@ -7,4 +7,8 @@ public enum ImageType
     RightImage,
     TopImage,
     FightModeImage,
+    Commentator1Image,
+    Commentator2Image,
+    Commentator3Image,
+    Commentator4Image,
 }

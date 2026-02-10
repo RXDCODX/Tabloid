@@ -387,4 +387,48 @@ public class ScoreboardStateService
         _state = new ScoreboardState();
         SaveState();
     }
+
+    public void UpdateCommentator1(Player commentator)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateCommentator1 called");
+        }
+
+        _state.Commentator1 = commentator;
+        SaveState();
+    }
+
+    public void UpdateCommentator2(Player commentator)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateCommentator2 called");
+        }
+
+        _state.Commentator2 = commentator;
+        SaveState();
+    }
+
+    public void UpdateCommentator3(Player commentator)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateCommentator3 called");
+        }
+
+        _state.Commentator3 = commentator;
+        SaveState();
+    }
+
+    public void UpdateCommentator4(Player commentator)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateCommentator4 called");
+        }
+
+        _state.Commentator4 = commentator;
+        SaveState();
+    }
 }

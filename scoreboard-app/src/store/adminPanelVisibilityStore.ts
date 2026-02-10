@@ -10,6 +10,7 @@ export interface CardVisibility {
   fonts: boolean;
   layoutConfig: boolean;
   players: boolean;
+  commentators: boolean;
 }
 
 interface AdminPanelVisibilityState {
@@ -28,6 +29,7 @@ const defaultVisibility: CardVisibility = {
   fonts: true,
   layoutConfig: true,
   players: true,
+  commentators: true,
 };
 
 export const useAdminPanelVisibilityStore = create<AdminPanelVisibilityState>()(
@@ -59,6 +61,7 @@ export const useAdminPanelVisibilityStore = create<AdminPanelVisibilityState>()(
             fonts: false,
             layoutConfig: false,
             players: false,
+            commentators: false,
           },
         }),
     }),

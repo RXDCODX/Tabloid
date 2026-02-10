@@ -36,6 +36,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   const [isNameOpen, setIsNameOpen] = useState(false);
   const [presetsVersion, setPresetsVersion] = useState(0);
   const [presets, setPresets] = useState<Player[]>([]);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const debounced = useDebouncedCallback(
@@ -198,7 +199,11 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             className={`form-control form-control-sm ${styles.tagInput} bg-dark text-info border-info border-2 fw-bold rounded-3`}
             style={{ maxWidth: 90 }}
           />
-          <div className={styles.nameInputContainer}>
+          <div
+            className={styles.nameInputContainer}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
             <input
               type='text'
               placeholder='Name'
@@ -258,6 +263,28 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+            {showTooltip && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: '4px',
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                  color: '#fff',
+                  fontSize: '12px',
+                  borderRadius: '6px',
+                  zIndex: 1000,
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                  pointerEvents: 'none',
+                }}
+              >
+                💡 Оставьте поле пустым, чтобы скрыть блок на скорборде
               </div>
             )}
           </div>

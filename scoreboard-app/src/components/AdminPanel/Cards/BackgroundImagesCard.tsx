@@ -11,6 +11,10 @@ const IMAGE_TYPE_TO_FIELD: Record<ImageType, keyof Images | undefined> = {
   [ImageType.LeftImage]: 'leftImage',
   [ImageType.RightImage]: 'rightImage',
   [ImageType.FightModeImage]: 'fightModeImage',
+  [ImageType.Commentator1Image]: 'commentator1Image',
+  [ImageType.Commentator2Image]: 'commentator2Image',
+  [ImageType.Commentator3Image]: 'commentator3Image',
+  [ImageType.Commentator4Image]: 'commentator4Image',
   [ImageType.None]: undefined,
 };
 
@@ -189,6 +193,10 @@ const BackgroundImagesCard: React.FC = () => {
       [ImageType.LeftImage]: React.createRef<HTMLInputElement>(),
       [ImageType.RightImage]: React.createRef<HTMLInputElement>(),
       [ImageType.FightModeImage]: React.createRef<HTMLInputElement>(),
+      [ImageType.Commentator1Image]: React.createRef<HTMLInputElement>(),
+      [ImageType.Commentator2Image]: React.createRef<HTMLInputElement>(),
+      [ImageType.Commentator3Image]: React.createRef<HTMLInputElement>(),
+      [ImageType.Commentator4Image]: React.createRef<HTMLInputElement>(),
       [ImageType.None]: React.createRef<HTMLInputElement>(),
     }),
     []
@@ -257,6 +265,10 @@ const BackgroundImagesCard: React.FC = () => {
       ImageType.LeftImage,
       ImageType.RightImage,
       ImageType.FightModeImage,
+      ImageType.Commentator1Image,
+      ImageType.Commentator2Image,
+      ImageType.Commentator3Image,
+      ImageType.Commentator4Image,
     ].forEach(t => {
       const ref = fileInputRefs[t];
       if (ref?.current) ref.current.value = '';
@@ -300,6 +312,50 @@ const BackgroundImagesCard: React.FC = () => {
             field={ImageType.FightModeImage}
             label='Блок режима драки'
             fileInputRef={fileInputRefs[ImageType.FightModeImage]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
+          />
+        </Row>
+        <Row>
+          {' '}
+          <Col xs={12}>
+            <hr
+              style={{
+                borderTop: '2px dashed #28a745',
+                margin: '24px 0',
+              }}
+            />
+          </Col>
+        </Row>
+        <Row>
+          {' '}
+          <ImageUploadField
+            field={ImageType.Commentator1Image}
+            label='Блок комментатора 1'
+            fileInputRef={fileInputRefs[ImageType.Commentator1Image]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
+          />
+          <ImageUploadField
+            field={ImageType.Commentator2Image}
+            label='Блок комментатора 2'
+            fileInputRef={fileInputRefs[ImageType.Commentator2Image]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
+          />
+        </Row>
+        <Row>
+          <ImageUploadField
+            field={ImageType.Commentator3Image}
+            label='Блок комментатора 3'
+            fileInputRef={fileInputRefs[ImageType.Commentator3Image]}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={handleRemoveImage}
+          />
+          <ImageUploadField
+            field={ImageType.Commentator4Image}
+            label='Блок комментатора 4'
+            fileInputRef={fileInputRefs[ImageType.Commentator4Image]}
             onImageUpload={handleImageUpload}
             onRemoveImage={handleRemoveImage}
           />

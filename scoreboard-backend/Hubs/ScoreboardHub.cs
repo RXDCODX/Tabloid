@@ -56,6 +56,66 @@ public class ScoreboardHub(
         }
     }
 
+    public async Task UpdateCommentator1(Player commentator)
+    {
+        logger.LogInformation("UpdateCommentator1 called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            stateService.UpdateCommentator1(commentator);
+            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateCommentator1");
+            throw;
+        }
+    }
+
+    public async Task UpdateCommentator2(Player commentator)
+    {
+        logger.LogInformation("UpdateCommentator2 called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            stateService.UpdateCommentator2(commentator);
+            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateCommentator2");
+            throw;
+        }
+    }
+
+    public async Task UpdateCommentator3(Player commentator)
+    {
+        logger.LogInformation("UpdateCommentator2 called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            stateService.UpdateCommentator3(commentator);
+            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateCommentator3");
+            throw;
+        }
+    }
+
+    public async Task UpdateCommentator4(Player commentator)
+    {
+        logger.LogInformation("UpdateCommentator4 called by {ConnectionId}", Context.ConnectionId);
+        try
+        {
+            stateService.UpdateCommentator4(commentator);
+            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateCommentator4");
+            throw;
+        }
+    }
+
     public async Task UpdateMeta(MetaInfo meta)
     {
         logger.LogInformation("UpdateMeta called by {ConnectionId}", Context.ConnectionId);

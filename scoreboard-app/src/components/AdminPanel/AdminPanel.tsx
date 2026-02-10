@@ -6,6 +6,7 @@ import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
 import ColorPresetCard from './Cards/ColorPresetCard';
+import CommentatorsCard from './Cards/CommentatorsCard';
 import FontsCard from './Cards/FontsCard';
 import LayoutConfigCard from './Cards/LayoutConfigCard';
 import MetaPanel from './Cards/MetaPanel';
@@ -109,6 +110,9 @@ const AdminPanel = () => {
             </Col>
           </Row>
         )}
+
+        {/* Commentators Card */}
+        {cardVisibility.commentators && <CommentatorsCard />}
       </Container>
       <style>
         {` 
