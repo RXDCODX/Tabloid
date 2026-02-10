@@ -80,6 +80,18 @@ public class ScoreboardStateService
             case ImageType.FightModeImage:
                 _state.Images.FightModeImage = image.IsShouldExists ? image : null;
                 break;
+            case ImageType.Commentator1Image:
+                _state.Images.Commentator1Image = image.IsShouldExists ? image : null;
+                break;
+            case ImageType.Commentator2Image:
+                _state.Images.Commentator2Image = image.IsShouldExists ? image : null;
+                break;
+            case ImageType.Commentator3Image:
+                _state.Images.Commentator3Image = image.IsShouldExists ? image : null;
+                break;
+            case ImageType.Commentator4Image:
+                _state.Images.Commentator4Image = image.IsShouldExists ? image : null;
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(image));
         }
