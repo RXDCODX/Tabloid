@@ -257,7 +257,12 @@ const FontsCard: React.FC<FontsCardProps> = () => {
       (Object.keys(updatedConfig) as Array<keyof FontConfiguration>).forEach(
         key => {
           if (updatedConfig[key] === selectedFontToDelete) {
-            updatedConfig[key] = '';
+            // For font name fields, set to empty string; for size fields, set to 0
+            if (key.includes('Size')) {
+              (updatedConfig[key] as any) = 0;
+            } else {
+              (updatedConfig[key] as any) = '';
+            }
             configChanged = true;
           }
         }
@@ -296,7 +301,7 @@ const FontsCard: React.FC<FontsCardProps> = () => {
   };
 
   const handleFontConfigChange = useCallback(
-    (field: keyof FontConfiguration, value: string) => {
+    (field: keyof FontConfiguration, value: string | number) => {
       const newConfig = { ...fontConfig, [field]: value };
       setFontConfiguration(newConfig);
     },
@@ -522,21 +527,46 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Имена игроков
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.PlayerNameFont}
-                    onChange={e =>
-                      handleFontConfigChange('PlayerNameFont', e.target.value)
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.PlayerNameFont}
+                      onChange={e =>
+                        handleFontConfigChange('PlayerNameFont', e.target.value)
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.PlayerNameFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'PlayerNameFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -546,21 +576,46 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Теги игроков
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.PlayerTagFont}
-                    onChange={e =>
-                      handleFontConfigChange('PlayerTagFont', e.target.value)
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.PlayerTagFont}
+                      onChange={e =>
+                        handleFontConfigChange('PlayerTagFont', e.target.value)
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.PlayerTagFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'PlayerTagFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -570,21 +625,46 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Счет
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.ScoreFont}
-                    onChange={e =>
-                      handleFontConfigChange('ScoreFont', e.target.value)
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.ScoreFont}
+                      onChange={e =>
+                        handleFontConfigChange('ScoreFont', e.target.value)
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.ScoreFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'ScoreFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -594,24 +674,49 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Название турнира
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.TournamentTitleFont}
-                    onChange={e =>
-                      handleFontConfigChange(
-                        'TournamentTitleFont',
-                        e.target.value
-                      )
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.TournamentTitleFont}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'TournamentTitleFont',
+                          e.target.value
+                        )
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.TournamentTitleFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'TournamentTitleFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -621,21 +726,46 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Режим драки
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.FightModeFont}
-                    onChange={e =>
-                      handleFontConfigChange('FightModeFont', e.target.value)
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.FightModeFont}
+                      onChange={e =>
+                        handleFontConfigChange('FightModeFont', e.target.value)
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.FightModeFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'FightModeFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <hr className='border-secondary' />
@@ -647,24 +777,49 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Имена комментаторов
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.CommentatorNameFont}
-                    onChange={e =>
-                      handleFontConfigChange(
-                        'CommentatorNameFont',
-                        e.target.value
-                      )
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.CommentatorNameFont}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorNameFont',
+                          e.target.value
+                        )
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.CommentatorNameFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorNameFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -674,24 +829,49 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Теги комментаторов
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.CommentatorTagFont}
-                    onChange={e =>
-                      handleFontConfigChange(
-                        'CommentatorTagFont',
-                        e.target.value
-                      )
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.CommentatorTagFont}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorTagFont',
+                          e.target.value
+                        )
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.CommentatorTagFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorTagFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
 
                 <div className={styles.fontConfigItem}>
@@ -701,24 +881,49 @@ const FontsCard: React.FC<FontsCardProps> = () => {
                   >
                     Счет комментаторов
                   </Form.Label>
-                  <Form.Select
-                    value={fontConfig.CommentatorScoreFont}
-                    onChange={e =>
-                      handleFontConfigChange(
-                        'CommentatorScoreFont',
-                        e.target.value
-                      )
-                    }
-                    className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
-                    disabled={loading}
-                  >
-                    <option value=''>По умолчанию</option>
-                    {fonts.map(font => (
-                      <option key={font.fontName} value={font.fontName}>
-                        {font.fontName}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  <div className='d-flex gap-2'>
+                    <Form.Select
+                      value={fontConfig.CommentatorScoreFont}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorScoreFont',
+                          e.target.value
+                        )
+                      }
+                      className={`${styles.fontConfigSelect} bg-dark text-white border-secondary`}
+                      disabled={loading}
+                    >
+                      <option value=''>По умолчанию</option>
+                      {fonts.map(font => (
+                        <option key={font.fontName} value={font.fontName}>
+                          {font.fontName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control
+                      type='number'
+                      min='8'
+                      max='200'
+                      step='1'
+                      value={fontConfig.CommentatorScoreFontSize ?? 0}
+                      onChange={e =>
+                        handleFontConfigChange(
+                          'CommentatorScoreFontSize',
+                          e.target.value ? parseFloat(e.target.value) : 0
+                        )
+                      }
+                      className='bg-dark text-white border-secondary'
+                      disabled={loading}
+                      style={{ width: '80px' }}
+                      placeholder='Size'
+                    />
+                    <span
+                      className='text-secondary pt-2'
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      px
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

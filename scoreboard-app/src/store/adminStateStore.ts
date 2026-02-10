@@ -244,13 +244,21 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
   layoutConfig: DEFAULT_LAYOUT,
   fontConfig: {
     PlayerNameFont: '',
+    PlayerNameFontSize: 0,
     PlayerTagFont: '',
+    PlayerTagFontSize: 0,
     ScoreFont: '',
+    ScoreFontSize: 0,
     TournamentTitleFont: '',
+    TournamentTitleFontSize: 0,
     FightModeFont: '',
+    FightModeFontSize: 0,
     CommentatorNameFont: '',
+    CommentatorNameFontSize: 0,
     CommentatorTagFont: '',
+    CommentatorTagFontSize: 0,
     CommentatorScoreFont: '',
+    CommentatorScoreFontSize: 0,
   },
 
   setPlayer1: p => {
@@ -424,13 +432,21 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
       layoutConfig: DEFAULT_LAYOUT,
       fontConfig: {
         PlayerNameFont: '',
+        PlayerNameFontSize: 0,
         PlayerTagFont: '',
+        PlayerTagFontSize: 0,
         ScoreFont: '',
+        ScoreFontSize: 0,
         TournamentTitleFont: '',
+        TournamentTitleFontSize: 0,
         FightModeFont: '',
+        FightModeFontSize: 0,
         CommentatorNameFont: '',
+        CommentatorNameFontSize: 0,
         CommentatorTagFont: '',
+        CommentatorTagFontSize: 0,
         CommentatorScoreFont: '',
+        CommentatorScoreFontSize: 0,
       },
     });
   },
@@ -567,32 +583,64 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
           incomingFontConfig.PlayerNameFont ||
           incomingFontConfig.playerNameFont ||
           '',
+        PlayerNameFontSize:
+          incomingFontConfig.PlayerNameFontSize ||
+          incomingFontConfig.playerNameFontSize ||
+          0,
         PlayerTagFont:
           incomingFontConfig.PlayerTagFont ||
           incomingFontConfig.playerTagFont ||
           '',
+        PlayerTagFontSize:
+          incomingFontConfig.PlayerTagFontSize ||
+          incomingFontConfig.playerTagFontSize ||
+          0,
         ScoreFont:
           incomingFontConfig.ScoreFont || incomingFontConfig.scoreFont || '',
+        ScoreFontSize:
+          incomingFontConfig.ScoreFontSize ||
+          incomingFontConfig.scoreFontSize ||
+          0,
         TournamentTitleFont:
           incomingFontConfig.TournamentTitleFont ||
           incomingFontConfig.tournamentTitleFont ||
           '',
+        TournamentTitleFontSize:
+          incomingFontConfig.TournamentTitleFontSize ||
+          incomingFontConfig.tournamentTitleFontSize ||
+          0,
         FightModeFont:
           incomingFontConfig.FightModeFont ||
           incomingFontConfig.fightModeFont ||
           '',
+        FightModeFontSize:
+          incomingFontConfig.FightModeFontSize ||
+          incomingFontConfig.fightModeFontSize ||
+          0,
         CommentatorNameFont:
           incomingFontConfig.CommentatorNameFont ||
           incomingFontConfig.commentatorNameFont ||
           '',
+        CommentatorNameFontSize:
+          incomingFontConfig.CommentatorNameFontSize ||
+          incomingFontConfig.commentatorNameFontSize ||
+          0,
         CommentatorTagFont:
           incomingFontConfig.CommentatorTagFont ||
           incomingFontConfig.commentatorTagFont ||
           '',
+        CommentatorTagFontSize:
+          incomingFontConfig.CommentatorTagFontSize ||
+          incomingFontConfig.commentatorTagFontSize ||
+          0,
         CommentatorScoreFont:
           incomingFontConfig.CommentatorScoreFont ||
           incomingFontConfig.commentatorScoreFont ||
           '',
+        CommentatorScoreFontSize:
+          incomingFontConfig.CommentatorScoreFontSize ||
+          incomingFontConfig.commentatorScoreFontSize ||
+          0,
       };
 
       if (!shallowEqualObject(normalizedFontConfig, current.fontConfig)) {

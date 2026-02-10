@@ -103,6 +103,13 @@ const Scoreboard: React.FC = () => {
     return `/assets/flags/${countryCode.toLowerCase()}.svg`;
   }, []);
 
+  // Функция для получения размера шрифта
+  const getFontSize = (fontSizeValue?: number): string | undefined => {
+    return fontSizeValue && fontSizeValue > 0
+      ? `${fontSizeValue}px`
+      : undefined;
+  };
+
   const p1 = player1;
   const p2 = player2;
   const c1 = commentator1;
@@ -150,7 +157,15 @@ const Scoreboard: React.FC = () => {
               ? 'rightImage'
               : imageType === ImageType.FightModeImage
                 ? 'fightModeImage'
-                : undefined;
+                : imageType === ImageType.Commentator1Image
+                  ? 'commentator1Image'
+                  : imageType === ImageType.Commentator2Image
+                    ? 'commentator2Image'
+                    : imageType === ImageType.Commentator3Image
+                      ? 'commentator3Image'
+                      : imageType === ImageType.Commentator4Image
+                        ? 'commentator4Image'
+                        : undefined;
 
       if (!imageKey) {
         return {};
@@ -302,6 +317,7 @@ const Scoreboard: React.FC = () => {
                   fontFamily: fontConfig.TournamentTitleFont
                     ? `'${fontConfig.TournamentTitleFont}', sans-serif`
                     : undefined,
+                  fontSize: getFontSize(fontConfig.TournamentTitleFontSize),
                 }}
               >
                 {m.title}
@@ -349,6 +365,7 @@ const Scoreboard: React.FC = () => {
                       fontFamily: fontConfig.PlayerNameFont
                         ? `'${fontConfig.PlayerNameFont}', sans-serif`
                         : undefined,
+                      fontSize: getFontSize(fontConfig.PlayerNameFontSize),
                     }}
                   >
                     <span
@@ -370,6 +387,7 @@ const Scoreboard: React.FC = () => {
                             fontFamily: fontConfig.PlayerTagFont
                               ? `'${fontConfig.PlayerTagFont}', sans-serif`
                               : undefined,
+                            fontSize: getFontSize(fontConfig.PlayerTagFontSize),
                           }}
                         >
                           {p1.tag}
@@ -415,6 +433,7 @@ const Scoreboard: React.FC = () => {
                       fontFamily: fontConfig.ScoreFont
                         ? `'${fontConfig.ScoreFont}', sans-serif`
                         : undefined,
+                      fontSize: getFontSize(fontConfig.ScoreFontSize),
                     }}
                   >
                     {p1.score}
@@ -461,6 +480,7 @@ const Scoreboard: React.FC = () => {
                       fontFamily: fontConfig.ScoreFont
                         ? `'${fontConfig.ScoreFont}', sans-serif`
                         : undefined,
+                      fontSize: getFontSize(fontConfig.ScoreFontSize),
                     }}
                   >
                     {p2.score}
@@ -504,6 +524,7 @@ const Scoreboard: React.FC = () => {
                       fontFamily: fontConfig.PlayerNameFont
                         ? `'${fontConfig.PlayerNameFont}', sans-serif`
                         : undefined,
+                      fontSize: getFontSize(fontConfig.PlayerNameFontSize),
                     }}
                   >
                     <span
@@ -527,6 +548,7 @@ const Scoreboard: React.FC = () => {
                             fontFamily: fontConfig.PlayerTagFont
                               ? `'${fontConfig.PlayerTagFont}', sans-serif`
                               : undefined,
+                            fontSize: getFontSize(fontConfig.PlayerTagFontSize),
                           }}
                         >
                           {p2.tag}
@@ -574,6 +596,7 @@ const Scoreboard: React.FC = () => {
                     fontFamily: fontConfig.FightModeFont
                       ? `'${fontConfig.FightModeFont}', sans-serif`
                       : undefined,
+                    fontSize: getFontSize(fontConfig.FightModeFontSize),
                   }}
                 >
                   {m.fightRule}
@@ -596,8 +619,18 @@ const Scoreboard: React.FC = () => {
                   right: layout?.commentator1?.right,
                   width: layout?.commentator1?.width,
                   height: layout?.commentator1?.height,
+                  ...(isVideoFile(imgs?.commentator1Image?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.Commentator1Image)),
                 }}
               >
+                {isVideoFile(imgs?.commentator1Image?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.commentator1Image?.imageName}
+                    imageType={ImageType.Commentator1Image}
+                    uploadedAt={imgs?.commentator1Image?.uploadedAt}
+                  />
+                )}
                 <div
                   style={{
                     display: 'flex',
@@ -605,6 +638,8 @@ const Scoreboard: React.FC = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   {c1.flag && c1.flag !== 'none' && (
@@ -629,6 +664,9 @@ const Scoreboard: React.FC = () => {
                         fontFamily: fontConfig.CommentatorNameFont
                           ? `'${fontConfig.CommentatorNameFont}', sans-serif`
                           : undefined,
+                        fontSize: getFontSize(
+                          fontConfig.CommentatorNameFontSize
+                        ),
                       }}
                     >
                       {c1.name}
@@ -641,10 +679,12 @@ const Scoreboard: React.FC = () => {
                         textShadow: getTextOutline(
                           c.textOutlineColor || '#000000'
                         ),
-                        fontSize: '0.9em',
                         fontFamily: fontConfig.CommentatorTagFont
                           ? `'${fontConfig.CommentatorTagFont}', sans-serif`
                           : undefined,
+                        fontSize:
+                          getFontSize(fontConfig.CommentatorTagFontSize) ||
+                          '0.9em',
                       }}
                     >
                       {c1.tag}
@@ -669,8 +709,18 @@ const Scoreboard: React.FC = () => {
                   right: layout?.commentator2?.right,
                   width: layout?.commentator2?.width,
                   height: layout?.commentator2?.height,
+                  ...(isVideoFile(imgs?.commentator2Image?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.Commentator2Image)),
                 }}
               >
+                {isVideoFile(imgs?.commentator2Image?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.commentator2Image?.imageName}
+                    imageType={ImageType.Commentator2Image}
+                    uploadedAt={imgs?.commentator2Image?.uploadedAt}
+                  />
+                )}
                 <div
                   style={{
                     display: 'flex',
@@ -678,6 +728,8 @@ const Scoreboard: React.FC = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   {c2.flag && c2.flag !== 'none' && (
@@ -702,6 +754,9 @@ const Scoreboard: React.FC = () => {
                         fontFamily: fontConfig.CommentatorNameFont
                           ? `'${fontConfig.CommentatorNameFont}', sans-serif`
                           : undefined,
+                        fontSize: getFontSize(
+                          fontConfig.CommentatorNameFontSize
+                        ),
                       }}
                     >
                       {c2.name}
@@ -714,10 +769,12 @@ const Scoreboard: React.FC = () => {
                         textShadow: getTextOutline(
                           c.textOutlineColor || '#000000'
                         ),
-                        fontSize: '0.9em',
                         fontFamily: fontConfig.CommentatorTagFont
                           ? `'${fontConfig.CommentatorTagFont}', sans-serif`
                           : undefined,
+                        fontSize:
+                          getFontSize(fontConfig.CommentatorTagFontSize) ||
+                          '0.9em',
                       }}
                     >
                       {c2.tag}
@@ -742,8 +799,18 @@ const Scoreboard: React.FC = () => {
                   right: layout?.commentator3?.right,
                   width: layout?.commentator3?.width,
                   height: layout?.commentator3?.height,
+                  ...(isVideoFile(imgs?.commentator3Image?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.Commentator3Image)),
                 }}
               >
+                {isVideoFile(imgs?.commentator3Image?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.commentator3Image?.imageName}
+                    imageType={ImageType.Commentator3Image}
+                    uploadedAt={imgs?.commentator3Image?.uploadedAt}
+                  />
+                )}
                 <div
                   style={{
                     display: 'flex',
@@ -751,6 +818,8 @@ const Scoreboard: React.FC = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   {c3.flag && c3.flag !== 'none' && (
@@ -775,6 +844,9 @@ const Scoreboard: React.FC = () => {
                         fontFamily: fontConfig.CommentatorNameFont
                           ? `'${fontConfig.CommentatorNameFont}', sans-serif`
                           : undefined,
+                        fontSize: getFontSize(
+                          fontConfig.CommentatorNameFontSize
+                        ),
                       }}
                     >
                       {c3.name}
@@ -787,10 +859,12 @@ const Scoreboard: React.FC = () => {
                         textShadow: getTextOutline(
                           c.textOutlineColor || '#000000'
                         ),
-                        fontSize: '0.9em',
                         fontFamily: fontConfig.CommentatorTagFont
                           ? `'${fontConfig.CommentatorTagFont}', sans-serif`
                           : undefined,
+                        fontSize:
+                          getFontSize(fontConfig.CommentatorTagFontSize) ||
+                          '0.9em',
                       }}
                     >
                       {c3.tag}
@@ -815,8 +889,18 @@ const Scoreboard: React.FC = () => {
                   right: layout?.commentator4?.right,
                   width: layout?.commentator4?.width,
                   height: layout?.commentator4?.height,
+                  ...(isVideoFile(imgs?.commentator4Image?.imageName)
+                    ? {}
+                    : bgStyleFor(ImageType.Commentator4Image)),
                 }}
               >
+                {isVideoFile(imgs?.commentator4Image?.imageName) && (
+                  <MediaBackground
+                    imageName={imgs?.commentator4Image?.imageName}
+                    imageType={ImageType.Commentator4Image}
+                    uploadedAt={imgs?.commentator4Image?.uploadedAt}
+                  />
+                )}
                 <div
                   style={{
                     display: 'flex',
@@ -824,6 +908,8 @@ const Scoreboard: React.FC = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   {c4.flag && c4.flag !== 'none' && (
@@ -848,6 +934,9 @@ const Scoreboard: React.FC = () => {
                         fontFamily: fontConfig.CommentatorNameFont
                           ? `'${fontConfig.CommentatorNameFont}', sans-serif`
                           : undefined,
+                        fontSize: getFontSize(
+                          fontConfig.CommentatorNameFontSize
+                        ),
                       }}
                     >
                       {c4.name}
@@ -860,10 +949,12 @@ const Scoreboard: React.FC = () => {
                         textShadow: getTextOutline(
                           c.textOutlineColor || '#000000'
                         ),
-                        fontSize: '0.9em',
                         fontFamily: fontConfig.CommentatorTagFont
                           ? `'${fontConfig.CommentatorTagFont}', sans-serif`
                           : undefined,
+                        fontSize:
+                          getFontSize(fontConfig.CommentatorTagFontSize) ||
+                          '0.9em',
                       }}
                     >
                       {c4.tag}

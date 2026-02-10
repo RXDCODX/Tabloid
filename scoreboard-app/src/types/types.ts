@@ -117,13 +117,21 @@ export interface ScoreboardState {
 
 export interface FontConfiguration {
   PlayerNameFont: string; // Шрифт для имен игроков
+  PlayerNameFontSize: number; // Размер шрифта для имен игроков
   PlayerTagFont: string; // Шрифт для тегов игроков
+  PlayerTagFontSize: number; // Размер шрифта для тегов игроков
   ScoreFont: string; // Шрифт для счета
+  ScoreFontSize: number; // Размер шрифта для счета
   TournamentTitleFont: string; // Шрифт для заголовка турнира
+  TournamentTitleFontSize: number; // Размер шрифта для заголовка турнира
   FightModeFont: string; // Шрифт для правила драки
+  FightModeFontSize: number; // Размер шрифта для правила драки
   CommentatorNameFont: string; // Шрифт для имен комментаторов
+  CommentatorNameFontSize: number; // Размер шрифта для имен комментаторов
   CommentatorTagFont: string; // Шрифт для тегов комментаторов
+  CommentatorTagFontSize: number; // Размер шрифта для тегов комментаторов
   CommentatorScoreFont: string; // Шрифт для счета комментаторов
+  CommentatorScoreFontSize: number; // Размер шрифта для счета комментаторов
 }
 
 export const defaultPreset: ColorPreset = {
