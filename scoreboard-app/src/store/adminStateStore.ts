@@ -28,6 +28,38 @@ const DEFAULT_PLAYER_2: Player = {
   final: 'none',
 };
 
+const DEFAULT_COMMENTATOR_1: Player = {
+  name: 'Commentator 1',
+  score: 0,
+  tag: '',
+  flag: 'ru',
+  final: 'none',
+};
+
+const DEFAULT_COMMENTATOR_2: Player = {
+  name: 'Commentator 2',
+  score: 0,
+  tag: '',
+  flag: 'us',
+  final: 'none',
+};
+
+const DEFAULT_COMMENTATOR_3: Player = {
+  name: 'Commentator 3',
+  score: 0,
+  tag: '',
+  flag: 'gb',
+  final: 'none',
+};
+
+const DEFAULT_COMMENTATOR_4: Player = {
+  name: 'Commentator 4',
+  score: 0,
+  tag: '',
+  flag: 'it',
+  final: 'none',
+};
+
 const DEFAULT_META: MetaInfo = {
   title: 'Tournament',
   fightRule: 'Grand Finals',
@@ -38,6 +70,10 @@ const DEFAULT_LAYOUT: LayoutConfig = {
   left: { top: '15px', left: '167px', width: '540px', height: '120px' },
   right: { top: '15px', right: '167px', width: '540px', height: '120px' },
   fightMode: { top: '150px', left: '50%', width: '300px', height: '50px' },
+  commentator1: { top: '200px', left: '50px', width: '300px', height: '80px' },
+  commentator2: { top: '200px', left: '50%', width: '300px', height: '80px' },
+  commentator3: { top: '200px', right: '50px', width: '300px', height: '80px' },
+  commentator4: { top: '280px', left: '50%', width: '300px', height: '80px' },
 };
 
 const isConnected = (connection: signalR.HubConnection | null) => {
@@ -135,6 +171,10 @@ export type AdminStateStore = {
   // state
   player1: Player;
   player2: Player;
+  commentator1: Player;
+  commentator2: Player;
+  commentator3: Player;
+  commentator4: Player;
   meta: MetaInfo;
   isVisible: boolean;
   isShowBorders: boolean;
@@ -149,6 +189,21 @@ export type AdminStateStore = {
   setPlayer1: (p: Player) => void;
   setPlayer2: (p: Player) => void;
   swapPlayers: () => void;
+
+  setCommentator1: (p: Player) => void;
+  setCommentator2: (p: Player) => void;
+  setCommentator3: (p: Player) => void;
+  setCommentator4: (p: Player) => void;
+  swapCommentators1And2: () => void;
+  swapCommentators2And3: () => void;
+  swapCommentators3And4: () => void;
+  swapCommentators1And3: () => void;
+  swapCommentators2And4: () => void;
+  swapCommentators1And2Names: () => void;
+  swapCommentators3And4Names: () => void;
+  swapCommentators1And3Names: () => void;
+  swapCommentators2And4Names: () => void;
+  resetAllCommentators: () => void;
 
   setMeta: (m: MetaInfo) => void;
   setVisibility: (visible: boolean) => void;
@@ -169,13 +224,16 @@ export type AdminStateStore = {
   // remote (ReceiveState)
   applyRemoteState: (state: ScoreboardState) => void;
 };
-
 export const useAdminStore = create<AdminStateStore>((set, get) => ({
   connection: null,
   setConnection: connection => set({ connection }),
 
   player1: DEFAULT_PLAYER_1,
   player2: DEFAULT_PLAYER_2,
+  commentator1: DEFAULT_COMMENTATOR_1,
+  commentator2: DEFAULT_COMMENTATOR_2,
+  commentator3: DEFAULT_COMMENTATOR_3,
+  commentator4: DEFAULT_COMMENTATOR_4,
   meta: DEFAULT_META,
   isVisible: true,
   isShowBorders: false,
@@ -186,10 +244,21 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
   layoutConfig: DEFAULT_LAYOUT,
   fontConfig: {
     PlayerNameFont: '',
+    PlayerNameFontSize: 0,
     PlayerTagFont: '',
+    PlayerTagFontSize: 0,
     ScoreFont: '',
+    ScoreFontSize: 0,
     TournamentTitleFont: '',
+    TournamentTitleFontSize: 0,
     FightModeFont: '',
+    FightModeFontSize: 0,
+    CommentatorNameFont: '',
+    CommentatorNameFontSize: 0,
+    CommentatorTagFont: '',
+    CommentatorTagFontSize: 0,
+    CommentatorScoreFont: '',
+    CommentatorScoreFontSize: 0,
   },
 
   setPlayer1: p => {
@@ -209,6 +278,91 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
     // Use action wrappers so updates propagate to server
     get().setPlayer1(player2);
     get().setPlayer2(player1);
+  },
+
+  setCommentator1: p => {
+    console.log('[adminStateStore] setCommentator1', p);
+    set({ commentator1: p });
+    debouncedInvoke(get().connection, 'UpdateCommentator1', p);
+  },
+
+  setCommentator2: p => {
+    console.log('[adminStateStore] setCommentator2', p);
+    set({ commentator2: p });
+    debouncedInvoke(get().connection, 'UpdateCommentator2', p);
+  },
+
+  setCommentator3: p => {
+    console.log('[adminStateStore] setCommentator3', p);
+    set({ commentator3: p });
+    debouncedInvoke(get().connection, 'UpdateCommentator3', p);
+  },
+
+  setCommentator4: p => {
+    console.log('[adminStateStore] setCommentator4', p);
+    set({ commentator4: p });
+    debouncedInvoke(get().connection, 'UpdateCommentator4', p);
+  },
+
+  swapCommentators1And2: () => {
+    const { commentator1, commentator2 } = get();
+    get().setCommentator1(commentator2);
+    get().setCommentator2(commentator1);
+  },
+
+  swapCommentators2And3: () => {
+    const { commentator2, commentator3 } = get();
+    get().setCommentator2(commentator3);
+    get().setCommentator3(commentator2);
+  },
+
+  swapCommentators3And4: () => {
+    const { commentator3, commentator4 } = get();
+    get().setCommentator3(commentator4);
+    get().setCommentator4(commentator3);
+  },
+
+  swapCommentators1And3: () => {
+    const { commentator1, commentator3 } = get();
+    get().setCommentator1(commentator3);
+    get().setCommentator3(commentator1);
+  },
+
+  swapCommentators2And4: () => {
+    const { commentator2, commentator4 } = get();
+    get().setCommentator2(commentator4);
+    get().setCommentator4(commentator2);
+  },
+
+  swapCommentators1And2Names: () => {
+    const { commentator1, commentator2 } = get();
+    get().setCommentator1({ ...commentator1, name: commentator2.name });
+    get().setCommentator2({ ...commentator2, name: commentator1.name });
+  },
+
+  swapCommentators3And4Names: () => {
+    const { commentator3, commentator4 } = get();
+    get().setCommentator3({ ...commentator3, name: commentator4.name });
+    get().setCommentator4({ ...commentator4, name: commentator3.name });
+  },
+
+  swapCommentators1And3Names: () => {
+    const { commentator1, commentator3 } = get();
+    get().setCommentator1({ ...commentator1, name: commentator3.name });
+    get().setCommentator3({ ...commentator3, name: commentator1.name });
+  },
+
+  swapCommentators2And4Names: () => {
+    const { commentator2, commentator4 } = get();
+    get().setCommentator2({ ...commentator2, name: commentator4.name });
+    get().setCommentator4({ ...commentator4, name: commentator2.name });
+  },
+
+  resetAllCommentators: () => {
+    get().setCommentator1(DEFAULT_COMMENTATOR_1);
+    get().setCommentator2(DEFAULT_COMMENTATOR_2);
+    get().setCommentator3(DEFAULT_COMMENTATOR_3);
+    get().setCommentator4(DEFAULT_COMMENTATOR_4);
   },
 
   setMeta: m => {
@@ -264,6 +418,10 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
     set({
       player1: DEFAULT_PLAYER_1,
       player2: DEFAULT_PLAYER_2,
+      commentator1: DEFAULT_COMMENTATOR_1,
+      commentator2: DEFAULT_COMMENTATOR_2,
+      commentator3: DEFAULT_COMMENTATOR_3,
+      commentator4: DEFAULT_COMMENTATOR_4,
       meta: DEFAULT_META,
       isVisible: true,
       isShowBorders: false,
@@ -274,10 +432,21 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
       layoutConfig: DEFAULT_LAYOUT,
       fontConfig: {
         PlayerNameFont: '',
+        PlayerNameFontSize: 0,
         PlayerTagFont: '',
+        PlayerTagFontSize: 0,
         ScoreFont: '',
+        ScoreFontSize: 0,
         TournamentTitleFont: '',
+        TournamentTitleFontSize: 0,
         FightModeFont: '',
+        FightModeFontSize: 0,
+        CommentatorNameFont: '',
+        CommentatorNameFontSize: 0,
+        CommentatorTagFont: '',
+        CommentatorTagFontSize: 0,
+        CommentatorScoreFont: '',
+        CommentatorScoreFontSize: 0,
       },
     });
   },
@@ -304,6 +473,50 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
         new: state.player2,
       });
       patch.player2 = state.player2;
+    }
+
+    if (
+      state.commentator1 &&
+      !playersEqual(state.commentator1, current.commentator1)
+    ) {
+      console.log('[adminStateStore] commentator1 changed', {
+        old: current.commentator1,
+        new: state.commentator1,
+      });
+      patch.commentator1 = state.commentator1;
+    }
+
+    if (
+      state.commentator2 &&
+      !playersEqual(state.commentator2, current.commentator2)
+    ) {
+      console.log('[adminStateStore] commentator2 changed', {
+        old: current.commentator2,
+        new: state.commentator2,
+      });
+      patch.commentator2 = state.commentator2;
+    }
+
+    if (
+      state.commentator3 &&
+      !playersEqual(state.commentator3, current.commentator3)
+    ) {
+      console.log('[adminStateStore] commentator3 changed', {
+        old: current.commentator3,
+        new: state.commentator3,
+      });
+      patch.commentator3 = state.commentator3;
+    }
+
+    if (
+      state.commentator4 &&
+      !playersEqual(state.commentator4, current.commentator4)
+    ) {
+      console.log('[adminStateStore] commentator4 changed', {
+        old: current.commentator4,
+        new: state.commentator4,
+      });
+      patch.commentator4 = state.commentator4;
     }
 
     if (state.meta && !shallowEqualObject(state.meta, current.meta)) {
@@ -370,20 +583,64 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
           incomingFontConfig.PlayerNameFont ||
           incomingFontConfig.playerNameFont ||
           '',
+        PlayerNameFontSize:
+          incomingFontConfig.PlayerNameFontSize ||
+          incomingFontConfig.playerNameFontSize ||
+          0,
         PlayerTagFont:
           incomingFontConfig.PlayerTagFont ||
           incomingFontConfig.playerTagFont ||
           '',
+        PlayerTagFontSize:
+          incomingFontConfig.PlayerTagFontSize ||
+          incomingFontConfig.playerTagFontSize ||
+          0,
         ScoreFont:
           incomingFontConfig.ScoreFont || incomingFontConfig.scoreFont || '',
+        ScoreFontSize:
+          incomingFontConfig.ScoreFontSize ||
+          incomingFontConfig.scoreFontSize ||
+          0,
         TournamentTitleFont:
           incomingFontConfig.TournamentTitleFont ||
           incomingFontConfig.tournamentTitleFont ||
           '',
+        TournamentTitleFontSize:
+          incomingFontConfig.TournamentTitleFontSize ||
+          incomingFontConfig.tournamentTitleFontSize ||
+          0,
         FightModeFont:
           incomingFontConfig.FightModeFont ||
           incomingFontConfig.fightModeFont ||
           '',
+        FightModeFontSize:
+          incomingFontConfig.FightModeFontSize ||
+          incomingFontConfig.fightModeFontSize ||
+          0,
+        CommentatorNameFont:
+          incomingFontConfig.CommentatorNameFont ||
+          incomingFontConfig.commentatorNameFont ||
+          '',
+        CommentatorNameFontSize:
+          incomingFontConfig.CommentatorNameFontSize ||
+          incomingFontConfig.commentatorNameFontSize ||
+          0,
+        CommentatorTagFont:
+          incomingFontConfig.CommentatorTagFont ||
+          incomingFontConfig.commentatorTagFont ||
+          '',
+        CommentatorTagFontSize:
+          incomingFontConfig.CommentatorTagFontSize ||
+          incomingFontConfig.commentatorTagFontSize ||
+          0,
+        CommentatorScoreFont:
+          incomingFontConfig.CommentatorScoreFont ||
+          incomingFontConfig.commentatorScoreFont ||
+          '',
+        CommentatorScoreFontSize:
+          incomingFontConfig.CommentatorScoreFontSize ||
+          incomingFontConfig.commentatorScoreFontSize ||
+          0,
       };
 
       if (!shallowEqualObject(normalizedFontConfig, current.fontConfig)) {

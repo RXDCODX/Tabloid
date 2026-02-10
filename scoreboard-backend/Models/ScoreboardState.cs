@@ -4,6 +4,10 @@ public class ScoreboardState
 {
     public Player Player1 { get; set; } = new();
     public Player Player2 { get; set; } = new();
+    public Player Commentator1 { get; set; } = new();
+    public Player Commentator2 { get; set; } = new();
+    public Player Commentator3 { get; set; } = new();
+    public Player Commentator4 { get; set; } = new();
     public MetaInfo Meta { get; set; } = new();
     public ColorPreset Colors { get; set; } = new();
     public TextConfiguration TextConfig { get; set; } = new();

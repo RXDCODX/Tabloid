@@ -16,6 +16,7 @@ const Sidebar = () => {
     { key: 'fonts' as const, label: 'Fonts' },
     { key: 'layoutConfig' as const, label: 'Layout Config' },
     { key: 'players' as const, label: 'Players' },
+    { key: 'commentators' as const, label: 'Commentators' },
   ];
 
   return (

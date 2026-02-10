@@ -18,6 +18,8 @@ type ColorPresetModel = {
   fightModeColor?: string;
   scoreColor?: string;
   textOutlineColor?: string;
+  commentatorTagColor?: string;
+  commentatorNamesColor?: string;
 };
 
 const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
@@ -36,6 +38,8 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
     fightModeColor: defaultPreset.fightModeColor,
     scoreColor: defaultPreset.scoreColor,
     textOutlineColor: defaultPreset.textOutlineColor,
+    commentatorTagColor: defaultPreset.commentatorTagColor,
+    commentatorNamesColor: defaultPreset.commentatorNamesColor,
   });
   const [colorPresets, setColorPresets] = useState<ColorPresetModel[]>([]);
   const [presetName, setPresetName] = useState<string>('');
@@ -64,6 +68,8 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
       fightModeColor: defaultPreset.fightModeColor,
       scoreColor: defaultPreset.scoreColor,
       textOutlineColor: defaultPreset.textOutlineColor,
+      commentatorTagColor: defaultPreset.commentatorTagColor,
+      commentatorNamesColor: defaultPreset.commentatorNamesColor,
     });
   }, [handleColorChange]);
 
@@ -90,6 +96,10 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
         scoreColor: preset.scoreColor || defaultPreset.scoreColor,
         textOutlineColor:
           preset.textOutlineColor || defaultPreset.textOutlineColor,
+        commentatorTagColor:
+          preset.commentatorTagColor || defaultPreset.commentatorTagColor,
+        commentatorNamesColor:
+          preset.commentatorNamesColor || defaultPreset.commentatorNamesColor,
       };
 
       // Обновим локально UI сразу
@@ -130,6 +140,8 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
       fightModeColor: customColors.fightModeColor,
       scoreColor: customColors.scoreColor,
       textOutlineColor: customColors.textOutlineColor,
+      commentatorTagColor: customColors.commentatorTagColor,
+      commentatorNamesColor: customColors.commentatorNamesColor,
     };
 
     try {
@@ -304,7 +316,7 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                   </Col>
                 </Row>
                 {/* Третий ряд - обводка текста */}
-                <Row className='g-3 justify-content-center'>
+                <Row className='g-3 mb-3 justify-content-center'>
                   <Col xs={12} md={12} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
@@ -314,6 +326,57 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                         value={customColors.textOutlineColor as string}
                         onChange={value =>
                           handleCustomColorChange('textOutlineColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+
+              {/* Блок настроек для комментаторов */}
+              <div
+                className={styles.colorSettings}
+                style={{
+                  marginTop: '20px',
+                  paddingTop: '16px',
+                  borderTop: '2px solid #6f42c1',
+                }}
+              >
+                <div
+                  className={styles.areaHeader}
+                  style={{ marginBottom: '16px' }}
+                >
+                  <h6 className={styles.areaTitle}>Commentators Colors</h6>
+                </div>
+                {/* Цвета комментаторов */}
+                <Row className='g-3 justify-content-center'>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Commentator Tag Color
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.commentatorTagColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('commentatorTagColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Commentator Names
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.commentatorNamesColor as string}
+                        onChange={value =>
+                          handleCustomColorChange(
+                            'commentatorNamesColor',
+                            value
+                          )
                         }
                         placeholder='hex или rgba'
                       />

@@ -80,6 +80,9 @@ public class DatabaseService
                     ScoreColor TEXT,
                     BackgroundColor TEXT,
                     BorderColor TEXT,
+                    TextOutlineColor TEXT,
+                    CommentatorTagColor TEXT,
+                    CommentatorNamesColor TEXT,
                     UpdatedAt TEXT
                 );
                 """;
@@ -87,6 +90,49 @@ public class DatabaseService
             using var colorCmd = conn.CreateCommand();
             colorCmd.CommandText = colorSql;
             colorCmd.ExecuteNonQuery();
+
+            // Add missing columns to color_presets if they don't exist (backward compatibility)
+            try
+            {
+                using var pragmaCmd = conn.CreateCommand();
+                pragmaCmd.CommandText = "PRAGMA table_info('color_presets');";
+
+                var columnNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                using (var reader = pragmaCmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        columnNames.Add(reader.GetString(1));
+                    }
+                }
+
+                var columnsToAdd = new List<(string name, string type)>();
+                if (!columnNames.Contains("TextOutlineColor"))
+                    columnsToAdd.Add(("TextOutlineColor", "TEXT"));
+                if (!columnNames.Contains("CommentatorTagColor"))
+                    columnsToAdd.Add(("CommentatorTagColor", "TEXT"));
+                if (!columnNames.Contains("CommentatorNamesColor"))
+                    columnsToAdd.Add(("CommentatorNamesColor", "TEXT"));
+
+                foreach (var (colName, colType) in columnsToAdd)
+                {
+                    using var alterCmd = conn.CreateCommand();
+                    alterCmd.CommandText = $"ALTER TABLE color_presets ADD COLUMN {colName} {colType};";
+                    try
+                    {
+                        alterCmd.ExecuteNonQuery();
+                        _logger.LogInformation("Added column {ColumnName} to color_presets", colName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Column {ColumnName} may already exist in color_presets", colName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to check/update color_presets schema");
+            }
 
             // Create table for background images
             var imagesSql = """
@@ -259,7 +305,7 @@ public class DatabaseService
             using var conn = GetConnection();
             using var cmd = conn.CreateCommand();
             cmd.CommandText =
-                "SELECT Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor FROM color_presets ORDER BY rowid DESC";
+                "SELECT Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor, TextOutlineColor, CommentatorTagColor, CommentatorNamesColor FROM color_presets ORDER BY rowid DESC";
 
             using var reader = cmd.ExecuteReader();
             var list = new List<ColorPresetModel>();
@@ -275,6 +321,9 @@ public class DatabaseService
                     ScoreColor = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
                     BackgroundColor = reader.IsDBNull(6) ? string.Empty : reader.GetString(6),
                     BorderColor = reader.IsDBNull(7) ? string.Empty : reader.GetString(7),
+                    TextOutlineColor = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
+                    CommentatorTagColor = reader.IsDBNull(9) ? string.Empty : reader.GetString(9),
+                    CommentatorNamesColor = reader.IsDBNull(10) ? string.Empty : reader.GetString(10),
                 };
                 list.Add(model);
             }
@@ -295,8 +344,8 @@ public class DatabaseService
             using var conn = GetConnection();
             using var cmd = conn.CreateCommand();
             cmd.CommandText = """
-                INSERT INTO color_presets(Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor, UpdatedAt)
-                VALUES(@Name, @MainColor, @PlayerNamesColor, @TournamentTitleColor, @FightModeColor, @ScoreColor, @BackgroundColor, @BorderColor, @updatedAt)
+                INSERT INTO color_presets(Name, MainColor, PlayerNamesColor, TournamentTitleColor, FightModeColor, ScoreColor, BackgroundColor, BorderColor, TextOutlineColor, CommentatorTagColor, CommentatorNamesColor, UpdatedAt)
+                VALUES(@Name, @MainColor, @PlayerNamesColor, @TournamentTitleColor, @FightModeColor, @ScoreColor, @BackgroundColor, @BorderColor, @TextOutlineColor, @CommentatorTagColor, @CommentatorNamesColor, @updatedAt)
                 ON CONFLICT(Name) DO UPDATE SET
                   MainColor = excluded.MainColor,
                   PlayerNamesColor = excluded.PlayerNamesColor,
@@ -305,6 +354,9 @@ public class DatabaseService
                   ScoreColor = excluded.ScoreColor,
                   BackgroundColor = excluded.BackgroundColor,
                   BorderColor = excluded.BorderColor,
+                  TextOutlineColor = excluded.TextOutlineColor,
+                  CommentatorTagColor = excluded.CommentatorTagColor,
+                  CommentatorNamesColor = excluded.CommentatorNamesColor,
                   UpdatedAt = excluded.UpdatedAt;
                 """;
 
@@ -324,6 +376,9 @@ public class DatabaseService
             AddParam("@ScoreColor", preset.ScoreColor);
             AddParam("@BackgroundColor", preset.BackgroundColor);
             AddParam("@BorderColor", preset.BorderColor);
+            AddParam("@TextOutlineColor", preset.TextOutlineColor);
+            AddParam("@CommentatorTagColor", preset.CommentatorTagColor);
+            AddParam("@CommentatorNamesColor", preset.CommentatorNamesColor);
             AddParam("@updatedAt", DateTime.UtcNow.ToString("o"));
 
             cmd.ExecuteNonQuery();

@@ -98,6 +98,8 @@ public class ColorPresetService
                 FightModeColor = "#FFFFFF",
                 ScoreColor = "#FFFFFF",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#3F00FF",
+                CommentatorNamesColor = "#FFFFFF",
             },
             new()
             {
@@ -107,6 +109,8 @@ public class ColorPresetService
                 FightModeColor = "#0dcaf0",
                 ScoreColor = "#0dcaf0",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#0dcaf0",
+                CommentatorNamesColor = "#ffffff",
             },
             new()
             {
@@ -116,6 +120,8 @@ public class ColorPresetService
                 FightModeColor = "#dc3545",
                 ScoreColor = "#dc3545",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#dc3545",
+                CommentatorNamesColor = "#ffffff",
             },
             new()
             {
@@ -125,6 +131,8 @@ public class ColorPresetService
                 FightModeColor = "#198754",
                 ScoreColor = "#198754",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#198754",
+                CommentatorNamesColor = "#ffffff",
             },
             new()
             {
@@ -134,6 +142,8 @@ public class ColorPresetService
                 FightModeColor = "#6f42c1",
                 ScoreColor = "#6f42c1",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#6f42c1",
+                CommentatorNamesColor = "#ffffff",
             },
             new()
             {
@@ -143,6 +153,8 @@ public class ColorPresetService
                 FightModeColor = "#ffc107",
                 ScoreColor = "#ffc107",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#ffc107",
+                CommentatorNamesColor = "#ffffff",
             },
             new()
             {
@@ -152,6 +164,8 @@ public class ColorPresetService
                 FightModeColor = "#00ff88",
                 ScoreColor = "#00ff88",
                 TextOutlineColor = "#000000",
+                CommentatorTagColor = "#00ff88",
+                CommentatorNamesColor = "#ffffff",
             },
         };
 
@@ -175,5 +189,7 @@ public class ColorPresetService
             BackgroundColor = p.BackgroundColor,
             BorderColor = p.BorderColor,
             TextOutlineColor = p.TextOutlineColor,
+            CommentatorTagColor = p.CommentatorTagColor,
+            CommentatorNamesColor = p.CommentatorNamesColor,
         };
 }

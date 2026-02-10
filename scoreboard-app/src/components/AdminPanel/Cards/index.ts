@@ -2,6 +2,7 @@ export { default as ActionButtons } from '../UI/ActionButtons';
 export { default as BackgroundImagesCard } from './BackgroundImagesCard';
 export { default as BordersToggleCard } from './BordersToggleCard';
 export { default as ColorPresetCard } from './ColorPresetCard';
+export { default as CommentatorsCard } from './CommentatorsCard';
 export { default as FontsCard } from './FontsCard';
 export { default as LayoutConfigCard } from './LayoutConfigCard';
 export { default as MetaPanel } from './MetaPanel';

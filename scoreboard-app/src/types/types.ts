@@ -35,6 +35,8 @@ export interface ColorPreset {
   backgroundColor?: string;
   borderColor?: string;
   textOutlineColor?: string;
+  commentatorTagColor?: string;
+  commentatorNamesColor?: string;
 }
 
 export interface TextConfiguration {
@@ -51,6 +53,10 @@ export interface Images {
   leftImage?: BackgroundImage;
   rightImage?: BackgroundImage;
   fightModeImage?: BackgroundImage;
+  commentator1Image?: BackgroundImage;
+  commentator2Image?: BackgroundImage;
+  commentator3Image?: BackgroundImage;
+  commentator4Image?: BackgroundImage;
 }
 
 export interface BackgroundImage {
@@ -66,6 +72,10 @@ export enum ImageType {
   RightImage = 'RightImage',
   TopImage = 'TopImage',
   FightModeImage = 'FightModeImage',
+  Commentator1Image = 'Commentator1Image',
+  Commentator2Image = 'Commentator2Image',
+  Commentator3Image = 'Commentator3Image',
+  Commentator4Image = 'Commentator4Image',
 }
 
 export interface LayoutBlockSizeAndPosition {
@@ -81,11 +91,19 @@ export interface LayoutConfig {
   left?: LayoutBlockSizeAndPosition;
   right?: LayoutBlockSizeAndPosition;
   fightMode?: LayoutBlockSizeAndPosition;
+  commentator1?: LayoutBlockSizeAndPosition;
+  commentator2?: LayoutBlockSizeAndPosition;
+  commentator3?: LayoutBlockSizeAndPosition;
+  commentator4?: LayoutBlockSizeAndPosition;
 }
 
 export interface ScoreboardState {
   player1: Player;
   player2: Player;
+  commentator1: Player;
+  commentator2: Player;
+  commentator3: Player;
+  commentator4: Player;
   meta: MetaInfo;
   colors: ColorPreset;
   textConfig?: TextConfiguration;
@@ -99,10 +117,21 @@ export interface ScoreboardState {
 
 export interface FontConfiguration {
   PlayerNameFont: string; // Шрифт для имен игроков
+  PlayerNameFontSize: number; // Размер шрифта для имен игроков
   PlayerTagFont: string; // Шрифт для тегов игроков
+  PlayerTagFontSize: number; // Размер шрифта для тегов игроков
   ScoreFont: string; // Шрифт для счета
+  ScoreFontSize: number; // Размер шрифта для счета
   TournamentTitleFont: string; // Шрифт для заголовка турнира
+  TournamentTitleFontSize: number; // Размер шрифта для заголовка турнира
   FightModeFont: string; // Шрифт для правила драки
+  FightModeFontSize: number; // Размер шрифта для правила драки
+  CommentatorNameFont: string; // Шрифт для имен комментаторов
+  CommentatorNameFontSize: number; // Размер шрифта для имен комментаторов
+  CommentatorTagFont: string; // Шрифт для тегов комментаторов
+  CommentatorTagFontSize: number; // Размер шрифта для тегов комментаторов
+  CommentatorScoreFont: string; // Шрифт для счета комментаторов
+  CommentatorScoreFontSize: number; // Размер шрифта для счета комментаторов
 }
 
 export const defaultPreset: ColorPreset = {
@@ -115,4 +144,6 @@ export const defaultPreset: ColorPreset = {
   backgroundColor: '#1a1a1a',
   borderColor: '#3F00FF',
   textOutlineColor: '#000000',
+  commentatorTagColor: '#3F00FF',
+  commentatorNamesColor: '#FFFFFF',
 };
