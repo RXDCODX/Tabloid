@@ -1,6 +1,7 @@
 import { memo, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import type { CardKey } from '../../store/adminPanelVisibilityStore';
 import { useAdminPanelVisibilityStore } from '../../store/adminPanelVisibilityStore';
 import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
@@ -19,7 +20,7 @@ import ActionButtons from './UI/ActionButtons';
 const AdminPanel = () => {
   console.log('[AdminPanel] Render');
 
-  const { cardVisibility } = useAdminPanelVisibilityStore();
+  const { cardVisibility, cardOrder } = useAdminPanelVisibilityStore();
 
   // Редирект на админку при открытии с телефона
   const navigate = useNavigate();
@@ -32,37 +33,22 @@ const AdminPanel = () => {
 
   // swap names handled inside ActionButtons now
 
-  return (
-    <>
-      <Sidebar />
-      <Container className={`py-4 admin-panel ${styles.adminPanel}`}>
-        {/* Visibility Panel и Meta Panel в один ряд с одинаковой шириной */}
-        {(cardVisibility.visibility || cardVisibility.meta) && (
-          <Row className='mb-4'>
-            {cardVisibility.visibility && (
-              <Col
-                xs={12}
-                md={cardVisibility.meta ? 6 : 12}
-                lg={cardVisibility.meta ? 6 : 12}
-              >
-                <VisibilityCard />
-              </Col>
-            )}
-            {cardVisibility.meta && (
-              <Col
-                xs={12}
-                md={cardVisibility.visibility ? 6 : 12}
-                lg={cardVisibility.visibility ? 6 : 12}
-              >
-                <MetaPanel />
-              </Col>
-            )}
-          </Row>
-        )}
+  // Рендер для каждого типа карточки
+  const renderCard = (cardKey: CardKey) => {
+    if (!cardVisibility[cardKey]) return null;
 
-        {/* Players Cards */}
-        {cardVisibility.players && (
-          <Row className='justify-content-center align-items-center my-4'>
+    switch (cardKey) {
+      case 'visibility':
+      case 'meta':
+        // Эти карточки рендерятся вместе
+        return null;
+
+      case 'players':
+        return (
+          <Row
+            key={cardKey}
+            className='justify-content-center align-items-center'
+          >
             <Col
               xs={12}
               md={5}
@@ -88,31 +74,76 @@ const AdminPanel = () => {
               <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
             </Col>
           </Row>
-        )}
+        );
 
-        {/* Color Preset Panel */}
-        {cardVisibility.colorPreset && <ColorPresetCard />}
+      case 'colorPreset':
+        return <ColorPresetCard key={cardKey} />;
 
-        {/* Borders Toggle */}
-        {cardVisibility.borders && (
-          <Row className='mb-4'>
+      case 'borders':
+        return (
+          <Row key={cardKey}>
             <Col xs={12}>
               <BordersToggleCard />
             </Col>
           </Row>
+        );
+
+      case 'backgroundImages':
+        return <BackgroundImagesCard key={cardKey} />;
+
+      case 'fonts':
+        return <FontsCard key={cardKey} />;
+
+      case 'layoutConfig':
+        return <LayoutConfigCard key={cardKey} />;
+
+      case 'commentators':
+        return <CommentatorsCard key={cardKey} />;
+
+      default:
+        return null;
+    }
+  };
+
+  // Рендер Visibility и Meta панелей (всегда вместе)
+  const renderVisibilityAndMeta = () => {
+    if (!cardVisibility.visibility && !cardVisibility.meta) return null;
+
+    return (
+      <Row>
+        {cardVisibility.visibility && (
+          <Col
+            xs={12}
+            md={cardVisibility.meta ? 6 : 12}
+            lg={cardVisibility.meta ? 6 : 12}
+          >
+            <VisibilityCard />
+          </Col>
         )}
+        {cardVisibility.meta && (
+          <Col
+            xs={12}
+            md={cardVisibility.visibility ? 6 : 12}
+            lg={cardVisibility.visibility ? 6 : 12}
+          >
+            <MetaPanel />
+          </Col>
+        )}
+      </Row>
+    );
+  };
 
-        {/* Background Images Panel */}
-        {cardVisibility.backgroundImages && <BackgroundImagesCard />}
+  return (
+    <>
+      <Sidebar />
+      <Container className={`py-4 admin-panel ${styles.adminPanel}`}>
+        {/* Visibility и Meta всегда первыми */}
+        {renderVisibilityAndMeta()}
 
-        {/* Fonts Panel */}
-        {cardVisibility.fonts && <FontsCard />}
-
-        {/* Layout Config Panel */}
-        {cardVisibility.layoutConfig && <LayoutConfigCard />}
-
-        {/* Commentators Card */}
-        {cardVisibility.commentators && <CommentatorsCard />}
+        {/* Остальные карточки в порядке из cardOrder */}
+        {cardOrder
+          .filter(key => key !== 'visibility' && key !== 'meta')
+          .map(cardKey => renderCard(cardKey))}
       </Container>
       <style>
         {` 

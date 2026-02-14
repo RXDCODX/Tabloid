@@ -1,23 +1,112 @@
-import { memo } from 'react';
-import { Form } from 'react-bootstrap';
+import { memo, useState } from 'react';
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import type { CardKey } from '../../../store/adminPanelVisibilityStore';
 import { useAdminPanelVisibilityStore } from '../../../store/adminPanelVisibilityStore';
 import styles from './Sidebar.module.scss';
 
 const Sidebar = () => {
-  const { cardVisibility, toggleCard, showAll, hideAll } =
-    useAdminPanelVisibilityStore();
+  const {
+    cardVisibility,
+    toggleCard,
+    showAll,
+    hideAll,
+    cardOrder,
+    reorderCards,
+  } = useAdminPanelVisibilityStore();
 
-  const cards = [
-    { key: 'visibility' as const, label: 'Visibility Panel' },
-    { key: 'meta' as const, label: 'Meta Info' },
-    { key: 'colorPreset' as const, label: 'Color Presets' },
-    { key: 'borders' as const, label: 'Borders Toggle' },
-    { key: 'backgroundImages' as const, label: 'Background Images' },
-    { key: 'fonts' as const, label: 'Fonts' },
-    { key: 'layoutConfig' as const, label: 'Layout Config' },
-    { key: 'players' as const, label: 'Players' },
-    { key: 'commentators' as const, label: 'Commentators' },
-  ];
+  const [draggedItem, setDraggedItem] = useState<CardKey | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<CardKey | null>(null);
+
+  const cardLabels: Record<CardKey, string> = {
+    visibility: 'Visibility Panel',
+    meta: 'Meta Info',
+    colorPreset: 'Color Presets',
+    borders: 'Borders Toggle',
+    backgroundImages: 'Background Images',
+    fonts: 'Fonts',
+    layoutConfig: 'Layout Config',
+    players: 'Players',
+    commentators: 'Commentators',
+  };
+
+  // Группируем visibility и meta как locked группу
+  const lockedGroup: CardKey[] = ['visibility', 'meta'];
+  const draggableCards = cardOrder.filter(key => !lockedGroup.includes(key));
+
+  const handleDragStart = (e: React.DragEvent, cardKey: CardKey) => {
+    if (lockedGroup.includes(cardKey)) {
+      e.preventDefault();
+      return;
+    }
+    setDraggedItem(cardKey);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, cardKey: CardKey) => {
+    e.preventDefault();
+    if (lockedGroup.includes(cardKey) || draggedItem === cardKey) return;
+    setDragOverItem(cardKey);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverItem(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetKey: CardKey) => {
+    e.preventDefault();
+    if (
+      !draggedItem ||
+      lockedGroup.includes(targetKey) ||
+      draggedItem === targetKey
+    ) {
+      setDragOverItem(null);
+      return;
+    }
+
+    const newOrder = [...cardOrder];
+    const draggedIndex = newOrder.indexOf(draggedItem);
+    const targetIndex = newOrder.indexOf(targetKey);
+
+    // Удаляем draggedItem и вставляем его на новое место
+    newOrder.splice(draggedIndex, 1);
+    newOrder.splice(targetIndex, 0, draggedItem);
+
+    reorderCards(newOrder);
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
+
+  const renderLockedGroup = () => {
+    const tooltip = (
+      <Tooltip id='locked-tooltip'>
+        Эти панели всегда отображаются вместе и не могут быть перемещены
+      </Tooltip>
+    );
+
+    return (
+      <OverlayTrigger placement='right' overlay={tooltip}>
+        <div className={styles.lockedGroup}>
+          {lockedGroup.map(key => (
+            <div key={key} className={styles.lockedItem}>
+              <Form.Check
+                type='switch'
+                id={`switch-${key}`}
+                label={cardLabels[key]}
+                checked={cardVisibility[key]}
+                onChange={() => toggleCard(key)}
+                className={styles.switch}
+              />
+            </div>
+          ))}
+        </div>
+      </OverlayTrigger>
+    );
+  };
 
   return (
     <div className={styles.sidebarWrapper}>
@@ -38,14 +127,30 @@ const Sidebar = () => {
           </div>
 
           <div className={styles.cardList}>
-            {cards.map(card => (
-              <div key={card.key} className={styles.cardItem}>
+            {/* Locked группа (visibility и meta) */}
+            {renderLockedGroup()}
+
+            {/* Draggable карточки */}
+            {draggableCards.map(key => (
+              <div
+                key={key}
+                className={`${styles.cardItem} ${
+                  draggedItem === key ? styles.dragging : ''
+                } ${dragOverItem === key ? styles.dragOver : ''}`}
+                draggable={true}
+                onDragStart={e => handleDragStart(e, key)}
+                onDragOver={e => handleDragOver(e, key)}
+                onDragLeave={handleDragLeave}
+                onDrop={e => handleDrop(e, key)}
+                onDragEnd={handleDragEnd}
+              >
+                <div className={styles.dragHandle}>⋮⋮</div>
                 <Form.Check
                   type='switch'
-                  id={`switch-${card.key}`}
-                  label={card.label}
-                  checked={cardVisibility[card.key]}
-                  onChange={() => toggleCard(card.key)}
+                  id={`switch-${key}`}
+                  label={cardLabels[key]}
+                  checked={cardVisibility[key]}
+                  onChange={() => toggleCard(key)}
                   className={styles.switch}
                 />
               </div>

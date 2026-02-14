@@ -13,11 +13,15 @@ export interface CardVisibility {
   commentators: boolean;
 }
 
+export type CardKey = keyof CardVisibility;
+
 interface AdminPanelVisibilityState {
   cardVisibility: CardVisibility;
-  toggleCard: (cardName: keyof CardVisibility) => void;
+  cardOrder: CardKey[];
+  toggleCard: (cardName: CardKey) => void;
   showAll: () => void;
   hideAll: () => void;
+  reorderCards: (newOrder: CardKey[]) => void;
 }
 
 const defaultVisibility: CardVisibility = {
@@ -32,10 +36,23 @@ const defaultVisibility: CardVisibility = {
   commentators: true,
 };
 
+const defaultCardOrder: CardKey[] = [
+  'visibility',
+  'meta',
+  'players',
+  'colorPreset',
+  'borders',
+  'backgroundImages',
+  'fonts',
+  'layoutConfig',
+  'commentators',
+];
+
 export const useAdminPanelVisibilityStore = create<AdminPanelVisibilityState>()(
   persist(
     set => ({
       cardVisibility: defaultVisibility,
+      cardOrder: defaultCardOrder,
 
       toggleCard: cardName =>
         set(state => ({
@@ -63,6 +80,11 @@ export const useAdminPanelVisibilityStore = create<AdminPanelVisibilityState>()(
             players: false,
             commentators: false,
           },
+        }),
+
+      reorderCards: newOrder =>
+        set({
+          cardOrder: newOrder,
         }),
     }),
     {

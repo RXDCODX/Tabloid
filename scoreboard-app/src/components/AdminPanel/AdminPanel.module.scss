@@ -2,6 +2,15 @@
 
 .adminPanel {
   // Убрали margin-left, чтобы контент был по центру
+  
+  // Вертикальный отступ между панелями
+  > * {
+    margin-bottom: 2rem !important;
+    
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
+  }
 }
 
 // Белые плейсхолдеры для всех input полей в админ панели
