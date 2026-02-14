@@ -60,30 +60,9 @@ const AdminPanel = () => {
           </Row>
         )}
 
-        {/* Color Preset Panel */}
-        {cardVisibility.colorPreset && <ColorPresetCard />}
-
-        {/* Borders Toggle */}
-        {cardVisibility.borders && (
-          <Row className='mb-4'>
-            <Col xs={12}>
-              <BordersToggleCard />
-            </Col>
-          </Row>
-        )}
-
-        {/* Background Images Panel */}
-        {cardVisibility.backgroundImages && <BackgroundImagesCard />}
-
-        {/* Fonts Panel */}
-        {cardVisibility.fonts && <FontsCard />}
-
-        {/* Layout Config Panel */}
-        {cardVisibility.layoutConfig && <LayoutConfigCard />}
-
         {/* Players Cards */}
         {cardVisibility.players && (
-          <Row className='justify-content-center align-items-center g-4'>
+          <Row className='justify-content-center align-items-center my-4'>
             <Col
               xs={12}
               md={5}
@@ -110,6 +89,27 @@ const AdminPanel = () => {
             </Col>
           </Row>
         )}
+
+        {/* Color Preset Panel */}
+        {cardVisibility.colorPreset && <ColorPresetCard />}
+
+        {/* Borders Toggle */}
+        {cardVisibility.borders && (
+          <Row className='mb-4'>
+            <Col xs={12}>
+              <BordersToggleCard />
+            </Col>
+          </Row>
+        )}
+
+        {/* Background Images Panel */}
+        {cardVisibility.backgroundImages && <BackgroundImagesCard />}
+
+        {/* Fonts Panel */}
+        {cardVisibility.fonts && <FontsCard />}
+
+        {/* Layout Config Panel */}
+        {cardVisibility.layoutConfig && <LayoutConfigCard />}
 
         {/* Commentators Card */}
         {cardVisibility.commentators && <CommentatorsCard />}
