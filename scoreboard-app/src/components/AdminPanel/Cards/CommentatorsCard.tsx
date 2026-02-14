@@ -97,7 +97,7 @@ const CommentatorsCard: React.FC = () => {
                       1
                     </div>
                     <span style={{ color: '#17a2b8', fontWeight: 'bold' }}>
-                      Комментатор 1
+                      Комментатор №1
                     </span>
                   </div>
 
@@ -246,7 +246,7 @@ const CommentatorsCard: React.FC = () => {
                       2
                     </div>
                     <span style={{ color: '#17a2b8', fontWeight: 'bold' }}>
-                      Комментатор 2
+                      Комментатор №2
                     </span>
                   </div>
 
@@ -430,7 +430,7 @@ const CommentatorsCard: React.FC = () => {
                       3
                     </div>
                     <span style={{ color: '#17a2b8', fontWeight: 'bold' }}>
-                      Комментатор 3
+                      Комментатор №3
                     </span>
                   </div>
 
@@ -579,7 +579,7 @@ const CommentatorsCard: React.FC = () => {
                       4
                     </div>
                     <span style={{ color: '#17a2b8', fontWeight: 'bold' }}>
-                      Комментатор 4
+                      Комментатор №4
                     </span>
                   </div>
 
