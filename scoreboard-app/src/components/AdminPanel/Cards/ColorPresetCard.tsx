@@ -272,6 +272,23 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                   <Col xs={12} md={6} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
+                        Player Tags
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.playerTagsColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('playerTagsColor', value)
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                {/* Второй ряд */}
+                <Row className='g-3 mb-3 justify-content-center'>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
                         Tournament Title
                       </Form.Label>
                       <ColorPickerWithTransparency
@@ -283,9 +300,6 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                       />
                     </Form.Group>
                   </Col>
-                </Row>
-                {/* Второй ряд */}
-                <Row className='g-3 mb-3 justify-content-center'>
                   <Col xs={12} md={6} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
@@ -300,6 +314,9 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                       />
                     </Form.Group>
                   </Col>
+                </Row>
+                {/* Третий ряд - обводка текста */}
+                <Row className='g-3 mb-3 justify-content-center'>
                   <Col xs={12} md={6} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
@@ -314,9 +331,6 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                       />
                     </Form.Group>
                   </Col>
-                </Row>
-                {/* Третий ряд - обводка текста */}
-                <Row className='g-3 mb-3 justify-content-center'>
                   <Col xs={12} md={12} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
@@ -354,20 +368,6 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                   <Col xs={12} md={6} className={styles.colorField}>
                     <Form.Group>
                       <Form.Label className={styles.fieldLabel}>
-                        Commentator Tag Color
-                      </Form.Label>
-                      <ColorPickerWithTransparency
-                        value={customColors.commentatorTagColor as string}
-                        onChange={value =>
-                          handleCustomColorChange('commentatorTagColor', value)
-                        }
-                        placeholder='hex или rgba'
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6} className={styles.colorField}>
-                    <Form.Group>
-                      <Form.Label className={styles.fieldLabel}>
                         Commentator Names
                       </Form.Label>
                       <ColorPickerWithTransparency
@@ -377,6 +377,20 @@ const ColorPresetCard: React.FC<ColorPresetCardProps> = () => {
                             'commentatorNamesColor',
                             value
                           )
+                        }
+                        placeholder='hex или rgba'
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6} className={styles.colorField}>
+                    <Form.Group>
+                      <Form.Label className={styles.fieldLabel}>
+                        Commentator Tag Color
+                      </Form.Label>
+                      <ColorPickerWithTransparency
+                        value={customColors.commentatorTagColor as string}
+                        onChange={value =>
+                          handleCustomColorChange('commentatorTagColor', value)
                         }
                         placeholder='hex или rgba'
                       />

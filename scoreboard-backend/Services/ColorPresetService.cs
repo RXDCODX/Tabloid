@@ -94,6 +94,7 @@ public class ColorPresetService
             {
                 Name = "Default",
                 PlayerNamesColor = "#FFFFFF",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#FFFFFF",
                 FightModeColor = "#FFFFFF",
                 ScoreColor = "#FFFFFF",
@@ -105,6 +106,7 @@ public class ColorPresetService
             {
                 Name = "Classic Blue",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#0dcaf0",
                 FightModeColor = "#0dcaf0",
                 ScoreColor = "#0dcaf0",
@@ -116,6 +118,7 @@ public class ColorPresetService
             {
                 Name = "Fire Red",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#dc3545",
                 FightModeColor = "#dc3545",
                 ScoreColor = "#dc3545",
@@ -127,6 +130,7 @@ public class ColorPresetService
             {
                 Name = "Forest Green",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#198754",
                 FightModeColor = "#198754",
                 ScoreColor = "#198754",
@@ -138,6 +142,8 @@ public class ColorPresetService
             {
                 Name = "Purple Night",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
+
                 TournamentTitleColor = "#6f42c1",
                 FightModeColor = "#6f42c1",
                 ScoreColor = "#6f42c1",
@@ -149,6 +155,7 @@ public class ColorPresetService
             {
                 Name = "Golden",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#ffc107",
                 FightModeColor = "#ffc107",
                 ScoreColor = "#ffc107",
@@ -160,6 +167,7 @@ public class ColorPresetService
             {
                 Name = "Neon",
                 PlayerNamesColor = "#ffffff",
+                PlayerTagsColor = "#FFFFFF",
                 TournamentTitleColor = "#0088ff",
                 FightModeColor = "#00ff88",
                 ScoreColor = "#00ff88",
@@ -183,6 +191,7 @@ public class ColorPresetService
             Name = (p.Name ?? string.Empty).Trim(),
             MainColor = p.MainColor,
             PlayerNamesColor = p.PlayerNamesColor,
+            PlayerTagsColor = p.PlayerTagsColor,
             TournamentTitleColor = p.TournamentTitleColor,
             FightModeColor = p.FightModeColor,
             ScoreColor = p.ScoreColor,

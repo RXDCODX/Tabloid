@@ -29,6 +29,7 @@ export interface ColorPreset {
   name?: string;
   mainColor?: string;
   playerNamesColor?: string;
+  playerTagsColor?: string;
   tournamentTitleColor?: string;
   fightModeColor?: string;
   scoreColor?: string;
