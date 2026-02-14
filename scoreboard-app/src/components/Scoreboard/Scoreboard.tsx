@@ -271,6 +271,13 @@ const Scoreboard: React.FC = () => {
 
   return (
     <>
+      <style>
+        {` 
+          body {
+            overflow: hidden;
+          }
+        `}
+      </style>
       <AnimatePresence mode='wait'>
         {isVisible && (
           <motion.div
