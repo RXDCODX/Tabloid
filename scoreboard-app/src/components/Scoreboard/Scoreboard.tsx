@@ -387,7 +387,7 @@ const Scoreboard: React.FC = () => {
                       {isValidTag(p1.tag) && (
                         <span
                           style={{
-                            color: c.mainColor,
+                            color: c.playerTagsColor,
                             textShadow: getTextOutline(
                               c.textOutlineColor || '#000000'
                             ),
@@ -548,7 +548,7 @@ const Scoreboard: React.FC = () => {
                       {isValidTag(p2.tag) && (
                         <span
                           style={{
-                            color: c.mainColor,
+                            color: c.playerTagsColor,
                             textShadow: getTextOutline(
                               c.textOutlineColor || '#000000'
                             ),
