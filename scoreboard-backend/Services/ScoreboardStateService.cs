@@ -165,6 +165,19 @@ public class ScoreboardStateService
         SaveState();
     }
 
+    public void UpdateDisplayMode(string displayMode)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("UpdateDisplayMode called: {DisplayMode}", displayMode);
+        }
+
+        _state.DisplayMode = string.Equals(displayMode, "simple", StringComparison.OrdinalIgnoreCase)
+            ? "simple"
+            : "advanced";
+        SaveState();
+    }
+
     public void UpdateShowBorders(bool isShowBorders)
     {
         if (_logger.IsEnabled(LogLevel.Information))

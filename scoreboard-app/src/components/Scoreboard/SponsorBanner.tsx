@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAdminStore } from '../../store/adminStateStore';
 import styles from './SponsorBanner.module.scss';
 
@@ -9,12 +10,14 @@ const SponsorBanner: React.FC = () => {
   const lastShownTimeRef = useRef<number>(0);
 
   // Отслеживаем изменения в состоянии
-  const stateSnapshot = useAdminStore(state => ({
-    player1: state.player1,
-    player2: state.player2,
-    meta: state.meta,
-    isVisible: state.isVisible,
-  }));
+  const stateSnapshot = useAdminStore(
+    useShallow(state => ({
+      player1: state.player1,
+      player2: state.player2,
+      meta: state.meta,
+      isVisible: state.isVisible,
+    }))
+  );
 
   useEffect(() => {
     // Проверяем, отключен ли спонсорский баннер

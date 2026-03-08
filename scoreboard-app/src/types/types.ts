@@ -98,6 +98,8 @@ export interface LayoutConfig {
   commentator4?: LayoutBlockSizeAndPosition;
 }
 
+export type DisplayMode = 'simple' | 'advanced';
+
 export interface ScoreboardState {
   player1: Player;
   player2: Player;
@@ -114,6 +116,7 @@ export interface ScoreboardState {
   isShowBorders?: boolean;
   layoutConfig?: LayoutConfig;
   fontConfig?: FontConfiguration;
+  displayMode?: DisplayMode;
 }
 
 export interface FontConfiguration {

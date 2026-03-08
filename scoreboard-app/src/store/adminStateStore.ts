@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import {
   ColorPreset,
   defaultPreset,
+  DisplayMode,
   FontConfiguration,
   Images,
   LayoutConfig,
@@ -75,6 +76,8 @@ const DEFAULT_LAYOUT: LayoutConfig = {
   commentator3: { top: '200px', right: '50px', width: '300px', height: '80px' },
   commentator4: { top: '280px', left: '50%', width: '300px', height: '80px' },
 };
+
+const DEFAULT_DISPLAY_MODE: DisplayMode = 'advanced';
 
 const isConnected = (connection: signalR.HubConnection | null) => {
   // Provider sets connection only after successful start.
@@ -163,6 +166,10 @@ const deepEqualLayoutConfig = (a: LayoutConfig, b: LayoutConfig) => {
   return true;
 };
 
+const isDisplayMode = (value: unknown): value is DisplayMode => {
+  return value === 'simple' || value === 'advanced';
+};
+
 export type AdminStateStore = {
   // connection injected from React via sync component
   connection: signalR.HubConnection | null;
@@ -184,6 +191,7 @@ export type AdminStateStore = {
   backgroundImages: Images;
   layoutConfig: LayoutConfig;
   fontConfig: FontConfiguration;
+  displayMode: DisplayMode;
 
   // actions (local + server)
   setPlayer1: (p: Player) => void;
@@ -208,6 +216,7 @@ export type AdminStateStore = {
   setMeta: (m: MetaInfo) => void;
   setVisibility: (visible: boolean) => void;
   setAnimationDuration: (d: number) => void;
+  setDisplayMode: (mode: DisplayMode) => void;
 
   handleColorChange: (newColors: ColorPreset) => void;
   setShowBorders: (enabled: boolean) => void;
@@ -242,6 +251,7 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
   textConfig: {},
   backgroundImages: {},
   layoutConfig: DEFAULT_LAYOUT,
+  displayMode: DEFAULT_DISPLAY_MODE,
   fontConfig: {
     PlayerNameFont: '',
     PlayerNameFontSize: 0,
@@ -380,6 +390,11 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
     void invokeSafe(get().connection, 'UpdateAnimationDuration', d);
   },
 
+  setDisplayMode: mode => {
+    set({ displayMode: mode });
+    void invokeSafe(get().connection, 'UpdateDisplayMode', mode);
+  },
+
   handleColorChange: newColors => {
     set({ colors: newColors });
     debouncedInvoke(get().connection, 'UpdateColors', newColors);
@@ -430,6 +445,7 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
       textConfig: {},
       backgroundImages: {},
       layoutConfig: DEFAULT_LAYOUT,
+      displayMode: DEFAULT_DISPLAY_MODE,
       fontConfig: {
         PlayerNameFont: '',
         PlayerNameFontSize: 0,
@@ -528,6 +544,16 @@ export const useAdminStore = create<AdminStateStore>((set, get) => ({
       state.isVisible !== current.isVisible
     ) {
       patch.isVisible = state.isVisible;
+    }
+
+    const incomingDisplayMode =
+      (state as { displayMode?: unknown }).displayMode ??
+      (state as { DisplayMode?: unknown }).DisplayMode;
+    if (
+      isDisplayMode(incomingDisplayMode) &&
+      incomingDisplayMode !== current.displayMode
+    ) {
+      patch.displayMode = incomingDisplayMode;
     }
 
     if (

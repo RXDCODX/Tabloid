@@ -184,6 +184,25 @@ public class ScoreboardHub(
         }
     }
 
+    public async Task UpdateDisplayMode(string displayMode)
+    {
+        logger.LogInformation(
+            "UpdateDisplayMode called by {ConnectionId}: {DisplayMode}",
+            Context.ConnectionId,
+            displayMode
+        );
+        try
+        {
+            stateService.UpdateDisplayMode(displayMode);
+            await Clients.All.SendAsync(MainReceiveStateMethodName, stateService.GetState());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in UpdateDisplayMode");
+            throw;
+        }
+    }
+
     public async Task UpdateLayoutConfig(LayoutConfig config)
     {
         logger.LogInformation("UpdateLayoutConfig called by {ConnectionId}", Context.ConnectionId);

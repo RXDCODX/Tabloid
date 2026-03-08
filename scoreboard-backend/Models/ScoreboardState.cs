@@ -17,4 +17,5 @@ public class ScoreboardState
     public int AnimationDuration { get; set; } = 2000; // Время анимации в миллисекундах
     public bool IsShowBorders { get; set; } = false;
     public LayoutConfig LayoutConfig { get; set; } = new();
+    public string DisplayMode { get; set; } = "advanced";
 }

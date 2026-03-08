@@ -8,6 +8,7 @@ import { BackgroundImageService } from '../AdminPanel/services/BackgroundImagesS
 import { FontsService } from '../AdminPanel/services/FontsService';
 import MediaBackground from './MediaBackground';
 import styles from './Scoreboard.module.scss';
+import SimpleScoreboard from './SimpleScoreboard';
 import SponsorBanner from './SponsorBanner';
 
 const Scoreboard: React.FC = () => {
@@ -26,6 +27,7 @@ const Scoreboard: React.FC = () => {
     isShowBorders,
     backgroundImages,
     fontConfig,
+    displayMode,
   } = useAdminStore(
     useShallow(s => ({
       player1: s.player1,
@@ -42,6 +44,7 @@ const Scoreboard: React.FC = () => {
       isShowBorders: s.isShowBorders,
       backgroundImages: s.backgroundImages,
       fontConfig: s.fontConfig,
+      displayMode: s.displayMode,
     }))
   );
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -204,6 +207,10 @@ const Scoreboard: React.FC = () => {
       m.fightRule.toLowerCase() !== 'n/a'
     );
   };
+
+  if (displayMode === 'simple') {
+    return <SimpleScoreboard />;
+  }
 
   // Анимационные варианты для framer-motion
   const containerVariants = {

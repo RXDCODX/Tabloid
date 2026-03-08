@@ -3,6 +3,7 @@ import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import type { CardKey } from '../../store/adminPanelVisibilityStore';
 import { useAdminPanelVisibilityStore } from '../../store/adminPanelVisibilityStore';
+import { useAdminStore } from '../../store/adminStateStore';
 import styles from './AdminPanel.module.scss';
 import BackgroundImagesCard from './Cards/BackgroundImagesCard';
 import BordersToggleCard from './Cards/BordersToggleCard';
@@ -21,6 +22,8 @@ const AdminPanel = () => {
   console.log('[AdminPanel] Render');
 
   const { cardVisibility, cardOrder } = useAdminPanelVisibilityStore();
+  const displayMode = useAdminStore(s => s.displayMode);
+  const setDisplayMode = useAdminStore(s => s.setDisplayMode);
 
   // Редирект на админку при открытии с телефона
   const navigate = useNavigate();
@@ -33,6 +36,37 @@ const AdminPanel = () => {
 
   // swap names handled inside ActionButtons now
 
+  const renderPlayersRow = (key: string) => {
+    return (
+      <Row key={key} className='justify-content-center align-items-center'>
+        <Col
+          xs={12}
+          md={5}
+          lg={4}
+          className='d-flex justify-content-center mb-3 mb-md-0'
+        >
+          <PlayerCard label='Player 1' playerNumber={1} accent='#0dcaf0' />
+        </Col>
+        <Col
+          xs={12}
+          md={2}
+          lg={2}
+          className='d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2'
+        >
+          <ActionButtons />
+        </Col>
+        <Col
+          xs={12}
+          md={5}
+          lg={4}
+          className='d-flex justify-content-center mb-3 mb-md-0'
+        >
+          <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
+        </Col>
+      </Row>
+    );
+  };
+
   // Рендер для каждого типа карточки
   const renderCard = (cardKey: CardKey) => {
     if (!cardVisibility[cardKey]) return null;
@@ -44,37 +78,7 @@ const AdminPanel = () => {
         return null;
 
       case 'players':
-        return (
-          <Row
-            key={cardKey}
-            className='justify-content-center align-items-center'
-          >
-            <Col
-              xs={12}
-              md={5}
-              lg={4}
-              className='d-flex justify-content-center mb-3 mb-md-0'
-            >
-              <PlayerCard label='Player 1' playerNumber={1} accent='#0dcaf0' />
-            </Col>
-            <Col
-              xs={12}
-              md={2}
-              lg={2}
-              className='d-flex flex-column align-items-center justify-content-center gap-3 mb-3 mb-md-0 mx-2'
-            >
-              <ActionButtons />
-            </Col>
-            <Col
-              xs={12}
-              md={5}
-              lg={4}
-              className='d-flex justify-content-center mb-3 mb-md-0'
-            >
-              <PlayerCard label='Player 2' playerNumber={2} accent='#6610f2' />
-            </Col>
-          </Row>
-        );
+        return renderPlayersRow(cardKey);
 
       case 'colorPreset':
         return <ColorPresetCard key={cardKey} />;
@@ -133,17 +137,72 @@ const AdminPanel = () => {
     );
   };
 
+  const renderSimpleModeCards = () => {
+    return (
+      <>
+        <Row>
+          <Col xs={12} md={6} lg={6}>
+            <VisibilityCard />
+          </Col>
+          <Col xs={12} md={6} lg={6}>
+            <MetaPanel />
+          </Col>
+        </Row>
+        {renderPlayersRow('simple-players')}
+        <ColorPresetCard />
+      </>
+    );
+  };
+
   return (
     <>
-      <Sidebar />
+      {displayMode === 'advanced' && <Sidebar />}
       <Container className={`py-4 admin-panel ${styles.adminPanel}`}>
-        {/* Visibility и Meta всегда первыми */}
-        {renderVisibilityAndMeta()}
+        <Row>
+          <Col xs={12}>
+            <div className={styles.modeSwitchRow}>
+              <div className={styles.modeSwitchButtons}>
+                <button
+                  type='button'
+                  className={`${styles.modeButton} ${
+                    displayMode === 'simple' ? styles.activeMode : ''
+                  }`}
+                  onClick={() => setDisplayMode('simple')}
+                >
+                  Простой
+                </button>
+                <button
+                  type='button'
+                  className={`${styles.modeButton} ${
+                    displayMode === 'advanced' ? styles.activeMode : ''
+                  }`}
+                  onClick={() => setDisplayMode('advanced')}
+                >
+                  Опытный
+                </button>
+              </div>
+              <p className={styles.modeHint}>
+                {displayMode === 'simple'
+                  ? 'Быстрые настройки: игроки, счет, заголовок трансляции и цвета.'
+                  : 'Опытный режим: полный контроль макета, шрифтов, медиа и дополнительных блоков.'}
+              </p>
+            </div>
+          </Col>
+        </Row>
 
-        {/* Остальные карточки в порядке из cardOrder */}
-        {cardOrder
-          .filter(key => key !== 'visibility' && key !== 'meta')
-          .map(cardKey => renderCard(cardKey))}
+        {displayMode === 'simple' ? (
+          renderSimpleModeCards()
+        ) : (
+          <>
+            {/* Visibility и Meta всегда первыми */}
+            {renderVisibilityAndMeta()}
+
+            {/* Остальные карточки в порядке из cardOrder */}
+            {cardOrder
+              .filter(key => key !== 'visibility' && key !== 'meta')
+              .map(cardKey => renderCard(cardKey))}
+          </>
+        )}
       </Container>
       <style>
         {` 
